@@ -63,6 +63,8 @@ $ npm run test:cov
 - Author - [Rizky Iqbal](mailto:rizkiiqbal36@gmail.com)
 - Website - [https://rizky-iqbal.netlify.app](https://rizky-iqbal.netlify.app)
 - Instagram - [@rizky_iqbal48](https://www.instagram.com/rizky_iqbal48)
+- Github - [Rizky-Iqbal36](https://github.com/Rizky-Iqbal36)
+- Gitlab - [rizkyiqbal36](https://gitlab.com/rizkyiqbal36)
 
 ## License
 
