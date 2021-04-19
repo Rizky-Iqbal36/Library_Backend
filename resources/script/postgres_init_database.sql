@@ -1,7 +1,7 @@
-CREATE DATABASE library
+CREATE DATABASE book_db
     WITH
     TABLESPACE = pg_default;
 
-CREATE DATABASE library_test
+CREATE DATABASE book_db_test
     WITH
     TABLESPACE = pg_default;
