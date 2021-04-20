@@ -56,4 +56,10 @@ describe(`Get book`, () => {
     expect(res.status).toBe(400)
     expect(res.body.message).toBe('INVALID_PARAM')
   })
+
+  it(`Error => No such a book`, async () => {
+    const res = await request(app.getHttpServer()).get(`${url}/607ea12bd21e76a4433ea592`).send()
+    expect(res.status).toBe(400)
+    expect(res.body.message).toBe('BOOK_NOT_FOUND')
+  })
 })

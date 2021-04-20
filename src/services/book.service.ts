@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { BookRepository } from '@root/repositories/book.repository'
+import { BadRequestException } from '@root/app/exception/httpException'
+import { httpFlags } from '@root/constant/flags'
 
 @Injectable()
 export class BookService {
@@ -16,7 +18,7 @@ export class BookService {
       await this.bookRepository.save(book)
       return book
     } else {
-      return {}
+      throw new BadRequestException(httpFlags.BOOK_NOT_FOUND)
     }
   }
 }
