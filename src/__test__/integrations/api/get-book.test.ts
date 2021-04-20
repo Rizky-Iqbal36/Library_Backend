@@ -36,11 +36,12 @@ describe(`Get book`, () => {
   it(`Should get book`, async () => {
     const category = await seedCategoryData.createOne()
     const book = await seedBookData.createOne(category.name)
-    const res = await request(app.getHttpServer()).get(url).send()
+    const res = await request(app.getHttpServer()).get(`${url}/${book.id}`).send()
     expect(res.status).toBe(200)
-    expect(res.body[0].ISBN).toBe(book.ISBN)
-    expect(res.body[0].category[0]).toBe(category.name)
-    expect(res.body[0].category[0]).toBe(book.category[0])
+    expect(res.body.ISBN).toBe(book.ISBN)
+    expect(res.body.category[0]).toBe(category.name)
+    expect(res.body.category[0]).toBe(book.category[0])
+    expect(res.body.views).toBe(book.views + 1)
   })
 
   it(`Should get many books`, async () => {

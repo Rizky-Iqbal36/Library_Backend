@@ -1,10 +1,9 @@
 import { Entity, Column, ObjectIdColumn, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from 'typeorm'
-import { ObjectID } from 'mongodb'
 
 @Entity({ name: 'Books' })
 export class BookModel {
   @ObjectIdColumn()
-  id: ObjectID
+  id: string
 
   @Column({ default: true })
   isActive: boolean

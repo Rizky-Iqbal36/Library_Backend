@@ -6,4 +6,7 @@ export class BookRepository extends Repository<BookModel> {
   public async getAllBooks() {
     return this.find()
   }
+  public async getOneBook(id: string) {
+    return this.findOne(id)
+  }
 }
