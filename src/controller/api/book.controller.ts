@@ -1,7 +1,8 @@
 import { Controller, Get, Param } from '@nestjs/common'
 import { BookService } from '@root/services/book.service'
+import { BadRequestException } from '@root/app/exception/httpException'
 import mongoose from 'mongoose'
-
+import { httpFlags } from '@root/constant/flags'
 @Controller('book')
 export class BookController {
   constructor(private readonly bookService: BookService) {}
@@ -17,7 +18,7 @@ export class BookController {
     if (isValidID) {
       return this.bookService.findOneBook(id)
     } else {
-      return {}
+      throw new BadRequestException(httpFlags.INVALID_PARAM)
     }
   }
 }

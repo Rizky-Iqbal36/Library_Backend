@@ -33,7 +33,7 @@ describe(`Get book`, () => {
     await stopServerApp()
   })
 
-  it(`Should get book`, async () => {
+  it(`Success => Should get book`, async () => {
     const category = await seedCategoryData.createOne()
     const book = await seedBookData.createOne(category.name)
     const res = await request(app.getHttpServer()).get(`${url}/${book.id}`).send()
@@ -44,10 +44,16 @@ describe(`Get book`, () => {
     expect(res.body.views).toBe(book.views + 1)
   })
 
-  it(`Should get many books`, async () => {
+  it(`Success => Should get many books`, async () => {
     await seedBookData.createMany(10)
     const res = await request(app.getHttpServer()).get(url).send()
     expect(res.status).toBe(200)
     expect(res.body.length).toBe(10)
+  })
+
+  it(`Error => Invalid param`, async () => {
+    const res = await request(app.getHttpServer()).get(`${url}/20010411`).send()
+    expect(res.status).toBe(400)
+    console.log(res.body)
   })
 })
