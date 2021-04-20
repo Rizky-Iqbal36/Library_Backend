@@ -33,7 +33,7 @@ describe(`Get book`, () => {
     await stopServerApp()
   })
 
-  it(`Success => Should get book`, async () => {
+  it(`Success => Should get a book`, async () => {
     const category = await seedCategoryData.createOne()
     const book = await seedBookData.createOne(category.name)
     const res = await request(app.getHttpServer()).get(`${url}/${book.id}`).send()
