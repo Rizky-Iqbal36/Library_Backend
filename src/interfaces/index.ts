@@ -9,3 +9,8 @@ export interface IHttpExceptionOptions {
   joiError?: ValidationError
   localeMessage?: IGetLocalizedMsgOption
 }
+
+export interface IExceptionResponse {
+  flag: string
+  options?: IHttpExceptionOptions
+}

@@ -54,6 +54,6 @@ describe(`Get book`, () => {
   it(`Error => Invalid param`, async () => {
     const res = await request(app.getHttpServer()).get(`${url}/20010411`).send()
     expect(res.status).toBe(400)
-    console.log(res.body)
+    expect(res.body.message).toBe('INVALID_PARAM')
   })
 })
