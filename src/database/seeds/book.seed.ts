@@ -20,7 +20,7 @@ export class BookDataSeed {
       title: faker.name.title(),
       ISBN: faker.finance.creditCardNumber(),
       author: `${faker.name.firstName()} ${faker.name.middleName()} ${faker.name.lastName()}`,
-      publication: faker.date.recent(),
+      publication: faker.date.past(10, new Date()),
       pages: faker.datatype.number(),
       uploadBy: faker.datatype.uuid(),
       aboutBook: faker.commerce.productDescription(),
