@@ -3,6 +3,7 @@ import { Test } from '@nestjs/testing'
 import { AppModule } from '@root/app.module'
 import * as express from 'express'
 import { SeederModule } from '@database/seeds/seeder.module'
+import { closeMongoDB } from '@database/index'
 
 let app: INestApplication
 
@@ -18,4 +19,5 @@ export const initServerApp = async () => {
 
 export const stopServerApp = async () => {
   await app.close()
+  await closeMongoDB()
 }

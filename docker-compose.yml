@@ -16,16 +16,13 @@ services:
       - net
 
   database:
-    container_name: database
-    image: postgres
-    restart: always
+    container_name: mongodb
+    image: mongo:4.2.7
     environment:
-      POSTGRES_USERNAME: postgres
-      POSTGRES_PASSWORD: 123456
-    volumes:
-      - ./resources/script/postgres_init_database.sql:/docker-entrypoint-initdb.d/postgres_init_database.sql
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=developer
     ports:
-      - 5432:5432
+      - 27017:27017
     networks:
       - net
 

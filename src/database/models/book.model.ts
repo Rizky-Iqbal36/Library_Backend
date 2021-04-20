@@ -1,8 +1,8 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from 'typeorm'
+import { Entity, Column, ObjectIdColumn, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from 'typeorm'
 
 @Entity({ name: 'Books' })
 export class BookModel {
-  @PrimaryGeneratedColumn()
+  @ObjectIdColumn()
   id: number
 
   @Column({ default: true })
@@ -41,12 +41,12 @@ export class BookModel {
   @Column()
   views: number
 
-  @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn()
   createdAt: Date
 
-  @UpdateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
+  @UpdateDateColumn()
   updatedAt: Date
 
-  @DeleteDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
+  @DeleteDateColumn()
   deletedAt: Date
 }

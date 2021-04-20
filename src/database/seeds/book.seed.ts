@@ -5,7 +5,6 @@ import { Injectable } from '@nestjs/common'
 @Injectable()
 export class BookDataSeed {
   constructor(private readonly bookRepository: BookRepository) {}
-
   async createMany(loop: number) {
     await this.bookRepository.delete({})
     const all = []
@@ -26,7 +25,9 @@ export class BookDataSeed {
       uploadBy: faker.datatype.uuid(),
       aboutBook: faker.commerce.productDescription(),
       bookMarked: faker.datatype.number(),
-      views: faker.datatype.number()
+      views: faker.datatype.number(),
+      thumbnail: faker.image.animals(),
+      file: `file_${faker.lorem.sentence(1)}epub`
     })
   }
 }
