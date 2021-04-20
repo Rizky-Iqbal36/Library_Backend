@@ -16,15 +16,6 @@ export default TypeOrmModule.forRoot({
   database: dbName,
   entities: entities
 })
-// mongoose.connect(`${config.mongodb.uri}/${dbName}`, {
-//   useNewUrlParser: true,
-//   useUnifiedTopology: true,
-//   user: config.mongodb.user,
-//   pass: config.mongodb.pass,
-//   authSource: config.mongodb.authSource,
-//   useFindAndModify: false,
-//   useCreateIndex: true
-// })
 
 export const flushMongoDB = async () => {
   const models = Object.values(mongoose.models)

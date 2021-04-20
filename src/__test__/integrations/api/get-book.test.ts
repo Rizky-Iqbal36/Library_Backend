@@ -2,19 +2,23 @@ import { INestApplication } from '@nestjs/common'
 import { Connection } from 'typeorm'
 import request from 'supertest'
 import { initServerApp, stopServerApp } from '@root/__test__/util/createApp'
-import { BookDataSeed } from '@database/seeds/book.seed'
 import { flushMongoDB } from '@database/index'
+
+import { SeedBookData } from '@database/seeds/book.seed'
+import { SeedCategoryData } from '@database/seeds/category.seed'
 
 const url = '/book'
 
 describe(`Get book`, () => {
   let app: INestApplication
   let connection: Connection
-  let bookDataSeed: BookDataSeed
+  let seedBookData: SeedBookData
+  let seedCategoryData: SeedCategoryData
 
   beforeAll(async () => {
     app = await initServerApp()
-    bookDataSeed = await app.get(BookDataSeed)
+    seedBookData = await app.get(SeedBookData)
+    seedCategoryData = await app.get(SeedCategoryData)
     connection = await app.get(Connection)
 
     await app.init()
@@ -30,14 +34,17 @@ describe(`Get book`, () => {
   })
 
   it(`Should get book`, async () => {
-    const book = await bookDataSeed.createOne()
+    const category = await seedCategoryData.createOne()
+    const book = await seedBookData.createOne(category.name)
     const res = await request(app.getHttpServer()).get(url).send()
     expect(res.status).toBe(200)
     expect(res.body[0].ISBN).toBe(book.ISBN)
+    expect(res.body[0].category[0]).toBe(category.name)
+    expect(res.body[0].category[0]).toBe(book.category[0])
   })
 
   it(`Should get many books`, async () => {
-    await bookDataSeed.createMany(10)
+    await seedBookData.createMany(10)
     const res = await request(app.getHttpServer()).get(url).send()
     expect(res.status).toBe(200)
     expect(res.body.length).toBe(10)

@@ -3,7 +3,7 @@ import { BookRepository } from '@root/repositories/book.repository'
 import { Injectable } from '@nestjs/common'
 
 @Injectable()
-export class BookDataSeed {
+export class SeedBookData {
   constructor(private readonly bookRepository: BookRepository) {}
   async createMany(loop: number) {
     await this.bookRepository.delete({})
@@ -14,7 +14,7 @@ export class BookDataSeed {
     return all
   }
 
-  async createOne() {
+  async createOne(category?: string) {
     return this.bookRepository.save({
       isActive: faker.datatype.boolean(),
       title: faker.name.title(),
@@ -27,7 +27,8 @@ export class BookDataSeed {
       bookMarked: faker.datatype.number(),
       views: faker.datatype.number(),
       thumbnail: faker.image.animals(),
-      file: `file_${faker.lorem.sentence(1)}epub`
+      file: `file_${faker.lorem.sentence(1)}epub`,
+      category: [category ? category : faker.commerce.department()]
     })
   }
 }

@@ -1,8 +1,8 @@
 import { Entity, Column, ObjectIdColumn, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from 'typeorm'
 import { ObjectID } from 'mongodb'
 
-@Entity({ name: 'Books' })
-export class BookModel {
+@Entity({ name: 'Category' })
+export class CategoryModel {
   @ObjectIdColumn()
   id: ObjectID
 
@@ -10,40 +10,16 @@ export class BookModel {
   isActive: boolean
 
   @Column()
-  title: string
-
-  @Column({ unique: true })
-  ISBN: string
+  name: string
 
   @Column()
-  author: string
+  numberOfBook: number
 
   @Column('simple-array', { default: [] })
-  category: string[]
+  book: string[]
 
   @Column()
-  publication: Date
-
-  @Column()
-  pages: number
-
-  @Column()
-  uploadBy: string
-
-  @Column()
-  aboutBook: string
-
-  @Column()
-  thumbnail: string
-
-  @Column()
-  file: string
-
-  @Column()
-  bookMarked: number
-
-  @Column()
-  views: number
+  description: string
 
   @CreateDateColumn()
   createdAt: Date
