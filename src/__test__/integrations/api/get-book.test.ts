@@ -29,10 +29,17 @@ describe(`Get book`, () => {
     await stopServerApp()
   })
 
-  it(`should get book`, async () => {
-    await bookDataSeed.createOne()
+  it(`Should get book`, async () => {
+    const book = await bookDataSeed.createOne()
     const res = await request(app.getHttpServer()).get(url).send()
-    console.log(res.body)
     expect(res.status).toBe(200)
+    expect(res.body[0].ISBN).toBe(book.ISBN)
+  })
+
+  it(`Should get many books`, async () => {
+    await bookDataSeed.createMany(10)
+    const res = await request(app.getHttpServer()).get(url).send()
+    expect(res.status).toBe(200)
+    expect(res.body.length).toBe(10)
   })
 })
