@@ -51,6 +51,7 @@ describe(`Get book`, () => {
     expect(res.status).toBe(200)
     expect(res.body.length).toBe(10)
     expect(res.body[0].publication).dateNewerThan(res.body[9].publication)
+    expect(res.body[1].publication).not.dateNewerThan(res.body[0].publication)
   })
 
   it(`Error => Invalid param`, async () => {

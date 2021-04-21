@@ -5,13 +5,13 @@ expect.extend({
       pass: condition,
       message: () => `${received} is ${condition ? 'newer' : 'older'} than ${argument}`
     }
-  },
-  newFunc(): any {
-    return {
-      pass: true,
-      message: () => 'true'
-    }
   }
+  // newFunc(): any {
+  //   return {
+  //     pass: true,
+  //     message: () => 'true'
+  //   }
+  // }
 })
 
 export default undefined
