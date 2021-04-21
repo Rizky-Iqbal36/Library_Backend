@@ -25,6 +25,7 @@ export class SeedBookData {
       uploadBy: faker.datatype.uuid(),
       aboutBook: faker.commerce.productDescription(),
       bookMarked: faker.datatype.number(),
+      bookMarkedBy: [faker.datatype.uuid()],
       views: 0,
       thumbnail: faker.image.animals(),
       file: `file_${faker.lorem.sentence(1)}epub`,

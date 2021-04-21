@@ -41,6 +41,9 @@ export class BookModel {
   @Column()
   bookMarked: number
 
+  @Column('simple-array', { default: [] })
+  bookMarkedBy: string[]
+
   @Column()
   views: number
 
