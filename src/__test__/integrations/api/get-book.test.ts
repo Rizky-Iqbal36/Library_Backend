@@ -3,6 +3,7 @@ import { Connection } from 'typeorm'
 import request from 'supertest'
 import { initServerApp, stopServerApp } from '@root/__test__/util/createApp'
 import { flushMongoDB } from '@database/index'
+import '@root/__test__/matcher/custom-matcher'
 
 import { SeedBookData } from '@database/seeds/book.seed'
 import { SeedCategoryData } from '@database/seeds/category.seed'
@@ -44,11 +45,12 @@ describe(`Get book`, () => {
     expect(res.body.views).toBe(book.views + 1)
   })
 
-  it(`Success => Should get many books`, async () => {
+  it(`Success => Should get many books that sorted by publication`, async () => {
     await seedBookData.createMany(10)
     const res = await request(app.getHttpServer()).get(url).send()
     expect(res.status).toBe(200)
     expect(res.body.length).toBe(10)
+    expect(res.body[0].publication).dateNewerThan(res.body[9].publication)
   })
 
   it(`Error => Invalid param`, async () => {
