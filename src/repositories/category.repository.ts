@@ -1,12 +1,19 @@
-import { EntityRepository, Repository } from 'typeorm'
-import { CategoryModel } from '@database/models/category.model'
+import { Injectable } from '@nestjs/common'
+import { CategoryModel, ICategory } from '@database/models/category.model'
 
-@EntityRepository(CategoryModel)
-export class CategoryRepository extends Repository<CategoryModel> {
+@Injectable()
+export class CategoryRepository {
+  private readonly categoryModel = CategoryModel
+
   public async getAllCategory() {
-    return this.find()
+    return this.categoryModel.find().populate('bookId')
   }
+
   public async getCategoryByName(name: string) {
-    return this.find({ where: { name } })
+    return this.categoryModel.find({ where: { name } })
+  }
+
+  public async createCategory(data: ICategory) {
+    return this.categoryModel.create(data)
   }
 }

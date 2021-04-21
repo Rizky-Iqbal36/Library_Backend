@@ -1,58 +1,42 @@
-import { Entity, Column, ObjectIdColumn, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from 'typeorm'
+import { Document, model, Schema } from 'mongoose'
 
-@Entity({ name: 'Books' })
-export class BookModel {
-  @ObjectIdColumn()
-  id: string
-
-  @Column({ default: true })
+export interface IBook {
   isActive: boolean
-
-  @Column()
   title: string
-
-  @Column({ unique: true })
-  ISBN: string
-
-  @Column()
-  author: string
-
-  @Column('simple-array', { default: [] })
-  category: string[]
-
-  @Column()
+  isbn: string
+  authors: string[]
+  categoryIds?: any[]
   publication: Date
-
-  @Column()
   pages: number
-
-  @Column()
-  uploadBy: string
-
-  @Column()
-  aboutBook: string
-
-  @Column()
-  thumbnail: string
-
-  @Column()
-  file: string
-
-  @Column()
-  bookMarked: number
-
-  @Column('simple-array', { default: [] })
-  bookMarkedBy: string[]
-
-  @Column()
+  uploadBy: any
   views: number
-
-  @CreateDateColumn()
-  createdAt: Date
-
-  @UpdateDateColumn()
-  updatedAt: Date
-
-  @DeleteDateColumn()
-  deletedAt: Date
+  aboutBook: string
+  file: string
+  thumbnail: string
+  bookMarked: number
+  bookMarkedBy?: any[]
 }
+
+export type IBookDoc = IBook & Document
+
+const BookSchema = new Schema(
+  {
+    isActive: { type: Boolean, required: true },
+    title: { type: String, required: true },
+    isbn: { type: String, required: false, default: null },
+    authors: [{ type: String, required: true }],
+    categoryIds: [{ type: Schema.Types.ObjectId, ref: 'Category', required: false, default: null }],
+    publication: { type: Date, required: true },
+    pages: { type: Number, required: true },
+    uploadBy: { type: Schema.Types.ObjectId, ref: 'book', required: true, default: null },
+    views: { type: Number, required: true, default: 0 },
+    aboutBook: { type: String, required: true },
+    file: { type: String, required: true },
+    thumbnail: { type: String, required: true },
+    bookMarked: { type: String, required: true },
+    bookMarkedBy: [{ type: Schema.Types.ObjectId, ref: 'book', required: false, default: null }]
+  },
+  { timestamps: true }
+)
+
+export const BookModel = model<IBookDoc>('Book', BookSchema, 'books')

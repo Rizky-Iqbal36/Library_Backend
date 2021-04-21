@@ -15,7 +15,7 @@ export class BookService {
     const book = await this.bookRepository.getOneBook(id)
     if (book) {
       book.views += 1
-      await this.bookRepository.save(book)
+      await book.save()
       return book
     } else {
       throw new BadRequestException(httpFlags.BOOK_NOT_FOUND)

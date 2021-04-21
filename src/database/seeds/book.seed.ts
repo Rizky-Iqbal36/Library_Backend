@@ -6,7 +6,6 @@ import { Injectable } from '@nestjs/common'
 export class SeedBookData {
   constructor(private readonly bookRepository: BookRepository) {}
   async createMany(loop: number) {
-    await this.bookRepository.delete({})
     const all = []
     for (let i = 0; i < loop; i++) {
       all.push(await this.createOne())
@@ -14,22 +13,22 @@ export class SeedBookData {
     return all
   }
 
-  async createOne(category?: string) {
-    return this.bookRepository.save({
+  async createOne(categoryId?: string[], authors?: string[], bookMarkedBy?: string[]) {
+    return this.bookRepository.createBook({
       isActive: faker.datatype.boolean(),
       title: faker.name.title(),
-      ISBN: faker.finance.creditCardNumber(),
-      author: `${faker.name.firstName()} ${faker.name.middleName()} ${faker.name.lastName()}`,
+      isbn: faker.finance.creditCardNumber(),
+      authors: [`${faker.name.firstName()} ${faker.name.middleName()} ${faker.name.lastName()}`],
+      ...(categoryId ? { categoryIds: categoryId } : {}),
       publication: faker.date.past(10, new Date()),
       pages: faker.datatype.number(),
-      uploadBy: faker.datatype.uuid(),
-      aboutBook: faker.commerce.productDescription(),
-      bookMarked: faker.datatype.number(),
-      bookMarkedBy: [faker.datatype.uuid()],
+      uploadBy: '607ea12bd21e76a4433ea592', //temporary, wait for user model
       views: 0,
-      thumbnail: faker.image.animals(),
+      aboutBook: faker.commerce.productDescription(),
       file: `file_${faker.lorem.sentence(1)}epub`,
-      category: [category ? category : faker.commerce.department()]
+      thumbnail: faker.image.animals(),
+      bookMarked: 0,
+      ...(bookMarkedBy ? { bookMarkedBy: bookMarkedBy } : {})
     })
   }
 }
