@@ -8,8 +8,15 @@ variables:
   DOCKER_DRIVER: overlay
   DOCKER_HOST: tcp://docker:2375/
 
+before_script:
+  - docker info
+  - apk update
+  - apk upgrade
+  - apk add python python-dev py-pip build-base
+  - pip install docker-compose
+
 services:
-  - name: docker:19.03.12-dind
+  - name: docker:dind
 
 include:
   - local: '.gitlab/ci/build-stage.gitlab-ci.yml'
