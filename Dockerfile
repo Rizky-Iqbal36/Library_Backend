@@ -10,7 +10,7 @@ WORKDIR /app
 COPY package*.json ./
 
 RUN npm install -g npm@latest
-RUN npm install -g jest
+RUN npm install -g jest jest-junit jest-sonar-reporter
 RUN npm install
 
 COPY . .

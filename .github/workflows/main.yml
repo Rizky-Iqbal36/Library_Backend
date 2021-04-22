@@ -34,7 +34,7 @@ jobs:
           context: ./
           file: ./Dockerfile
           push: true
-          tags: 200140/library-backend:latest
+          tags: ${{ secrets.DOCKER_HUB_IQBAL }}/library-backend:latest
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
