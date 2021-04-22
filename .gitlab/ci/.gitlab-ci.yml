@@ -14,12 +14,6 @@ services:
 
 before_script:
   - docker info
-  - apk update
-  - apk upgrade
-  - apk add curl jq python3 python3-dev build-base libffi-dev libressl-dev gettext
-  - curl -O https://bootstrap.pypa.io/get-pip.py
-  - python3 get-pip.py
-  - pip install docker-compose
 
 include:
   - local: '.gitlab/ci/build-stage.gitlab-ci.yml'
