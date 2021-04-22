@@ -45,6 +45,7 @@ jobs:
       - uses: actions/checkout@v1
       - name: Run Tests
         run: |
+          cp .env.example .env
           npm install
           npm run dependency:local
           npm run test
