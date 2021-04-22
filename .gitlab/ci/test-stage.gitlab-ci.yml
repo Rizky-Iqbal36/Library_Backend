@@ -1,4 +1,5 @@
 testing:
+  image: node:12-alpine
   stage: test
   needs:
     - job: install_dependencies

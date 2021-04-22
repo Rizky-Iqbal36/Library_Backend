@@ -3,6 +3,7 @@ cache:
     - node_modules/
 
 install_dependencies:
+  image: node:12-alpine
   stage: build
   script:
     - npm install
