@@ -3,6 +3,7 @@
 /node_modules
 .scannerwork
 junit.xml
+/builds
 
 # Logs
 logs
