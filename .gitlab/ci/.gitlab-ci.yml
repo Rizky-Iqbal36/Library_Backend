@@ -1,0 +1,7 @@
+image: node:latest
+stages:
+  - build
+  - test
+include:
+  - local: '.gitlab/ci/build-stage.gitlab-ci.yml'
+  - local: '.gitlab/ci/test-stage.gitlab-ci.yml'
