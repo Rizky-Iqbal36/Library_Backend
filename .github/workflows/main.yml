@@ -48,4 +48,5 @@ jobs:
           cp .env.example .env
           npm install
           npm run dependency:local
+          sleep 5
           npm run test

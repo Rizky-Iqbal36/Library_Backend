@@ -1,7 +1,12 @@
 image: node:latest
+
 stages:
   - build
   - test
+
+services:
+  - name: docker:19.03.12-dind
+
 include:
   - local: '.gitlab/ci/build-stage.gitlab-ci.yml'
   - local: '.gitlab/ci/test-stage.gitlab-ci.yml'
