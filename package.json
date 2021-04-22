@@ -9,7 +9,7 @@
     "prebuild": "rimraf dist",
     "build": "nest build",
     "commit": "git-cz",
-    "dependency:local": "docker compose up -d database",
+    "dependency:local": "docker-compose up -d database",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
