@@ -9,7 +9,6 @@ variables:
   DOCKER_HOST: tcp://docker:2375/
 
 before_script:
-  - docker info
   - apk update
   - apk upgrade
   - apk add python python-dev py-pip build-base
