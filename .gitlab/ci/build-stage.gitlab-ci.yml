@@ -4,6 +4,7 @@ cache:
 
 install_dependencies:
   stage: build
+  image: node:latest
   script:
     - npm install
   artifacts:
