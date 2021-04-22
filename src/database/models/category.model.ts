@@ -13,7 +13,7 @@ export type ICategoryDoc = ICategory & Document
 const categorySchema = new Schema(
   {
     isActive: { type: Boolean, required: true },
-    name: { type: String, required: true },
+    name: { type: String, required: true, unique: true },
     numberOfBook: { type: Number, required: true },
     bookIds: { type: Schema.Types.ObjectId, ref: 'Book', required: false },
     description: { type: String, required: true }
