@@ -1,8 +1,5 @@
 image: docker/compose
 
-services:
-  - name: docker:dind
-
 stages:
   - build
   - test
@@ -18,6 +15,9 @@ before_script:
   - git config --global user.email "${GITLAB_USER_EMAIL}"
   - export APP_NAME=$(node -e "console.log(require('./package.json').name)")
   - export APP_VERSION=$(node -e "console.log(require('./package.json').version)")
+
+services:
+  - name: docker:19.03.12-dind
 
 include:
   - local: '.gitlab/ci/build-stage.gitlab-ci.yml'
