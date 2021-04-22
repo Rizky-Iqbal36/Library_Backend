@@ -1,4 +1,4 @@
-image: docker:18.09
+image: node:latest
 
 stages:
   - build
@@ -6,7 +6,7 @@ stages:
 
 variables:
   DOCKER_HOST: tcp://docker:2375/
-  DOCKER_DRIVER: overlay2
+  DOCKER_DRIVER: overlay
   DOCKER_TLS_CERTDIR: ''
 
 services:

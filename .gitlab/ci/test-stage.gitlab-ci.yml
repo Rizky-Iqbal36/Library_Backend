@@ -1,6 +1,5 @@
 testing:
   stage: test
-  image: node:latest
   needs:
     - job: install_dependencies
       artifacts: true
