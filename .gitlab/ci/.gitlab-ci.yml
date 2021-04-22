@@ -9,6 +9,11 @@ variables:
   DOCKER_HOST: tcp://docker:2375/
 
 before_script:
+  - docker info
+  - apk update
+  - apk upgrade
+  - apk add python python-dev py-pip build-base
+  - pip install docker-compose
   - git config --global user.name "${GITLAB_USER_NAME}"
   - git config --global user.email "${GITLAB_USER_EMAIL}"
   - export APP_NAME=$(node -e "console.log(require('./package.json').name)")
