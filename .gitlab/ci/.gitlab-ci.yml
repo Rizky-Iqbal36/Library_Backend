@@ -9,11 +9,12 @@ variables:
   DOCKER_DRIVER: overlay
   DOCKER_TLS_CERTDIR: ''
 
-# before_script:
-#   - git config --global user.name "${GITLAB_USER_NAME}"
-#   - git config --global user.email "${GITLAB_USER_EMAIL}"
-#   - export APP_NAME=$(node -e "console.log(require('./package.json').name)")
-#   - export APP_VERSION=$(node -e "console.log(require('./package.json').version)")
+before_script:
+  - docker info
+  - git config --global user.name "${GITLAB_USER_NAME}"
+  - git config --global user.email "${GITLAB_USER_EMAIL}"
+  - export APP_NAME=$(node -e "console.log(require('./package.json').name)")
+  - export APP_VERSION=$(node -e "console.log(require('./package.json').version)")
 
 services:
   - docker:dind
