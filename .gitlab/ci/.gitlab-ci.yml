@@ -1,4 +1,4 @@
-image: docker/compose
+image: gitlab/dind
 
 stages:
   - build
@@ -6,18 +6,17 @@ stages:
 
 variables:
   DOCKER_HOST: tcp://docker:2375/
-  DOCKER_DRIVER: overlay2
+  DOCKER_DRIVER: overlay
   DOCKER_TLS_CERTDIR: ''
 
-before_script:
-  - docker info
-  - git config --global user.name "${GITLAB_USER_NAME}"
-  - git config --global user.email "${GITLAB_USER_EMAIL}"
-  - export APP_NAME=$(node -e "console.log(require('./package.json').name)")
-  - export APP_VERSION=$(node -e "console.log(require('./package.json').version)")
+# before_script:
+#   - git config --global user.name "${GITLAB_USER_NAME}"
+#   - git config --global user.email "${GITLAB_USER_EMAIL}"
+#   - export APP_NAME=$(node -e "console.log(require('./package.json').name)")
+#   - export APP_VERSION=$(node -e "console.log(require('./package.json').version)")
 
 services:
-  - name: docker:19.03.12-dind
+  - docker:dind
 
 include:
   - local: '.gitlab/ci/build-stage.gitlab-ci.yml'
