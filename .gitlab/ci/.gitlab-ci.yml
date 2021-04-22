@@ -1,22 +1,19 @@
-image: gitlab/dind
-
-stages:
-  - build
-  - test
+image: docker:latest
 
 variables:
-  DOCKER_HOST: tcp://docker:2375/
   DOCKER_DRIVER: overlay
-  DOCKER_TLS_CERTDIR: ''
-
-before_script:
-  - git config --global user.name "${GITLAB_USER_NAME}"
-  - git config --global user.email "${GITLAB_USER_EMAIL}"
-  - export APP_NAME=$(node -e "console.log(require('./package.json').name)")
-  - export APP_VERSION=$(node -e "console.log(require('./package.json').version)")
 
 services:
   - docker:dind
+
+before_script:
+  - docker info
+  - apk update
+  - apk upgrade
+  - apk add curl jq python3 python3-dev build-base libffi-dev libressl-dev gettext
+  - curl -O https://bootstrap.pypa.io/get-pip.py
+  - python3 get-pip.py
+  - pip install docker-compose
 
 include:
   - local: '.gitlab/ci/build-stage.gitlab-ci.yml'
