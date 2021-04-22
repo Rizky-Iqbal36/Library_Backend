@@ -1,4 +1,6 @@
-image: gitlab/dind
+default:
+  image: gitlab/dind
+
 stages:
   - build
   - test
