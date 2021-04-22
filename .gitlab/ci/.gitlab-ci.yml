@@ -1,4 +1,7 @@
-image: node:latest
+image: docker/compose
+
+services:
+  - name: docker:dind
 
 stages:
   - build
@@ -11,17 +14,10 @@ variables:
 
 before_script:
   - docker info
-  - apk update
-  - apk upgrade
-  - apk add python python-dev py-pip build-base
-  - pip install docker-compose
   - git config --global user.name "${GITLAB_USER_NAME}"
   - git config --global user.email "${GITLAB_USER_EMAIL}"
   - export APP_NAME=$(node -e "console.log(require('./package.json').name)")
   - export APP_VERSION=$(node -e "console.log(require('./package.json').version)")
-
-services:
-  - name: docker:dind
 
 include:
   - local: '.gitlab/ci/build-stage.gitlab-ci.yml'
