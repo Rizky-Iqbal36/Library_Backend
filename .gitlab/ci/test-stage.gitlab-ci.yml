@@ -1,6 +1,6 @@
 testing:
-  image: node:12-alpine
   stage: test
+  image: node:12
   needs:
     - job: install_dependencies
       artifacts: true
