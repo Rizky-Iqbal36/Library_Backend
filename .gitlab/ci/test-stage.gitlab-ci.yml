@@ -1,7 +1,5 @@
 testing:
   stage: test
-  services:
-    - node:12
   needs:
     - job: install_dependencies
       artifacts: true
