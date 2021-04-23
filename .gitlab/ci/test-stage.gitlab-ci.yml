@@ -1,7 +1,7 @@
 testing:
   stage: test
-  image:
-    name: node:12
+  services:
+    - node:12
   needs:
     - job: install_dependencies
       artifacts: true
