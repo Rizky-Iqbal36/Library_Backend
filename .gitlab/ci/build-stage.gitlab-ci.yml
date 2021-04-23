@@ -3,8 +3,9 @@ cache:
     - node_modules/
 
 install_dependencies:
+  image:
+    name: node:12
   stage: build
-  image: node:12
   script:
     - npm install
   artifacts:
