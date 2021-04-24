@@ -14,7 +14,6 @@ services:
 
 before_script:
   - docker info
-  - docker run --rm -it alpine /bin/bash
   - apk add --no-cache python py2-pip
   - pip install --no-cache-dir docker-compose
   - docker-compose --version
