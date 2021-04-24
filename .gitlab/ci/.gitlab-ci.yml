@@ -1,5 +1,4 @@
-image: docker:18.09
-
+image: docker:latest
 stages:
   - build
   - test
@@ -10,7 +9,7 @@ variables:
   DOCKER_TLS_CERTDIR: ''
 
 services:
-  - docker:18.09-dind
+  - docker:dind
 
 before_script:
   - docker info
