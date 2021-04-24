@@ -16,6 +16,7 @@ export class SeedBookData {
   async createOne(categoryId?: string[], authors?: string[], bookMarkedBy?: string[]) {
     return this.bookRepository.createBook({
       isActive: faker.datatype.boolean(),
+      status: 'ACTIVE',
       title: faker.name.title(),
       isbn: faker.finance.creditCardNumber(),
       authors: [`${faker.name.firstName()} ${faker.name.middleName()} ${faker.name.lastName()}`],

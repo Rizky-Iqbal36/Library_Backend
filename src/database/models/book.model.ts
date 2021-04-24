@@ -2,6 +2,7 @@ import { Document, model, Schema } from 'mongoose'
 
 export interface IBook {
   isActive: boolean
+  status: string
   title: string
   isbn: string
   authors: string[]
@@ -22,19 +23,20 @@ export type IBookDoc = IBook & Document
 const BookSchema = new Schema(
   {
     isActive: { type: Boolean, required: true },
+    status: { type: String, enum: ['WAIT', 'CANCEL', 'ACTIVE'], required: true, default: 'WAIT' },
     title: { type: String, required: true },
     isbn: { type: String, required: false, default: null },
     authors: [{ type: String, required: true }],
     categoryIds: [{ type: Schema.Types.ObjectId, ref: 'Category', required: false, default: null }],
     publication: { type: Date, required: true },
     pages: { type: Number, required: true },
-    uploadBy: { type: Schema.Types.ObjectId, ref: 'book', required: true, default: null },
+    uploadBy: { type: Schema.Types.ObjectId, ref: 'User', required: true, default: null },
     views: { type: Number, required: true, default: 0 },
     aboutBook: { type: String, required: true },
     file: { type: String, required: true },
     thumbnail: { type: String, required: true },
     bookMarked: { type: String, required: true },
-    bookMarkedBy: [{ type: Schema.Types.ObjectId, ref: 'book', required: false, default: null }]
+    bookMarkedBy: [{ type: Schema.Types.ObjectId, ref: 'User', required: false, default: null }]
   },
   { timestamps: true }
 )
