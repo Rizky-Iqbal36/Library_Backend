@@ -1,4 +1,5 @@
-image: docker:latest
+image: rizkyiqbal/dind-nodejs
+
 stages:
   - build
   - test
@@ -13,9 +14,6 @@ services:
 
 before_script:
   - docker info
-  - apk add --update --no-cache curl py3-pip
-  - pip install --no-cache-dir docker-compose
-  - pip install --no-cache-dir nodejs
   - docker-compose --version
   - npm -v && node -v
 

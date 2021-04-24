@@ -42,3 +42,6 @@ test-report.xml
 
 # Sonarqube
 .scannerwork
+
+# Docker
+custom.Dockerfile
