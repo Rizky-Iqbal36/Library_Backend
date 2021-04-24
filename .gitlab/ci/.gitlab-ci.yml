@@ -13,7 +13,7 @@ services:
 
 before_script:
   - docker info
-  - apk add --update py2-pip
+  - apk add --update --no-cache curl py2-pip
   - pip install --no-cache-dir docker-compose
   - pip install --no-cache-dir nodejs
   - docker-compose --version
