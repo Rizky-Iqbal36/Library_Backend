@@ -52,7 +52,7 @@ describe(`Get book`, () => {
     expect(res.body[1].publication).not.dateNewerThan(res.body[0].publication)
   })
 
-  it(`Error => Should get error: invalid param`, async () => {
+  it(`Error => Should get error: Invalid param`, async () => {
     const res = await request(server).get(`${url}/20010411`).send()
     expect(res.status).toBe(400)
     expect(res.body.message).toBe('INVALID_PARAM')

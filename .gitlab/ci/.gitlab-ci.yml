@@ -13,9 +13,10 @@ services:
 
 before_script:
   - docker info
-  - apk add --no-cache python py2-pip
   - pip install --no-cache-dir docker-compose
+  - pip install --no-cache-dir nodejs
   - docker-compose --version
+  - npm -v && node -v
 
 include:
   - local: '.gitlab/ci/build-stage.gitlab-ci.yml'
