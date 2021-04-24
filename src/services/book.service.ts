@@ -11,10 +11,16 @@ export class BookService {
     return this.bookRepository.getAllBooks()
   }
 
-  public async findOneBook(id: string) {
+  public async findOneBook(id: string, bookmark?: string) {
     const book = await this.bookRepository.getOneBook(id)
     if (book) {
-      book.views += 1
+      if (bookmark === 'BOOKMARK') {
+        book.bookMarked += 1
+      } else if (bookmark === 'UNBOOKMARK') {
+        book.bookMarked -= 1
+      } else {
+        book.views += 1
+      }
       await book.save()
       return book
     } else {

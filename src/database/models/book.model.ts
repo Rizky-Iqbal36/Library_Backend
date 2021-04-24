@@ -35,7 +35,7 @@ const BookSchema = new Schema(
     aboutBook: { type: String, required: true },
     file: { type: String, required: true },
     thumbnail: { type: String, required: true },
-    bookMarked: { type: String, required: true },
+    bookMarked: { type: Number, required: true },
     bookMarkedBy: [{ type: Schema.Types.ObjectId, ref: 'User', required: false, default: null }]
   },
   { timestamps: true }

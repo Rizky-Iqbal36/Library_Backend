@@ -1,4 +1,4 @@
-import { ValidationError } from 'joi'
+import Joi, { ValidationError } from 'joi'
 
 export interface IGetLocalizedMsgOption {
   key: string
@@ -13,4 +13,10 @@ export interface IHttpExceptionOptions {
 export interface IExceptionResponse {
   flag: string
   options?: IHttpExceptionOptions
+}
+
+export interface IRequestValidationSchema {
+  body?: Joi.Schema
+  query?: Joi.Schema
+  headers?: Joi.Schema
 }

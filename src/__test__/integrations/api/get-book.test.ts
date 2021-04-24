@@ -43,7 +43,19 @@ describe(`Get book`, () => {
     expect(res.body.views).toBe(book.views + 1)
   })
 
-  it(`Success => Should get many books that sorted by publication`, async () => {
+  it(`Success => Should bookmark and unbookmark a book`, async () => {
+    const category = await seedCategoryData.createOne()
+    const book = await seedBookData.createOne(category._id)
+    const res = await request(app.getHttpServer()).get(`${url}/${book._id}`).send().query({ bookmark: 'BOOKMARK' })
+    expect(res.status).toBe(200)
+    expect(res.body.bookMarked).toBe(1)
+
+    const res1 = await request(app.getHttpServer()).get(`${url}/${book._id}`).send().query({ bookmark: 'UNBOOKMARK' })
+    expect(res1.status).toBe(200)
+    expect(res1.body.bookMarked).toBe(0)
+  })
+
+  it(`Success => Should get many books that sorted by most recent publication date`, async () => {
     await seedBookData.createMany(10)
     const res = await request(server).get(url).send()
     expect(res.status).toBe(200)
@@ -52,15 +64,23 @@ describe(`Get book`, () => {
     expect(res.body[1].publication).not.dateNewerThan(res.body[0].publication)
   })
 
-  it(`Error => Should get error: Invalid param`, async () => {
+  it(`Error => Get book should get error: Invalid param`, async () => {
     const res = await request(server).get(`${url}/20010411`).send()
     expect(res.status).toBe(400)
     expect(res.body.message).toBe('INVALID_PARAM')
   })
 
-  it(`Error => Should get error: No such a book`, async () => {
+  it(`Error => Get Book Should get error: No such a book`, async () => {
     const res = await request(app.getHttpServer()).get(`${url}/607ea12bd21e76a4433ea592`).send()
     expect(res.status).toBe(400)
     expect(res.body.message).toBe('BOOK_NOT_FOUND')
+  })
+
+  it(`Error => Bookmark a book should get error: Invalid param`, async () => {
+    const category = await seedCategoryData.createOne()
+    const book = await seedBookData.createOne(category._id)
+    const res = await request(app.getHttpServer()).get(`${url}/${book._id}`).send().query({ bookmark: 'UWAUW' })
+    expect(res.status).toBe(400)
+    expect(res.body.message).toBe('INVALID_PARAM')
   })
 })
