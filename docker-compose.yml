@@ -7,8 +7,6 @@ services:
       - ./:/app
     restart: always
     working_dir: /app
-    environment:
-      - APP_ENV=container
     depends_on:
       - database
     ports:

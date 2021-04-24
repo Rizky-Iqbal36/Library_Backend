@@ -1,7 +1,5 @@
 testing:
   stage: test
-  variables:
-    APP_ENV: 'container'
   needs:
     - job: install_dependencies
       artifacts: true
@@ -25,6 +23,4 @@ testing:
       - stuck_or_timeout_failure
   script:
     - cp .env.example .env
-    - npm run dependency:local
-    - sleep 5
-    - npm run test
+    - docker-compose -f docker-compose.yml run app npm run test
