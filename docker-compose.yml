@@ -7,6 +7,8 @@ services:
       - ./:/app
     restart: always
     working_dir: /app
+    environment:
+      - APP_ENV=container
     depends_on:
       - database
     ports:
@@ -16,7 +18,7 @@ services:
       - net
 
   database:
-    container_name: mongodb
+    container_name: database
     image: mongo:4.2.7
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
@@ -25,7 +27,9 @@ services:
       - 27017:27017
     networks:
       - net
-
+    volumes:
+      - ./database:/data/db
+      - ./database_config:/data/configdb
   sonarqube:
     container_name: sonarqube
     image: sonarqube:latest

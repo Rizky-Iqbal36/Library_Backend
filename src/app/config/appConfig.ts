@@ -9,7 +9,8 @@ const appConfig = {
   },
   mongodb: {
     host: process.env.MONGO_DB_HOST,
-    uri: process.env.MONGO_DB_URI,
+    uri:
+      process.env.APP_ENV === 'local' ? process.env.MONGO_DB_URI + 'localhost' : process.env.MONGO_DB_URI + 'database',
     user: process.env.MONGO_DB_USER,
     pass: process.env.MONGO_DB_PASS,
     db: process.env.MONGO_DB_DB_NAME,

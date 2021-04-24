@@ -1,7 +1,7 @@
 FROM node:12-alpine
 
-ARG NODE_ENV=local
-ENV NODE_ENV=${NODE_ENV}
+ARG APP_ENV=container
+ENV APP_ENV=${APP_ENV}
 
 RUN mkdir /app
 

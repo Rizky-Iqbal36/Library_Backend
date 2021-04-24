@@ -1,5 +1,7 @@
 testing:
   stage: test
+  variables:
+    APP_ENV: 'container'
   needs:
     - job: install_dependencies
       artifacts: true

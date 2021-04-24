@@ -45,3 +45,5 @@ test-report.xml
 
 # Docker
 custom.Dockerfile
+/database
+/database_config
