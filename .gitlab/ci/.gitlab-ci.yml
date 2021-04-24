@@ -14,12 +14,7 @@ services:
 
 before_script:
   - docker info
-  - apt-get update
-  - echo y | apt-get upgrade
-  - echo y | apt-get install curl
-  - curl -sL https://deb.nodesource.com/setup_12.x | bash
-  - apt-get install nodejs
-  - node -v && npm -v
+  - docker-compose --version
 
 include:
   - local: '.gitlab/ci/build-stage.gitlab-ci.yml'
