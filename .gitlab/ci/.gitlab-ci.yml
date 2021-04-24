@@ -1,7 +1,8 @@
 image: rizkyiqbal/dind-nodejs
 
 stages:
-  - build and test
+  - build
+  - test
 
 variables:
   DOCKER_HOST: tcp://docker:2375/
@@ -12,4 +13,5 @@ services:
   - docker:dind
 
 include:
-  - local: '.gitlab/ci/build-test-stage.gitlab-ci.yml'
+  - local: '.gitlab/ci/build-stage.gitlab-ci.yml'
+  - local: '.gitlab/ci/test-stage.gitlab-ci.yml'
