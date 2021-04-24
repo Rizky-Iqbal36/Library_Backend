@@ -2,7 +2,7 @@ cache:
   paths:
     - node_modules/
 
-install_dependencies:
+prepare:
   stage: build
   script:
     - npm install

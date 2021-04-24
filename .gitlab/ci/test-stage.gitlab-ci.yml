@@ -1,7 +1,7 @@
-testing:
+test:integration:
   stage: test
   needs:
-    - job: install_dependencies
+    - job: prepare
       artifacts: true
   artifacts:
     paths:
