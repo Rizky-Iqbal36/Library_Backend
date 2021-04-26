@@ -18,7 +18,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
       result = exception.getResponse() as IExceptionResponse
     }
     if (result?.options?.joiError) detail = result?.options?.joiError?.details
-    console.log(result?.options?.joiError)
 
     if (status !== 500) message = result.flag
     response.status(status).json({
