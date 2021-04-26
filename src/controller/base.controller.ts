@@ -3,9 +3,12 @@ import { httpFlags } from '@root/constant/flags'
 import { BadRequestException } from '@root/app/exception/httpException'
 import { IRequestValidationSchema } from '@root/interfaces'
 import { BookSchema } from '@root/schema/requestvalidators/book.schema'
+import { UserSchema } from '@root/schema/requestvalidators/user.schema'
+
 export abstract class BaseController {
   static schemas = {
-    bookSchema: new BookSchema()
+    bookSchema: new BookSchema(),
+    userSchema: new UserSchema()
   }
   validateRequest = async (req: Request, schema: IRequestValidationSchema) => {
     const { body, query, headers } = req
