@@ -8,19 +8,20 @@ module.exports = {
     '@root(.*)$': '<rootDir>$1',
     '@app(.*)$': '<rootDir>/app$1',
     '@database(.*)$': '<rootDir>/database$1',
-    '@repositories(.*)$': '<rootDir>/repositories$1',
+    '@repositories(.*)$': '<rootDir>/repositories$1'
   },
   transform: {
-    '^.+\\.(t|j)s$': 'ts-jest',
+    '^.+\\.(t|j)s$': 'ts-jest'
   },
-  testPathIgnorePatterns: ['/node_modules/', 'src/database/*'],
+  testPathIgnorePatterns: ['/node_modules/', 'src/database/*', 'src/__test__/matcher/*'],
   coveragePathIgnorePatterns: [
     'node_modules/*',
     '<rootDir>/app/*',
     '<rootDir>/database/*',
-    '<rootDir>/main.ts',
+    '<rootDir>/__test__/matcher/*',
+    '<rootDir>/main.ts'
   ],
   testResultsProcessor: 'jest-sonar-reporter',
   coverageDirectory: '../coverage',
-  reporters: ['default', 'jest-junit'],
-};
+  reporters: ['default', 'jest-junit']
+}

@@ -41,4 +41,25 @@ describe(`Get user`, () => {
     expect(res.status).toBe(200)
     expect(res.body._id).toBe(user._id.toString())
   })
+
+  it(`Success => Should get many user datas`, async () => {
+    await seedUserData.createMany(10)
+    const res = await request(server).get(url).send().query({ isAdmin: true })
+    expect(res.body[0].isAdmin).toBe(true)
+
+    const res1 = await request(server).get(url).send().query({ isAdmin: false })
+    expect(res1.body[0].isAdmin).toBe(false)
+  })
+
+  it(`Error => Get user data should get error: Invalid param`, async () => {
+    const res = await request(server).get(`${url}/200140`).send()
+    expect(res.status).toBe(400)
+    expect(res.body.message).toBe('INVALID_PARAM')
+  })
+
+  it(`Error => Get user data should get error: No such a user`, async () => {
+    const res = await request(server).get(`${url}/607ea12bd21e76a4433ea592`).send()
+    expect(res.status).toBe(400)
+    expect(res.body.message).toBe('USER_NOT_FOUND')
+  })
 })

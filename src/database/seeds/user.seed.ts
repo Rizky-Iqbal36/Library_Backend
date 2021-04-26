@@ -13,7 +13,7 @@ export class SeedUserData {
     return all
   }
 
-  async createOne(bookmarkedBook?: string[], uploadedBook?: string[]) {
+  async createOne(bookmarkedBook?: string[], isAdmin?: boolean, uploadedBook?: string[]) {
     return this.userRepository.createUser({
       isActive: faker.datatype.boolean(),
       userIsAuthor: faker.datatype.boolean(),
@@ -24,7 +24,7 @@ export class SeedUserData {
       gender: faker.random.arrayElement(['MALE', 'SHEMALE']),
       phone: faker.phone.phoneNumber('62822########'),
       address: faker.address.streetAddress(),
-      isAdmin: faker.datatype.boolean(),
+      isAdmin: isAdmin ? isAdmin : faker.datatype.boolean(),
       ...(bookmarkedBook ? { bookmarkedBook: bookmarkedBook } : {}),
       ...(uploadedBook ? { uploadedBook: uploadedBook } : {}),
       totalBookmarked: 0,
