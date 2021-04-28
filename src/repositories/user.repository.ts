@@ -10,7 +10,7 @@ export class UserRepository {
   }
 
   public async getOneUser(id: string) {
-    return this.userModel.findById(id)
+    return this.userModel.findById(id).populate('bookmarkedBook')
   }
 
   public async createUser(data: IUser) {

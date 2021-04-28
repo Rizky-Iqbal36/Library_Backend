@@ -23,8 +23,9 @@ export class BookController extends BaseController {
     await this.validateRequest(req, BaseController.schemas.bookSchema.getBook)
     const isValidID = mongoose.Types.ObjectId.isValid(id)
     const { bookmark } = req.query
+    const userId = req.header('x-user-id')
     if (isValidID) {
-      return this.bookService.findOneBook(id, bookmark as string)
+      return this.bookService.findOneBook(id, userId, bookmark as string)
     } else {
       throw new BadRequestException(httpFlags.INVALID_PARAM)
     }
