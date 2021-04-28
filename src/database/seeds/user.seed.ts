@@ -15,7 +15,7 @@ export class SeedUserData {
 
   async createOne(bookmarkedBook?: string[], isAdmin?: boolean, uploadedBook?: string[]) {
     return this.userRepository.createUser({
-      isActive: faker.datatype.boolean(),
+      isActive: true,
       userIsAuthor: faker.datatype.boolean(),
       email: faker.internet.email(),
       password: faker.internet.password(8),

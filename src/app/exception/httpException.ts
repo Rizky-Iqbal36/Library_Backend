@@ -24,3 +24,15 @@ export class BadRequestException extends CustomException {
     super(HttpStatus.BAD_REQUEST, flag, options)
   }
 }
+
+export class UnauthorizedException extends CustomException {
+  constructor(flag: any, options?: IHttpExceptionOptions) {
+    super(HttpStatus.UNAUTHORIZED, flag, options)
+  }
+}
+
+export class ForbiddenException extends CustomException {
+  constructor(flag: string, options?: IHttpExceptionOptions) {
+    super(HttpStatus.FORBIDDEN, flag, options)
+  }
+}

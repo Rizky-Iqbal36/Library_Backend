@@ -1,11 +1,14 @@
-import { Module } from '@nestjs/common'
+import { Module, MiddlewareConsumer } from '@nestjs/common'
 import { APP_FILTER } from '@nestjs/core'
 import { controllers } from '@root/controller'
+import { BookController } from '@root/controller/api/book.controller'
+import { UserController } from '@root/controller/api/user.controller'
 import { databaseProviders } from '@database/index'
 import { repositories } from '@root/repositories'
 import { services } from '@root/services/index'
 import { HttpExceptionFilter } from '@root/app/exception/http-exception.filter'
 
+import { UserAuthMiddleware } from '@app/middlewares/user.middleware'
 @Module({
   controllers,
   providers: [
@@ -15,4 +18,8 @@ import { HttpExceptionFilter } from '@root/app/exception/http-exception.filter'
     { provide: APP_FILTER, useClass: HttpExceptionFilter }
   ]
 })
-export class AppModule {}
+export class AppModule {
+  async configure(consumer: MiddlewareConsumer) {
+    consumer.apply(UserAuthMiddleware).forRoutes(BookController, UserController)
+  }
+}
