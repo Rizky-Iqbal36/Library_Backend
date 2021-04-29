@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { UserRepository } from '@root/repositories/user.repository'
 import { BadRequestException } from '@root/app/exception/httpException'
 import { httpFlags } from '@root/constant/flags'
+import { Request } from 'express'
 
 @Injectable()
 export class UserService {
@@ -18,5 +19,10 @@ export class UserService {
     } else {
       throw new BadRequestException(httpFlags.USER_NOT_FOUND)
     }
+  }
+
+  public async createUser(req: Request) {
+    console.log(req.body)
+    return 'test'
   }
 }

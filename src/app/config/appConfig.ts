@@ -16,6 +16,11 @@ const appConfig = {
     pass: process.env.MONGO_DB_PASS,
     db: process.env.MONGO_DB_DB_NAME,
     authSource: process.env.MONGO_DB_AUTH_SOURCE
+  },
+  auth: {
+    jwtSecret: process.env.JWT_SECRET,
+    jwtExpiration: process.env.JWT_EXPIRATION,
+    ecryptJwtSecret: process.env.ENCRYPT_JWT_SECRET
   }
 }
 
