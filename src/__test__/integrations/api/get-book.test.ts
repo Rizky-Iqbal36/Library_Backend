@@ -43,10 +43,10 @@ describe(`Get book`, () => {
     const book = await seedBookData.createOne(category._id)
     const res = await request(app.getHttpServer()).get(`${url}/${book._id}`).set(header).send()
     expect(res.status).toBe(200)
-    expect(res.body.isbn).toBe(book.isbn)
-    expect(res.body.categoryIds[0].name).toBe(category.name)
-    expect(res.body.categoryIds[0]._id).toBe(book.categoryIds[0].toString())
-    expect(res.body.views).toBe(book.views + 1)
+    expect(res.body.result.isbn).toBe(book.isbn)
+    expect(res.body.result.categoryIds[0].name).toBe(category.name)
+    expect(res.body.result.categoryIds[0]._id).toBe(book.categoryIds[0].toString())
+    expect(res.body.result.views).toBe(book.views + 1)
   })
 
   it(`Success => User should bookmark and unbookmark a book`, async () => {
@@ -56,21 +56,21 @@ describe(`Get book`, () => {
     const book = await seedBookData.createOne(category._id)
 
     const gotUser = await request(server).get(`/user/${user._id}`).set(header).send()
-    expect(gotUser.body.bookmarkedBook.length).toBe(0)
-    expect(gotUser.body.totalBookmarked).toBe(0)
+    expect(gotUser.body.result.bookmarkedBook.length).toBe(0)
+    expect(gotUser.body.result.totalBookmarked).toBe(0)
     const res = await request(app.getHttpServer())
       .get(`${url}/${book._id}`)
       .set(header)
       .send()
       .query({ bookmark: 'BOOKMARK' })
     expect(res.status).toBe(200)
-    expect(res.body.bookMarked).toBe(1)
+    expect(res.body.result.bookMarked).toBe(1)
 
     const gotUser1 = await request(server).get(`/user/${user._id}`).set(header).send()
-    expect(gotUser1.body.bookmarkedBook.length).toBe(1)
-    expect(gotUser1.body.totalBookmarked).toBe(1)
-    expect(res.body.bookMarkedBy[0]).toBe(user._id.toString())
-    expect(gotUser1.body.bookmarkedBook[0]._id).toBe(book._id.toString())
+    expect(gotUser1.body.result.bookmarkedBook.length).toBe(1)
+    expect(gotUser1.body.result.totalBookmarked).toBe(1)
+    expect(res.body.result.bookMarkedBy[0]).toBe(user._id.toString())
+    expect(gotUser1.body.result.bookmarkedBook[0]._id).toBe(book._id.toString())
 
     const res1 = await request(app.getHttpServer())
       .get(`${url}/${book._id}`)
@@ -78,11 +78,11 @@ describe(`Get book`, () => {
       .send()
       .query({ bookmark: 'UNBOOKMARK' })
     expect(res1.status).toBe(200)
-    expect(res1.body.bookMarked).toBe(0)
+    expect(res1.body.result.bookMarked).toBe(0)
 
     const gotUser2 = await request(server).get(`/user/${user._id}`).set(header).send()
-    expect(gotUser2.body.bookmarkedBook.length).toBe(0)
-    expect(gotUser2.body.totalBookmarked).toBe(0)
+    expect(gotUser2.body.result.bookmarkedBook.length).toBe(0)
+    expect(gotUser2.body.result.totalBookmarked).toBe(0)
   })
 
   it(`Success => Should get many books that sorted by most recent publication date`, async () => {
@@ -91,9 +91,9 @@ describe(`Get book`, () => {
     await seedBookData.createMany(10)
     const res = await request(server).get(url).set(header).send()
     expect(res.status).toBe(200)
-    expect(res.body.length).toBe(10)
-    expect(res.body[0].publication).dateNewerThan(res.body[9].publication)
-    expect(res.body[1].publication).not.dateNewerThan(res.body[0].publication)
+    expect(res.body.result.length).toBe(10)
+    expect(res.body.result[0].publication).dateNewerThan(res.body.result[9].publication)
+    expect(res.body.result[1].publication).not.dateNewerThan(res.body.result[0].publication)
   })
 
   it(`Error => Get book should get error: Invalid param`, async () => {

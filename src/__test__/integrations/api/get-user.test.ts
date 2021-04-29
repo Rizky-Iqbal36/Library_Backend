@@ -42,7 +42,7 @@ describe(`Get user`, () => {
     header['x-user-id'] = user._id
     const res = await request(server).get(`${url}/${user._id}`).set(header).send()
     expect(res.status).toBe(200)
-    expect(res.body._id).toBe(user._id.toString())
+    expect(res.body.result._id).toBe(user._id.toString())
   })
 
   it(`Success => Should get many user datas`, async () => {
@@ -51,10 +51,10 @@ describe(`Get user`, () => {
     header['x-user-id'] = user._id
     await seedUserData.createMany(10)
     const res = await request(server).get(url).set(header).send().query({ isAdmin: true })
-    expect(res.body[0].isAdmin).toBe(true)
+    expect(res.body.result[0].isAdmin).toBe(true)
 
     const res1 = await request(server).get(url).set(header).query({ isAdmin: false })
-    expect(res1.body[0].isAdmin).toBe(false)
+    expect(res1.body.result[0].isAdmin).toBe(false)
   })
 
   it(`Error => Get user data should get error: Invalid param`, async () => {
