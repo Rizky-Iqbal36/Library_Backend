@@ -62,7 +62,7 @@ describe(`Get user`, () => {
     header['x-user-id'] = user._id
     const res = await request(server).get(`${url}/200140`).set(header).send()
     expect(res.status).toBe(400)
-    expect(res.body.message).toBe('INVALID_PARAM')
+    expect(res.body.errors.message).toBe('INVALID_PARAM')
   })
 
   it(`Error => Get user data should get error: No such a user`, async () => {
@@ -70,6 +70,6 @@ describe(`Get user`, () => {
     header['x-user-id'] = user._id
     const res = await request(server).get(`${url}/607ea12bd21e76a4433ea592`).set(header).send()
     expect(res.status).toBe(400)
-    expect(res.body.message).toBe('USER_NOT_FOUND')
+    expect(res.body.errors.message).toBe('USER_NOT_FOUND')
   })
 })

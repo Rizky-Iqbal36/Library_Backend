@@ -1,7 +1,7 @@
 import Joi from 'joi'
 
 export class UserSchema {
-  postUser = {
+  registerUser = {
     body: Joi.object({
       email: Joi.string().email().required(),
       password: Joi.string().min(8).required(),
@@ -13,6 +13,12 @@ export class UserSchema {
         .required(),
       address: Joi.string().required(),
       avatar: Joi.required()
+    })
+  }
+  loginUser = {
+    body: Joi.object({
+      email: Joi.string().email().required(),
+      password: Joi.string().min(8).required()
     })
   }
   getUser = {

@@ -3,7 +3,7 @@ import { UserRepository } from '@root/repositories/user.repository'
 import { AuthService } from '@root/authentication/service/auth.service'
 import { BadRequestException } from '@root/app/exception/httpException'
 import { httpFlags } from '@root/constant/flags'
-import { IUser } from '@root/database/models/user.model'
+import { IUser, IUserLogin } from '@root/database/models/user.model'
 
 @Injectable()
 export class UserService {
@@ -22,9 +22,9 @@ export class UserService {
     }
   }
 
-  public async createUser(body: IUser) {
-    const checkUser = await this.userRepository.getUserByEmail(body.email)
-    if (checkUser) throw new BadRequestException(httpFlags.EMAIL_ALREADY_EXIST)
+  public async registerUser(body: IUser) {
+    const user = await this.userRepository.getUserByEmail(body.email)
+    if (user) throw new BadRequestException(httpFlags.EMAIL_ALREADY_EXIST)
 
     const hashedPassword = await this.authService.hashPassword(body.password)
     body.password = hashedPassword
@@ -32,6 +32,20 @@ export class UserService {
     const storedUser = await this.userRepository.createUser(body)
 
     const token = this.authService.generateToken(storedUser._id)
+
+    return token
+  }
+
+  public async loginUser(body: IUserLogin) {
+    const user = await this.userRepository.getUserByEmail(body.email)
+
+    if (!user) throw new BadRequestException(httpFlags.EMAIL_OR_PASSWORD_INVALID)
+
+    const isPasswordValid = await this.authService.comparePassword(body.password, user.password)
+
+    if (!isPasswordValid) throw new BadRequestException(httpFlags.EMAIL_OR_PASSWORD_INVALID)
+
+    const token = this.authService.generateToken(user._id)
 
     return token
   }

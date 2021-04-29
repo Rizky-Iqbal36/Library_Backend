@@ -1,5 +1,10 @@
 import { Document, model, Schema } from 'mongoose'
 
+export interface IUserLogin {
+  email: string
+  password: string
+}
+
 export interface IUser {
   isActive?: boolean
   userIsAuthor?: boolean

@@ -101,7 +101,7 @@ describe(`Get book`, () => {
     header['x-user-id'] = user._id
     const res = await request(server).get(`${url}/20010411`).set(header).send()
     expect(res.status).toBe(400)
-    expect(res.body.message).toBe('INVALID_PARAM')
+    expect(res.body.errors.message).toBe('INVALID_PARAM')
   })
 
   it(`Error => Get Book Should get error: No such a book`, async () => {
@@ -109,7 +109,7 @@ describe(`Get book`, () => {
     header['x-user-id'] = user._id
     const res = await request(app.getHttpServer()).get(`${url}/607ea12bd21e76a4433ea592`).set(header).send()
     expect(res.status).toBe(400)
-    expect(res.body.message).toBe('BOOK_NOT_FOUND')
+    expect(res.body.errors.message).toBe('BOOK_NOT_FOUND')
   })
 
   it(`Error => Bookmark a book should get error: Invalid param`, async () => {
@@ -123,6 +123,6 @@ describe(`Get book`, () => {
       .send()
       .query({ bookmark: 'UWAUW' })
     expect(res.status).toBe(400)
-    expect(res.body.message).toBe('INVALID_PARAM')
+    expect(res.body.errors.message).toBe('INVALID_PARAM')
   })
 })

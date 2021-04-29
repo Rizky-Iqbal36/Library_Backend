@@ -12,7 +12,13 @@ export class AuthController extends BaseController {
 
   @Post('register')
   async signUp(@Req() req: Request) {
-    await this.validateRequest(req, BaseController.schemas.userSchema.postUser)
-    return this.userService.createUser(req.body)
+    await this.validateRequest(req, BaseController.schemas.userSchema.registerUser)
+    return this.userService.registerUser(req.body)
+  }
+
+  @Post('login')
+  async signIn(@Req() req: Request) {
+    await this.validateRequest(req, BaseController.schemas.userSchema.loginUser)
+    return this.userService.loginUser(req.body)
   }
 }

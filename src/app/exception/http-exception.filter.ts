@@ -12,20 +12,23 @@ export class HttpExceptionFilter implements ExceptionFilter {
     let message = 'INTERNAL_SERVER_ERROR'
 
     let result: any
-    let detail: any
     if (exception instanceof HttpException) {
       status = exception.getStatus()
       result = exception.getResponse() as IExceptionResponse
     }
-    if (result?.options?.joiError) detail = result?.options?.joiError?.details
-
     if (status !== 500) message = result.flag
+    const details = result.options?.joiError?.details
+    let errors = {
+      flag: result.flag,
+      message,
+      details
+    }
+    status !== 200 ? (result = undefined) : (errors = undefined)
     response.status(status).json({
       statusCode: status,
       path: request.url,
       result,
-      message,
-      detail,
+      errors,
       timestamp: new Date().toISOString()
     })
   }
