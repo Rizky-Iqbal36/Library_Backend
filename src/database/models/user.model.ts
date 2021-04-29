@@ -1,8 +1,8 @@
 import { Document, model, Schema } from 'mongoose'
 
 export interface IUser {
-  isActive: boolean
-  userIsAuthor: boolean
+  isActive?: boolean
+  userIsAuthor?: boolean
   email: string
   password: string
   fullName: string
@@ -10,10 +10,10 @@ export interface IUser {
   gender: string
   phone: string
   address: string
-  isAdmin: boolean
+  isAdmin?: boolean
   bookmarkedBook?: string[]
   uploadedBook?: string[]
-  totalBookmarked: number
+  totalBookmarked?: number
   avatar: string
 }
 

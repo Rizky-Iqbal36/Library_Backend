@@ -16,4 +16,8 @@ export class UserRepository {
   public async createUser(data: IUser) {
     return this.userModel.create(data)
   }
+
+  public async getUserByEmail(email: string) {
+    return this.userModel.findOne({ email })
+  }
 }

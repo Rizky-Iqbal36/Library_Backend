@@ -12,7 +12,6 @@ export class UserSchema {
         .regex(/^[0-9]+$/)
         .required(),
       address: Joi.string().required(),
-      isAdmin: Joi.required(),
       avatar: Joi.required()
     })
   }
