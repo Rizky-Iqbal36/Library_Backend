@@ -17,7 +17,11 @@ export class AuthService {
     return this.bcrypt.hash(password, 12)
   }
 
-  comparePassword(inComingPw: string, pwTOcompare: string) {
-    return this.bcrypt.compare(inComingPw, pwTOcompare)
+  comparePassword(inComingPw: string, pwToCompare: string) {
+    return this.bcrypt.compare(inComingPw, pwToCompare)
+  }
+
+  verifyToken(token: string) {
+    return this.jwt.verify(token, config.auth.jwtSecret)
   }
 }

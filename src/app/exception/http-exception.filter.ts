@@ -12,6 +12,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     let message = 'INTERNAL_SERVER_ERROR'
 
     let result: any
+    let path: any
     if (exception instanceof HttpException) {
       status = exception.getStatus()
       result = exception.getResponse() as IExceptionResponse
@@ -23,10 +24,16 @@ export class HttpExceptionFilter implements ExceptionFilter {
       message,
       details
     }
-    status !== 200 ? (result = undefined) : (errors = undefined)
+    if (status !== 200) {
+      result = undefined
+      path = request.url
+    } else {
+      errors = undefined
+      path = undefined
+    }
     response.status(status).json({
       statusCode: status,
-      path: request.url,
+      path,
       result,
       errors,
       timestamp: new Date().toISOString()

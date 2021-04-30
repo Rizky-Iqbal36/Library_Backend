@@ -5,7 +5,7 @@ import { httpFlags } from '@root/constant/flags'
 import { UserRepository } from '@root/repositories/user.repository'
 
 @Injectable()
-export class UserAuthMiddleware implements NestMiddleware {
+export class UserMiddleware implements NestMiddleware {
   constructor(private readonly userRepository: UserRepository) {}
   async use(req: Request, res: Response, next: NextFunction) {
     const userId = req.header('x-user-id')

@@ -24,6 +24,7 @@ export class UserService {
 
   public async registerUser(body: IUser) {
     const user = await this.userRepository.getUserByEmail(body.email)
+
     if (user) throw new BadRequestException(httpFlags.EMAIL_ALREADY_EXIST)
 
     const hashedPassword = await this.authService.hashPassword(body.password)
@@ -33,7 +34,10 @@ export class UserService {
 
     const token = this.authService.generateToken(storedUser._id)
 
-    return token
+    return {
+      message: 'Registration has been successfully carried out',
+      data: { userId: storedUser._id, email: storedUser.email, token }
+    }
   }
 
   public async loginUser(body: IUserLogin) {
@@ -47,6 +51,6 @@ export class UserService {
 
     const token = this.authService.generateToken(user._id)
 
-    return token
+    return { message: 'Login success', data: { userId: user._id, email: body.email, token } }
   }
 }

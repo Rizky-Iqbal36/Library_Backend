@@ -12,7 +12,9 @@ export class UserSchema {
         .regex(/^[0-9]+$/)
         .required(),
       address: Joi.string().required(),
-      avatar: Joi.required()
+      isAdmin: Joi.boolean(),
+      bookmarkedBook: Joi.array(),
+      uploadedBook: Joi.array()
     })
   }
   loginUser = {

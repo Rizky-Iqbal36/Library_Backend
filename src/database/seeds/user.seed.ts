@@ -13,10 +13,8 @@ export class SeedUserData {
     return all
   }
 
-  async createOne(bookmarkedBook?: string[], isAdmin?: boolean, uploadedBook?: string[]) {
-    return this.userRepository.createUser({
-      isActive: true,
-      userIsAuthor: faker.datatype.boolean(),
+  async createOne(bookmarkedBook?: string[], uploadedBook?: string[]) {
+    return {
       email: faker.internet.email(),
       password: faker.internet.password(8),
       fullName: `${faker.name.firstName()} ${faker.name.middleName()} ${faker.name.lastName()}`,
@@ -24,11 +22,9 @@ export class SeedUserData {
       gender: faker.random.arrayElement(['MALE', 'SHEMALE']),
       phone: faker.phone.phoneNumber('62822########'),
       address: faker.address.streetAddress(),
-      isAdmin: isAdmin ? isAdmin : faker.datatype.boolean(),
+      isAdmin: faker.datatype.boolean(),
       ...(bookmarkedBook ? { bookmarkedBook: bookmarkedBook } : {}),
-      ...(uploadedBook ? { uploadedBook: uploadedBook } : {}),
-      totalBookmarked: 0,
-      avatar: faker.image.avatar()
-    })
+      ...(uploadedBook ? { uploadedBook: uploadedBook } : {})
+    }
   }
 }

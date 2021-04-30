@@ -9,7 +9,8 @@ import { services } from '@root/services/index'
 import { HttpExceptionFilter } from '@root/app/exception/http-exception.filter'
 import ResponseInterceptor from '@root/app/utils/interceptor/response.interceptor'
 
-import { UserAuthMiddleware } from '@app/middlewares/user.middleware'
+import { UserMiddleware } from '@app/middlewares/user.middleware'
+import { UserAuthMiddleware } from '@root/authentication/middleware/auth.middleware'
 @Module({
   controllers,
   providers: [
@@ -22,6 +23,6 @@ import { UserAuthMiddleware } from '@app/middlewares/user.middleware'
 })
 export class AppModule {
   async configure(consumer: MiddlewareConsumer) {
-    consumer.apply(UserAuthMiddleware).forRoutes(BookController, UserController)
+    consumer.apply(UserAuthMiddleware, UserMiddleware).forRoutes(BookController, UserController)
   }
 }

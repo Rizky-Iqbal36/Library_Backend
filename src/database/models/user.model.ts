@@ -19,7 +19,7 @@ export interface IUser {
   bookmarkedBook?: string[]
   uploadedBook?: string[]
   totalBookmarked?: number
-  avatar: string
+  avatar?: string
 }
 
 export type IUserDoc = IUser & Document
@@ -39,7 +39,7 @@ const UserSchema = new Schema(
     uploadedBook: [{ type: Schema.Types.ObjectId, ref: 'Book', required: false, default: null }],
     bookmarkedBook: [{ type: Schema.Types.ObjectId, ref: 'Book', required: false, default: null }],
     totalBookmarked: { type: Number, required: false, default: 0 },
-    avatar: { type: String, required: true }
+    avatar: { type: String, required: false }
   },
   { timestamps: true }
 )

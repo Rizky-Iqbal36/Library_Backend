@@ -7,6 +7,7 @@ import { SeedUserData } from '@database/seeds/user.seed'
 import { SeedBookData } from '@database/seeds/book.seed'
 import { SeedCategoryData } from '@database/seeds/category.seed'
 
+const createUserUrl = '/auth/register'
 const url = '/user'
 const header: any = validHeaders
 
@@ -38,18 +39,28 @@ describe(`Get user`, () => {
   it(`Success => Should get one user data`, async () => {
     const category = await seedCategoryData.createOne()
     const book = await seedBookData.createOne(category._id)
-    const user = await seedUserData.createOne(book._id)
-    header['x-user-id'] = user._id
-    const res = await request(server).get(`${url}/${user._id}`).set(header).send()
+    const userData = await seedUserData.createOne([book._id])
+    const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
+    const registeredUser = registerUser.body.result.data
+    header['x-user-id'] = registeredUser.userId
+    header['Authorization'] = `Bearer ${registeredUser.token}`
+
+    const res = await request(server).get(`${url}/${registeredUser.userId}`).set(header).send()
     expect(res.status).toBe(200)
-    expect(res.body.result._id).toBe(user._id.toString())
+    expect(res.body.result._id).toBe(registeredUser.userId)
   })
 
-  it(`Success => Should get many user datas`, async () => {
-    const user = await seedUserData.createOne()
-    user.isAdmin = true
-    header['x-user-id'] = user._id
-    await seedUserData.createMany(10)
+  it(`Success => Should get many user datas that sorted by admin property`, async () => {
+    let userData: any
+    let registerUser: request.Response
+    for (let i = 0; i < 10; i++) {
+      userData = await seedUserData.createOne()
+      registerUser = await request(server).post(`${createUserUrl}`).send(userData)
+    }
+    const registeredUser = registerUser.body.result.data
+    header['x-user-id'] = registeredUser.userId
+    header['Authorization'] = `Bearer ${registeredUser.token}`
+
     const res = await request(server).get(url).set(header).send().query({ isAdmin: true })
     expect(res.body.result[0].isAdmin).toBe(true)
 
@@ -58,16 +69,23 @@ describe(`Get user`, () => {
   })
 
   it(`Error => Get user data should get error: Invalid param`, async () => {
-    const user = await seedUserData.createOne()
-    header['x-user-id'] = user._id
+    const userData = await seedUserData.createOne()
+    const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
+    const registeredUser = registerUser.body.result.data
+    header['x-user-id'] = registeredUser.userId
+    header['Authorization'] = `Bearer ${registeredUser.token}`
     const res = await request(server).get(`${url}/200140`).set(header).send()
     expect(res.status).toBe(400)
     expect(res.body.errors.message).toBe('INVALID_PARAM')
   })
 
   it(`Error => Get user data should get error: No such a user`, async () => {
-    const user = await seedUserData.createOne()
-    header['x-user-id'] = user._id
+    const userData = await seedUserData.createOne()
+    const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
+    const registeredUser = registerUser.body.result.data
+    header['x-user-id'] = registeredUser.userId
+    header['Authorization'] = `Bearer ${registeredUser.token}`
+
     const res = await request(server).get(`${url}/607ea12bd21e76a4433ea592`).set(header).send()
     expect(res.status).toBe(400)
     expect(res.body.errors.message).toBe('USER_NOT_FOUND')
