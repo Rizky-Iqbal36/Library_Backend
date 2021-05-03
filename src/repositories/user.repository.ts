@@ -5,8 +5,9 @@ import { UserModel, IUser } from '@database/models/user.model'
 export class UserRepository {
   private readonly userModel = UserModel
 
-  public async getAllUsers(isAdmin: boolean) {
-    return this.userModel.find({ isAdmin })
+  public async getAllUsers(isAdmin?: boolean) {
+    if (isAdmin) return this.userModel.find({ isAdmin })
+    else return this.userModel.find()
   }
 
   public async getOneUser(id: string) {

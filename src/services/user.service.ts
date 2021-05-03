@@ -9,7 +9,7 @@ import { IUser, IUserLogin } from '@root/database/models/user.model'
 export class UserService {
   constructor(private readonly userRepository: UserRepository, private readonly authService: AuthService) {}
 
-  public async findAllUser(isAdmin: boolean) {
+  public async findAllUser(isAdmin?: boolean) {
     return this.userRepository.getAllUsers(isAdmin)
   }
 

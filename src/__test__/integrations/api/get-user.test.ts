@@ -68,6 +68,23 @@ describe(`Get user`, () => {
     expect(res1.body.result[0].isAdmin).toBe(false)
   })
 
+  it(`Success => Should get many user datas without query`, async () => {
+    let userData: any
+    let registerUser: request.Response
+    for (let i = 0; i < 10; i++) {
+      userData = await seedUserData.createOne()
+      registerUser = await request(server).post(`${createUserUrl}`).send(userData)
+    }
+    const registeredUser = registerUser.body.result.data
+    header['x-user-id'] = registeredUser.userId
+    header['Authorization'] = `Bearer ${registeredUser.token}`
+
+    const res = await request(server).get(url).set(header).send()
+    expect(res.status).toBe(200)
+    expect(res.body).toHaveProperty('result')
+    expect(res.body.result.length).toBe(10)
+  })
+
   it(`Error => Get user data should get error: Invalid param`, async () => {
     const userData = await seedUserData.createOne()
     const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
