@@ -16,7 +16,7 @@ const body = {
   phone: '82290260388',
   address: 'itu di sana'
 }
-describe(`Get user`, () => {
+describe(`Authentication`, () => {
   let app: INestApplication
   let server: any
   //   let seedUserData: SeedUserData
@@ -46,5 +46,29 @@ describe(`Get user`, () => {
     expect(res.status).toBe(200)
     expect(res.body.result.data).toHaveProperty('token')
     expect(res.body.result.data.email).toBe(body.email)
+  })
+
+  it(`Success => Should login a user and return a token`, async () => {
+    await request(server).post(`${url}/register`).send(body)
+    const { email, password } = body
+    const res = await request(server).post(`${url}/login`).send({ email, password })
+    expect(res.status).toBe(200)
+    expect(res.body.result.message).toBe('Login success')
+    expect(res.body.result.data).toHaveProperty('token')
+  })
+
+  it(`Error => Register a user should get error: Invalid body`, async () => {
+    delete body.email
+    const res = await request(server).post(`${url}/register`).send(body)
+    expect(res.status).toBe(400)
+    expect(res.body.errors.flag).toBe('INVALID_BODY')
+  })
+
+  it(`Error => login a user should get error: Wrong password or email`, async () => {
+    const { password } = body
+    const email = 'coba@coba.com'
+    const res = await request(server).post(`${url}/login`).send({ email, password })
+    expect(res.status).toBe(400)
+    expect(res.body.errors.flag).toBe('EMAIL_OR_PASSWORD_INVALID')
   })
 })

@@ -5,7 +5,7 @@ import config from '@root/app/config/appConfig'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
-  app.setGlobalPrefix('library')
+  app.setGlobalPrefix('library/v1')
   app.useGlobalInterceptors(new ResponseInterceptor())
   await app.listen(config.app.port)
 }

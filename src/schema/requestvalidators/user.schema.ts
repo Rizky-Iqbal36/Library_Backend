@@ -26,6 +26,9 @@ export class UserSchema {
   getUser = {
     query: Joi.object({
       isAdmin: Joi.boolean()
-    }).required()
+    }).required(),
+    header: Joi.object({
+      'x-user-id': Joi.string().required()
+    })
   }
 }
