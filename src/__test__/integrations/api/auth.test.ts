@@ -57,18 +57,22 @@ describe(`Authentication`, () => {
     expect(res.body.result.data).toHaveProperty('token')
   })
 
+  it(`Error => login a user should get error: Wrong password or email`, async () => {
+    const fakeEmail = 'user@fake.com'
+    const res = await request(server).post(`${url}/login`).send({ email: fakeEmail, password: body.password })
+    expect(res.status).toBe(400)
+    expect(res.body.errors.flag).toBe('EMAIL_OR_PASSWORD_INVALID')
+
+    const fakePassword = 'fakePassword'
+    const res1 = await request(server).post(`${url}/login`).send({ email: body.email, password: fakePassword })
+    expect(res1.status).toBe(400)
+    expect(res1.body.errors.flag).toBe('EMAIL_OR_PASSWORD_INVALID')
+  })
+
   it(`Error => Register a user should get error: Invalid body`, async () => {
     delete body.email
     const res = await request(server).post(`${url}/register`).send(body)
     expect(res.status).toBe(400)
     expect(res.body.errors.flag).toBe('INVALID_BODY')
-  })
-
-  it(`Error => login a user should get error: Wrong password or email`, async () => {
-    const { password } = body
-    const email = 'coba@coba.com'
-    const res = await request(server).post(`${url}/login`).send({ email, password })
-    expect(res.status).toBe(400)
-    expect(res.body.errors.flag).toBe('EMAIL_OR_PASSWORD_INVALID')
   })
 })
