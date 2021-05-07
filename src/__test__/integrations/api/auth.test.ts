@@ -1,39 +1,32 @@
 import { INestApplication } from '@nestjs/common'
 import request from 'supertest'
 import { initServerApp, stopServerApp, flushMongoDB } from '@root/__test__/util/createApp'
+import { validHeaders } from '@root/__test__/util/set-header'
 
-// import { SeedUserData } from '@database/seeds/user.seed'
-// import { SeedBookData } from '@database/seeds/book.seed'
-// import { SeedCategoryData } from '@database/seeds/category.seed'
-
+const header: any = validHeaders
 const url = '/auth'
-const body = {
-  email: 'coba@email.com',
-  password: 'unchunch',
-  fullName: 'siapa oii',
-  userName: 'oii siapa',
-  gender: 'MALE',
-  phone: '82290260388',
-  address: 'itu di sana'
-}
+let body: any
 describe(`Authentication`, () => {
   let app: INestApplication
   let server: any
-  //   let seedUserData: SeedUserData
-  //   let seedBookData: SeedBookData
-  //   let seedCategoryData: SeedCategoryData
 
   beforeAll(async () => {
     app = await initServerApp()
     server = app.getHttpServer()
-    // seedUserData = await app.get(SeedUserData)
-    // seedBookData = await app.get(SeedBookData)
-    // seedCategoryData = await app.get(SeedCategoryData)
 
     await app.init()
   })
 
   beforeEach(async () => {
+    body = {
+      email: 'coba@email.com',
+      password: 'unchunch',
+      fullName: 'siapa oii',
+      userName: 'oii siapa',
+      gender: 'MALE',
+      phone: '82290260388',
+      address: 'itu di sana'
+    }
     await flushMongoDB()
   })
 
@@ -69,6 +62,44 @@ describe(`Authentication`, () => {
     const res1 = await request(server).post(`${url}/login`).send({ email: body.email, password: fakePassword })
     expect(res1.status).toBe(400)
     expect(res1.body.errors.flag).toBe('EMAIL_OR_PASSWORD_INVALID')
+  })
+
+  it(`Error => Register a user should get error: Wrong password or email`, async () => {
+    await request(server).post(`${url}/register`).send(body)
+    const res = await request(server).post(`${url}/register`).send(body)
+    expect(res.status).toBe(400)
+    expect(res.body.errors.flag).toBe('EMAIL_ALREADY_EXIST')
+  })
+
+  it(`Error => User access API should get error: User unauthorized`, async () => {
+    const registerUser = await request(server).post(`${url}/register`).send(body)
+    const registeredUser = registerUser.body.result.data
+    header['x-user-id'] = registeredUser.userId
+
+    const res = await request(app.getHttpServer())
+      .get(`/book/607ea12c821e76a4433ea592`)
+      .set(header)
+      .send()
+      .query({ bookmark: 'UWAUW' })
+    expect(res.status).toBe(401)
+    expect(res.body.errors.message).toBe('USER_UNAUTHORIZED')
+  })
+
+  it(`Error => User access API should get error: Invalid token`, async () => {
+    const registerUser = await request(server).post(`${url}/register`).send(body)
+    const registeredUser = registerUser.body.result.data
+    header['x-user-id'] = registeredUser.userId
+    header[
+      'Authorization'
+    ] = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwOGJhNzQ3MzE1YTgwMzA1NGEwZTJiNSIsImlhdCI6MTYxOTc2NTA5MCwiZXhwIjoxNjE5ODUxNDkwfQ.bv9Hwp4IAdLAktBa8BL4TFBpE2yWu5t8lCPKfeCVe0k`
+
+    const res = await request(app.getHttpServer())
+      .get(`/book/607ea12bd21e76a4433ea592`)
+      .set(header)
+      .send()
+      .query({ bookmark: 'UWAUW' })
+    expect(res.status).toBe(400)
+    expect(res.body.errors.message).toBe('INVALID_TOKEN')
   })
 
   it(`Error => Register a user should get error: Invalid body`, async () => {

@@ -8,8 +8,8 @@ import { AuthService } from '@root/authentication/service/auth.service'
 export class UserAuthMiddleware implements NestMiddleware {
   constructor(private readonly authService: AuthService) {}
   async use(req: Request, res: Response, next: NextFunction) {
-    const authorization = req.header('Authorization')
-    const token = authorization.replace('Bearer ', '')
+    const { authorization } = req.headers
+    const token = authorization?.replace('Bearer ', '')
     if (!authorization || !token) throw new UnauthorizedException(httpFlags.USER_UNAUTHORIZED)
     try {
       await this.authService.verifyToken(token)

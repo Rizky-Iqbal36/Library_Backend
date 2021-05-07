@@ -18,9 +18,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
       result = exception.getResponse() as IExceptionResponse
     }
     if (status !== 500) message = result.flag
-    const details = result.options?.joiError?.details
+    const details = result?.options?.joiError?.details
     let errors = {
-      flag: result.flag,
+      flag: result?.flag,
       message,
       details
     }
@@ -36,7 +36,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       path,
       result,
       errors,
-      timestamp: new Date().toISOString()
+      accessTime: new Date().toISOString()
     })
   }
 }
