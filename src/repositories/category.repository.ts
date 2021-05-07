@@ -10,7 +10,11 @@ export class CategoryRepository {
   }
 
   public async getCategoryByName(name: string) {
-    return this.categoryModel.find({ where: { name } })
+    return this.categoryModel.findOne({ where: { name } })
+  }
+
+  public async getCategoryById(id: string) {
+    return this.categoryModel.findById(id)
   }
 
   public async createCategory(data: ICategory) {

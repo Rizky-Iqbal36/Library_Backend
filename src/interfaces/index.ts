@@ -19,4 +19,5 @@ export interface IRequestValidationSchema {
   body?: Joi.Schema
   query?: Joi.Schema
   headers?: Joi.Schema
+  header?: Joi.Schema
 }

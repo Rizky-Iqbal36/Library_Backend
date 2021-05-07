@@ -20,7 +20,7 @@ export class UserController extends BaseController {
     return this.userService.findAllUser((isAdmin as unknown) as boolean)
   }
 
-  @Get(':id')
+  @Get('/:id')
   async getOne(@Param('id') id: string) {
     const isValidID = mongoose.Types.ObjectId.isValid(id)
     if (isValidID) {

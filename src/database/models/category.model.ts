@@ -1,10 +1,10 @@
 import { Document, model, Schema } from 'mongoose'
 
 export interface ICategory {
-  isActive: boolean
+  isActive?: boolean
   name: string
-  numberOfBook: number
-  bookIds?: any[]
+  numberOfBook?: number
+  books?: string[]
   description: string
 }
 
@@ -12,10 +12,10 @@ export type ICategoryDoc = ICategory & Document
 
 const categorySchema = new Schema(
   {
-    isActive: { type: Boolean, required: true },
+    isActive: { type: Boolean, required: true, default: true },
     name: { type: String, required: true, unique: true },
-    numberOfBook: { type: Number, required: true },
-    bookIds: { type: Schema.Types.ObjectId, ref: 'Book', required: false },
+    numberOfBook: { type: Number, required: false, default: 0 },
+    books: [{ type: Schema.Types.ObjectId, ref: 'Book', required: false }],
     description: { type: String, required: true }
   },
   { timestamps: true }
