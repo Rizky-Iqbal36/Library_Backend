@@ -29,19 +29,23 @@ this project is improvement from [this](https://github.com/Rizky-Iqbal36/DW18W66
 ## Installation
 
 ```bash
+$ cp .env.example .env
 $ npm install
 ```
 
 ## Running the app
 
 ```bash
-# development
+# Start service
+npm run dependency:local
+
+# Development
 $ npm run start
 
-# watch mode
+# Watch mode
 $ npm run start:dev
 
-# production mode
+# Production mode
 $ npm run start:prod
 ```
 
