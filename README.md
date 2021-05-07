@@ -28,6 +28,11 @@ this project is improvement from [this](https://github.com/Rizky-Iqbal36/DW18W66
 
 ## Installation
 
+Note: <br />
+
+- Make sure you have docker installed on your computer if you don't please feel free to access [Docker Documentation](https://docs.docker.com/)
+- Or you can install the service i use on docker compose instead install it using docker
+
 ```bash
 $ cp .env.example .env
 $ npm install
