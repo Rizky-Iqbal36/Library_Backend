@@ -58,6 +58,8 @@ describe(`Authentication`, () => {
   })
 
   it(`Error => login a user should get error: Wrong password or email`, async () => {
+    await request(server).post(`${url}/register`).send(body)
+
     const fakeEmail = 'user@fake.com'
     const res = await request(server).post(`${url}/login`).send({ email: fakeEmail, password: body.password })
     expect(res.status).toBe(400)

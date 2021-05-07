@@ -52,7 +52,7 @@ describe(`Category API`, () => {
     expect(res.status).toBe(200)
     expect(res.body.result).toMatchObject({
       _id: category._id.toString(),
-      isActive: true,
+      isActive: category.isActive,
       numberOfBook: 1,
       books: [book._id.toString()],
       name: category.name,

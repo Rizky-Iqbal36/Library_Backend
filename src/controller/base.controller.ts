@@ -28,7 +28,6 @@ export abstract class BaseController {
 
     if (schema.headers)
       await schema.headers.validateAsync(headers).catch(joiError => {
-        console.log(headers)
         throw new BadRequestException(httpFlags.INVALID_HEADERS, { joiError })
       })
   }
