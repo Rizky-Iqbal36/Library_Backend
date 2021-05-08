@@ -12,7 +12,7 @@ const createUserUrl = '/auth/register'
 const url = '/book'
 const header: any = validHeaders
 
-describe(`Get book`, () => {
+describe(`Book API`, () => {
   let app: INestApplication
   let server: any
   let seedBookData: SeedBookData

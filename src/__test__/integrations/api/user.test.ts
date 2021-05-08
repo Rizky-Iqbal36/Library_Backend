@@ -11,7 +11,7 @@ const createUserUrl = '/auth/register'
 const url = '/user'
 const header: any = validHeaders
 
-describe(`Get user`, () => {
+describe(`User API`, () => {
   let app: INestApplication
   let server: any
   let seedUserData: SeedUserData

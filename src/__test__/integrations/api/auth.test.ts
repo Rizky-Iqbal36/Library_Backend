@@ -6,7 +6,7 @@ import { validHeaders } from '@root/__test__/util/set-header'
 const header: any = validHeaders
 const url = '/auth'
 let body: any
-describe(`Authentication`, () => {
+describe(`Authentication API`, () => {
   let app: INestApplication
   let server: any
 
