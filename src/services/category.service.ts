@@ -13,8 +13,9 @@ export class CategoryService {
   }
 
   public async findOneCategory(id: string) {
-    const category = this.categoryRepository.getCategoryById(id)
+    const category = await this.categoryRepository.getCategoryById(id)
     if (category) {
+      if (!category.isActive) throw new BadRequestException(httpFlags.CATEGORY_IS_INACTIVE)
       return category
     } else {
       throw new BadRequestException(httpFlags.CATEGORY_NOT_FOUND)
@@ -22,8 +23,18 @@ export class CategoryService {
   }
 
   public async createCategory(data: ICategory) {
-    const categoryIsExist = this.categoryRepository.getCategoryByName(data.name)
+    const categoryIsExist = await this.categoryRepository.getCategoryByName(data.name)
+
     if (categoryIsExist) throw new BadRequestException(httpFlags.CATEGORY_IS_ALREADY_EXIST)
-    return this.categoryRepository.createCategory(data)
+
+    const createdCategory = await this.categoryRepository.createCategory(data)
+    return {
+      message: 'New category succesfully created',
+      data: {
+        categoryId: createdCategory._id,
+        categoryName: createdCategory.name,
+        categoryDescription: createdCategory.description
+      }
+    }
   }
 }

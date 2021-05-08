@@ -37,7 +37,7 @@ describe(`Get user`, () => {
   })
 
   it(`Success => Should get one user data`, async () => {
-    const category = await seedCategoryData.createOne()
+    const category = await seedCategoryData.createOne({ name: 'Sci-fi' })
     const book = await seedBookData.createOne(category._id)
     const userData = await seedUserData.createOne([book._id])
     const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
@@ -85,18 +85,18 @@ describe(`Get user`, () => {
     expect(res.body.result.length).toBe(10)
   })
 
-  it(`Error => Get user data should get error: Invalid param`, async () => {
+  it(`Error => Get user data should got error: Invalid param`, async () => {
     const userData = await seedUserData.createOne()
     const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
     const registeredUser = registerUser.body.result.data
     header['x-user-id'] = registeredUser.userId
     header['Authorization'] = `Bearer ${registeredUser.token}`
-    const res = await request(server).get(`${url}/200140`).set(header).send()
+    const res = await request(server).get(`${url}/0123456789`).set(header).send()
     expect(res.status).toBe(400)
     expect(res.body.errors.message).toBe('INVALID_PARAM')
   })
 
-  it(`Error => Get user data should get error: No such a user`, async () => {
+  it(`Error => Get user data should got error: No such a user`, async () => {
     const userData = await seedUserData.createOne()
     const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
     const registeredUser = registerUser.body.result.data

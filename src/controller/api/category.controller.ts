@@ -30,12 +30,8 @@ export class CategoryController extends BaseController {
   }
 
   @Post('/create')
-  async createOne(@Param('id') id: string, @Req() req: Request) {
-    const isValidID = mongoose.Types.ObjectId.isValid(id)
-    if (isValidID) {
-      return this.categoryService.createCategory(req.body)
-    } else {
-      throw new BadRequestException(httpFlags.INVALID_PARAM)
-    }
+  async createOne(@Req() req: Request) {
+    await this.validateRequest(req, BaseController.schemas.categorySchema.createCategory)
+    return this.categoryService.createCategory(req.body)
   }
 }

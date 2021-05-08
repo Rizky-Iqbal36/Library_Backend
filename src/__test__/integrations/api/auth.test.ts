@@ -50,7 +50,7 @@ describe(`Authentication`, () => {
     expect(res.body.result.data).toHaveProperty('token')
   })
 
-  it(`Error => login a user should get error: Wrong password or email`, async () => {
+  it(`Error => login a user should got error: Wrong password or email`, async () => {
     await request(server).post(`${url}/register`).send(body)
 
     const fakeEmail = 'user@fake.com'
@@ -64,14 +64,14 @@ describe(`Authentication`, () => {
     expect(res1.body.errors.flag).toBe('EMAIL_OR_PASSWORD_INVALID')
   })
 
-  it(`Error => Register a user should get error: Wrong password or email`, async () => {
+  it(`Error => Register a user should got error: Email already exist`, async () => {
     await request(server).post(`${url}/register`).send(body)
     const res = await request(server).post(`${url}/register`).send(body)
     expect(res.status).toBe(400)
     expect(res.body.errors.flag).toBe('EMAIL_ALREADY_EXIST')
   })
 
-  it(`Error => User access API should get error: User unauthorized`, async () => {
+  it(`Error => User access API should got error: User unauthorized`, async () => {
     const registerUser = await request(server).post(`${url}/register`).send(body)
     const registeredUser = registerUser.body.result.data
     header['x-user-id'] = registeredUser.userId
@@ -85,7 +85,7 @@ describe(`Authentication`, () => {
     expect(res.body.errors.message).toBe('USER_UNAUTHORIZED')
   })
 
-  it(`Error => User access API should get error: Invalid token`, async () => {
+  it(`Error => User access API should got error: Invalid token`, async () => {
     const registerUser = await request(server).post(`${url}/register`).send(body)
     const registeredUser = registerUser.body.result.data
     header['x-user-id'] = registeredUser.userId
@@ -102,7 +102,7 @@ describe(`Authentication`, () => {
     expect(res.body.errors.message).toBe('INVALID_TOKEN')
   })
 
-  it(`Error => Register a user should get error: Invalid body`, async () => {
+  it(`Error => Register a user should got error: Invalid body`, async () => {
     delete body.email
     const res = await request(server).post(`${url}/register`).send(body)
     expect(res.status).toBe(400)

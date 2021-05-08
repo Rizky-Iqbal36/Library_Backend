@@ -44,7 +44,7 @@ describe(`Get book`, () => {
     header['x-user-id'] = registeredUser.userId
     header['Authorization'] = `Bearer ${registeredUser.token}`
 
-    const category = await seedCategoryData.createOne()
+    const category = await seedCategoryData.createOne({ name: 'Sci-fi' })
     const book = await seedBookData.createOne(category._id)
     const res = await request(app.getHttpServer()).get(`${url}/${book._id}`).set(header).send()
     expect(res.status).toBe(200)
@@ -61,7 +61,7 @@ describe(`Get book`, () => {
     header['x-user-id'] = registeredUser.userId
     header['Authorization'] = `Bearer ${registeredUser.token}`
 
-    const category = await seedCategoryData.createOne()
+    const category = await seedCategoryData.createOne({ name: 'Sci-fi' })
     const book = await seedBookData.createOne(category._id)
 
     const gotUser = await request(server).get(`/user/${registeredUser.userId}`).set(header).send()
@@ -110,19 +110,19 @@ describe(`Get book`, () => {
     expect(res.body.result[1].publication).not.dateNewerThan(res.body.result[0].publication)
   })
 
-  it(`Error => Get book should get error: Invalid param`, async () => {
+  it(`Error => Get book should got error: Invalid param`, async () => {
     const userData = await seedUserData.createOne()
     const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
     const registeredUser = registerUser.body.result.data
     header['x-user-id'] = registeredUser.userId
     header['Authorization'] = `Bearer ${registeredUser.token}`
 
-    const res = await request(server).get(`${url}/20010411`).set(header).send()
+    const res = await request(server).get(`${url}/0123456789`).set(header).send()
     expect(res.status).toBe(400)
     expect(res.body.errors.message).toBe('INVALID_PARAM')
   })
 
-  it(`Error => Get Book Should get error: No such a book`, async () => {
+  it(`Error => Get Book Should got error: No such a book`, async () => {
     const userData = await seedUserData.createOne()
     const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
     const registeredUser = registerUser.body.result.data
@@ -134,14 +134,14 @@ describe(`Get book`, () => {
     expect(res.body.errors.message).toBe('BOOK_NOT_FOUND')
   })
 
-  it(`Error => Bookmark a book should get error: Invalid param`, async () => {
+  it(`Error => Bookmark a book should got error: Invalid param`, async () => {
     const userData = await seedUserData.createOne()
     const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
     const registeredUser = registerUser.body.result.data
     header['x-user-id'] = registeredUser.userId
     header['Authorization'] = `Bearer ${registeredUser.token}`
 
-    const category = await seedCategoryData.createOne()
+    const category = await seedCategoryData.createOne({ name: 'Sci-fi' })
     const book = await seedBookData.createOne(category._id)
     const res = await request(app.getHttpServer())
       .get(`${url}/${book._id}`)
