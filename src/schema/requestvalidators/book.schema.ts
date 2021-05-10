@@ -9,4 +9,24 @@ export class BookSchema {
       bookmark: Joi.string().valid('BOOKMARK', 'UNBOOKMARK').allow('')
     }).required()
   }
+
+  updateBook = {
+    body: Joi.object({
+      isActive: Joi.boolean(),
+      status: Joi.string().valid('WAIT', 'CANCEL', 'ACTIVE'),
+      title: Joi.string(),
+      isbn: Joi.string(),
+      authors: Joi.array(),
+      categoryIds: Joi.array(),
+      publication: Joi.string(),
+      pages: Joi.number(),
+      uploadBy: Joi.string(),
+      views: Joi.number(),
+      aboutBook: Joi.string(),
+      file: Joi.string(),
+      thumbnail: Joi.string(),
+      bookMarked: Joi.number(),
+      bookMarkedBy: Joi.array()
+    }).required()
+  }
 }

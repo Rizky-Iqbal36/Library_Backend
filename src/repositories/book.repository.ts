@@ -9,8 +9,9 @@ export class BookRepository {
     return this.bookModel.find().sort({ publication: -1 })
   }
 
-  public async getOneBook(id: string) {
-    return this.bookModel.findById(id).populate('categoryIds')
+  public async getOneBook(id: string, populate?: boolean) {
+    if (populate) return this.bookModel.findById(id).populate('categoryIds')
+    else return this.bookModel.findById(id)
   }
 
   public async createBook(data: IBook) {

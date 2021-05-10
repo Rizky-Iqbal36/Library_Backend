@@ -110,6 +110,26 @@ describe(`Book API`, () => {
     expect(res.body.result[1].publication).not.dateNewerThan(res.body.result[0].publication)
   })
 
+  it(`Success => User should update a book`, async () => {
+    const userData = await seedUserData.createOne()
+    const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
+    const registeredUser = registerUser.body.result.data
+    header['x-user-id'] = registeredUser.userId
+    header['Authorization'] = `Bearer ${registeredUser.token}`
+
+    const category = await seedCategoryData.createOne({ name: 'Sci-fi' })
+    const book = await seedBookData.createOne(category._id)
+    const category1 = await seedCategoryData.createOne({ name: 'Magic' })
+    const payload = { title: 'Stardenburdenhardenbart', categoryIds: [category1._id] }
+    const res = await request(server).put(`${url}/${book._id}`).set(header).send(payload)
+    expect(res.status).toBe(200)
+    expect(res.body.result.categoryIds.length).toBe(2)
+
+    const checkCategory = await request(server).get(`/category/${category1._id}`).set(header).send()
+    expect(checkCategory.status).toBe(200)
+    expect(checkCategory.body.result.books[0]).toBe(book._id.toString())
+  })
+
   it(`Error => Get book should got error: Invalid param`, async () => {
     const userData = await seedUserData.createOne()
     const registerUser = await request(server).post(`${createUserUrl}`).send(userData)

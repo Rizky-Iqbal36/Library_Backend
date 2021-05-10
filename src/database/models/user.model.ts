@@ -28,7 +28,7 @@ const UserSchema = new Schema(
   {
     isActive: { type: Boolean, required: true, default: true },
     userIsAuthor: { type: Boolean, required: true, default: false },
-    email: { type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true, lowercase: true },
     password: { type: String, required: true },
     fullName: { type: String, required: true },
     userName: { type: String, required: true },

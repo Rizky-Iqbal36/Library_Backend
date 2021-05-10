@@ -17,14 +17,14 @@ export class SeedBookData {
     //, authors?: string[]) {
     return this.bookRepository.createBook({
       isActive: faker.datatype.boolean(),
-      status: 'ACTIVE',
+      status: faker.random.arrayElement(['WAIT', 'CANCEL', 'ACTIVE']),
       title: faker.name.title(),
       isbn: faker.finance.creditCardNumber(),
       authors: [`${faker.name.firstName()} ${faker.name.middleName()} ${faker.name.lastName()}`],
       ...(categoryId ? { categoryIds: categoryId } : {}),
       publication: faker.date.past(10, new Date()),
       pages: faker.datatype.number(),
-      uploadBy: '607ea12bd21e76a4433ea592', //temporary, wait for user model
+      uploadBy: '607ea12bd21e76a4433ea592', //temporary, wait for user integration
       views: 0,
       aboutBook: faker.commerce.productDescription(),
       file: `file_${faker.lorem.sentence(1)}epub`,

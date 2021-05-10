@@ -1,20 +1,20 @@
 import { Document, model, Schema } from 'mongoose'
 
 export interface IBook {
-  isActive: boolean
-  status: string
-  title: string
-  isbn: string
-  authors: string[]
+  isActive?: boolean
+  status?: string
+  title?: string
+  isbn?: string
+  authors?: string[]
   categoryIds?: any[]
-  publication: Date
-  pages: number
-  uploadBy: any
-  views: number
-  aboutBook: string
-  file: string
-  thumbnail: string
-  bookMarked: number
+  publication?: Date
+  pages?: number
+  uploadBy?: any
+  views?: number
+  aboutBook?: string
+  file?: string
+  thumbnail?: string
+  bookMarked?: number
   bookMarkedBy?: any[]
 }
 
