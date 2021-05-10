@@ -73,19 +73,18 @@ export class BookService {
   }
 
   private async updateBookCategory(categories: string[], bookId: string) {
-    const bookCategory = []
-    categories.forEach(async result => {
-      bookCategory.push(result)
-      const category = await this.categoryRepository.getCategoryById(result)
-      if (category) {
-        category.books.push(bookId)
-        category.numberOfBook += 1
-        await category.save()
-      } else {
-        throw new BadRequestException(httpFlags.CATEGORY_NOT_FOUND)
-      }
-    })
-
-    return bookCategory
+    return Promise.all(
+      categories.map(async categoryId => {
+        const category = await this.categoryRepository.getCategoryById(categoryId)
+        if (category) {
+          category.books.push(bookId)
+          category.numberOfBook += 1
+          await category.save()
+          return categoryId
+        } else {
+          throw new BadRequestException(httpFlags.CATEGORY_NOT_FOUND)
+        }
+      })
+    )
   }
 }

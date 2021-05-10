@@ -130,6 +130,45 @@ describe(`Book API`, () => {
     expect(checkCategory.body.result.books[0]).toBe(book._id.toString())
   })
 
+  it(`Error => Update a book should got error: Book not found`, async () => {
+    const userData = await seedUserData.createOne()
+    const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
+    const registeredUser = registerUser.body.result.data
+    header['x-user-id'] = registeredUser.userId
+    header['Authorization'] = `Bearer ${registeredUser.token}`
+
+    const payload = { title: 'Wingardium Leviosa' }
+    const res = await request(server).put(`${url}/6098a9867105050cf0550956`).set(header).send(payload)
+    expect(res.status).toBe(400)
+    expect(res.body.errors.message).toBe('BOOK_NOT_FOUND')
+  })
+
+  it(`Error => Update a book should got error: Category not found`, async () => {
+    const userData = await seedUserData.createOne()
+    const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
+    const registeredUser = registerUser.body.result.data
+    header['x-user-id'] = registeredUser.userId
+    header['Authorization'] = `Bearer ${registeredUser.token}`
+
+    const book = await seedBookData.createOne()
+    const payload = { title: 'Expeliarmus', categoryIds: ['6098a9d6e45c890d2df28438'] }
+    const res = await request(server).put(`${url}/${book._id}`).set(header).send(payload)
+    expect(res.status).toBe(400)
+    expect(res.body.errors.message).toBe('CATEGORY_NOT_FOUND')
+  })
+  it(`Error => Update a book should got error: Invalid param`, async () => {
+    const userData = await seedUserData.createOne()
+    const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
+    const registeredUser = registerUser.body.result.data
+    header['x-user-id'] = registeredUser.userId
+    header['Authorization'] = `Bearer ${registeredUser.token}`
+
+    const payload = { title: 'Vershmeltzen' }
+    const res = await request(server).put(`${url}/0123456789`).set(header).send(payload)
+    expect(res.status).toBe(400)
+    expect(res.body.errors.message).toBe('INVALID_PARAM')
+  })
+
   it(`Error => Get book should got error: Invalid param`, async () => {
     const userData = await seedUserData.createOne()
     const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
