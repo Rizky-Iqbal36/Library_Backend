@@ -48,6 +48,15 @@ export class BookService {
     }
   }
 
+  public async createBook(body: IBook, userId: string) {
+    body.isActive = false
+    body.status = 'WAIT'
+    body.uploadBy = userId
+    const createdBook = await this.bookRepository.createBook(body)
+    body.categoryIds ? await this.updateBookCategory(body.categoryIds, createdBook._id) : undefined
+    return createdBook
+  }
+
   public async updateBook(id: string, body: IBook) {
     const { aboutBook, authors, categoryIds, file, isbn, pages, thumbnail, publication, title } = body
     const book = await this.bookRepository.getOneBook(id, false)

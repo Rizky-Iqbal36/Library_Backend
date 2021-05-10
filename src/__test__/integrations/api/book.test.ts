@@ -11,6 +11,7 @@ import { SeedCategoryData } from '@database/seeds/category.seed'
 const createUserUrl = '/auth/register'
 const url = '/book'
 const header: any = validHeaders
+let payload: any
 
 describe(`Book API`, () => {
   let app: INestApplication
@@ -30,11 +31,36 @@ describe(`Book API`, () => {
   })
 
   beforeEach(async () => {
+    payload = {
+      title: 'Harry Potter and the Goblet of Fire',
+      authors: ['J.K Rowling'],
+      categoryIds: [],
+      publication: '8 Juli 2000',
+      pages: 882,
+      aboutBook: "Harry Potter and the Goblet of Fire is the fourth book in J. K. Rowling's Harry Potter novel series",
+      file: 'harryPotterGobletOfFirer.epub',
+      thumbnail: 'harryPotterGobletOfFirer.jpg'
+    }
     await flushMongoDB()
   })
 
   afterAll(async () => {
     await stopServerApp()
+  })
+
+  it(`Success => User should post a book`, async () => {
+    const userData = await seedUserData.createOne()
+    const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
+    const registeredUser = registerUser.body.result.data
+    header['x-user-id'] = registeredUser.userId
+    header['Authorization'] = `Bearer ${registeredUser.token}`
+
+    const category = await seedCategoryData.createOne({ name: 'Sci-fi' })
+    payload.categoryIds.push(category._id)
+    const res = await request(app.getHttpServer()).post(url).set(header).send(payload)
+    expect(res.status).toBe(200)
+    expect(res.body.result.uploadBy).toBe(registeredUser.userId)
+    expect(res.body.result.categoryIds[0]).toBe(category._id.toString())
   })
 
   it(`Success => User should get a book`, async () => {
@@ -44,7 +70,7 @@ describe(`Book API`, () => {
     header['x-user-id'] = registeredUser.userId
     header['Authorization'] = `Bearer ${registeredUser.token}`
 
-    const category = await seedCategoryData.createOne({ name: 'Sci-fi' })
+    const category = await seedCategoryData.createOne({ name: 'Fantasy' })
     const book = await seedBookData.createOne(category._id)
     const res = await request(app.getHttpServer()).get(`${url}/${book._id}`).set(header).send()
     expect(res.status).toBe(200)
@@ -120,7 +146,8 @@ describe(`Book API`, () => {
     const category = await seedCategoryData.createOne({ name: 'Sci-fi' })
     const book = await seedBookData.createOne(category._id)
     const category1 = await seedCategoryData.createOne({ name: 'Magic' })
-    const payload = { title: 'Stardenburdenhardenbart', categoryIds: [category1._id] }
+    payload.title = 'Stardenburdenhardenbart'
+    payload.categoryIds.push(category1._id)
     const res = await request(server).put(`${url}/${book._id}`).set(header).send(payload)
     expect(res.status).toBe(200)
     expect(res.body.result.categoryIds.length).toBe(2)
@@ -137,7 +164,7 @@ describe(`Book API`, () => {
     header['x-user-id'] = registeredUser.userId
     header['Authorization'] = `Bearer ${registeredUser.token}`
 
-    const payload = { title: 'Wingardium Leviosa' }
+    payload.title = 'Wingardium Leviosa'
     const res = await request(server).put(`${url}/6098a9867105050cf0550956`).set(header).send(payload)
     expect(res.status).toBe(400)
     expect(res.body.errors.message).toBe('BOOK_NOT_FOUND')
@@ -151,7 +178,8 @@ describe(`Book API`, () => {
     header['Authorization'] = `Bearer ${registeredUser.token}`
 
     const book = await seedBookData.createOne()
-    const payload = { title: 'Expeliarmus', categoryIds: ['6098a9d6e45c890d2df28438'] }
+    payload.title = 'Expeliarmus'
+    payload.categoryIds.push('6098a9d6e45c890d2df28438')
     const res = await request(server).put(`${url}/${book._id}`).set(header).send(payload)
     expect(res.status).toBe(400)
     expect(res.body.errors.message).toBe('CATEGORY_NOT_FOUND')
@@ -163,7 +191,7 @@ describe(`Book API`, () => {
     header['x-user-id'] = registeredUser.userId
     header['Authorization'] = `Bearer ${registeredUser.token}`
 
-    const payload = { title: 'Vershmeltzen' }
+    payload.title = 'Vershmeltzen'
     const res = await request(server).put(`${url}/0123456789`).set(header).send(payload)
     expect(res.status).toBe(400)
     expect(res.body.errors.message).toBe('INVALID_PARAM')

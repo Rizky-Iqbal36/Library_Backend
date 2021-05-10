@@ -1,4 +1,4 @@
-import { Controller, Get, Put, Param, Req } from '@nestjs/common'
+import { Controller, Get, Put, Post, Param, Req } from '@nestjs/common'
 import { BookService } from '@root/services/book.service'
 import { BadRequestException } from '@root/app/exception/httpException'
 import { httpFlags } from '@root/constant/flags'
@@ -16,6 +16,13 @@ export class BookController extends BaseController {
   @Get()
   async getBooks() {
     return this.bookService.findAllBook()
+  }
+
+  @Post()
+  async createBook(@Req() req: Request) {
+    await this.validateRequest(req, BaseController.schemas.bookSchema.createBook)
+    const userId = req.header('x-user-id')
+    return this.bookService.createBook(req.body, userId)
   }
 
   @Get('/:id')

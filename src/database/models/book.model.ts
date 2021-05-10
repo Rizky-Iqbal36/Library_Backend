@@ -22,7 +22,7 @@ export type IBookDoc = IBook & Document
 
 const BookSchema = new Schema(
   {
-    isActive: { type: Boolean, required: true },
+    isActive: { type: Boolean, required: true, default: false },
     status: { type: String, enum: ['WAIT', 'CANCEL', 'ACTIVE'], required: true, default: 'WAIT' },
     title: { type: String, required: true },
     isbn: { type: String, required: false, default: null },
@@ -35,7 +35,7 @@ const BookSchema = new Schema(
     aboutBook: { type: String, required: true },
     file: { type: String, required: true },
     thumbnail: { type: String, required: true },
-    bookMarked: { type: Number, required: true },
+    bookMarked: { type: Number, required: false, default: 0 },
     bookMarkedBy: [{ type: Schema.Types.ObjectId, ref: 'User', required: false, default: null }]
   },
   { timestamps: true }

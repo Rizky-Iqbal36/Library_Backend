@@ -29,4 +29,23 @@ export class BookSchema {
       bookMarkedBy: Joi.array()
     }).required()
   }
+
+  createBook = {
+    body: Joi.object({
+      isActive: Joi.boolean(),
+      status: Joi.string().valid('WAIT', 'CANCEL', 'ACTIVE'),
+      title: Joi.string().required(),
+      isbn: Joi.string(),
+      authors: Joi.array().required(),
+      categoryIds: Joi.array().required(),
+      publication: Joi.string().required(),
+      pages: Joi.number().required(),
+      views: Joi.number(),
+      aboutBook: Joi.string().required(),
+      file: Joi.string().required(),
+      thumbnail: Joi.string().required(),
+      bookMarked: Joi.number(),
+      bookMarkedBy: Joi.array()
+    }).required()
+  }
 }
