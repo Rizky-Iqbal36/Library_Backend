@@ -11,6 +11,7 @@
     "commit": "git-cz",
     "dependency:local": "docker-compose up -d database",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "sonarqube:local": "source resources/script/cli/local-sonar.sh",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
