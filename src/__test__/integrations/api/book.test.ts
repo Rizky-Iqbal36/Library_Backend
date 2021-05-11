@@ -191,6 +191,29 @@ describe(`Book API`, () => {
     expect(res.body.result.message).toBe(`Book with id: ${bookId} has successfully deleted`)
   })
 
+  it(`Error => Delete a book should got error: Invalid param`, async () => {
+    const userData = await seedUserData.createOne()
+    const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
+    const registeredUser = registerUser.body.result.data
+    header['x-user-id'] = registeredUser.userId
+    header['Authorization'] = `Bearer ${registeredUser.token}`
+
+    const res = await request(server).delete(`${url}/0123456789`).set(header).send()
+    expect(res.status).toBe(400)
+    expect(res.body.errors.message).toBe('INVALID_PARAM')
+  })
+  it(`Error => Delete a book should got error: Book not found`, async () => {
+    const userData = await seedUserData.createOne()
+    const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
+    const registeredUser = registerUser.body.result.data
+    header['x-user-id'] = registeredUser.userId
+    header['Authorization'] = `Bearer ${registeredUser.token}`
+
+    const res = await request(server).delete(`${url}/6098a9867105050cf0550956`).set(header).send()
+    expect(res.status).toBe(400)
+    expect(res.body.errors.message).toBe('BOOK_NOT_FOUND')
+  })
+
   it(`Error => Update a book should got error: Book not found`, async () => {
     const userData = await seedUserData.createOne()
     const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
@@ -218,6 +241,7 @@ describe(`Book API`, () => {
     expect(res.status).toBe(400)
     expect(res.body.errors.message).toBe('CATEGORY_NOT_FOUND')
   })
+
   it(`Error => Update a book should got error: Invalid param`, async () => {
     const userData = await seedUserData.createOne()
     const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
