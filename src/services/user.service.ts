@@ -14,7 +14,7 @@ export class UserService {
   }
 
   public async findOneUser(id: string) {
-    const user = await this.userRepository.getOneUser(id)
+    const user = await this.userRepository.getOneUser(id, true)
     if (user) {
       return user
     } else {

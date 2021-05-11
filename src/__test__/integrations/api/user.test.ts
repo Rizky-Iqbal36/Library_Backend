@@ -55,13 +55,16 @@ describe(`User API`, () => {
     let registerUser: request.Response
     for (let i = 0; i < 10; i++) {
       userData = await seedUserData.createOne()
+      if (i === 9) userData.isAdmin = true
       registerUser = await request(server).post(`${createUserUrl}`).send(userData)
     }
+
     const registeredUser = registerUser.body.result.data
     header['x-user-id'] = registeredUser.userId
     header['Authorization'] = `Bearer ${registeredUser.token}`
 
     const res = await request(server).get(url).set(header).send().query({ isAdmin: true })
+
     expect(res.body.result[0].isAdmin).toBe(true)
 
     const res1 = await request(server).get(url).set(header).query({ isAdmin: false })
@@ -73,6 +76,7 @@ describe(`User API`, () => {
     let registerUser: request.Response
     for (let i = 0; i < 10; i++) {
       userData = await seedUserData.createOne()
+      if (i === 9) userData.isAdmin = true
       registerUser = await request(server).post(`${createUserUrl}`).send(userData)
     }
     const registeredUser = registerUser.body.result.data
@@ -83,6 +87,19 @@ describe(`User API`, () => {
     expect(res.status).toBe(200)
     expect(res.body).toHaveProperty('result')
     expect(res.body.result.length).toBe(10)
+  })
+
+  it(`Error => Get many user datas should got error: User is not admin`, async () => {
+    const userData = await seedUserData.createOne()
+    userData.isAdmin = false
+    const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
+    const registeredUser = registerUser.body.result.data
+    header['x-user-id'] = registeredUser.userId
+    header['Authorization'] = `Bearer ${registeredUser.token}`
+
+    const res = await request(server).get(url).set(header).send()
+    expect(res.status).toBe(401)
+    expect(res.body.errors.flag).toBe('USER_UNAUTHORIZED')
   })
 
   it(`Error => Get user data should got error: Invalid param`, async () => {

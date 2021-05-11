@@ -20,7 +20,7 @@ export class BookService {
 
   public async findOneBook(id: string, userId: string, bookmark?: string) {
     const book = await this.bookRepository.getOneBook(id, true)
-    const user = await this.userRepository.getOneUser(userId)
+    const user = await this.userRepository.getOneUser(userId, true)
     if (book) {
       if (bookmark === 'BOOKMARK') {
         user.bookmarkedBook.push(book._id)

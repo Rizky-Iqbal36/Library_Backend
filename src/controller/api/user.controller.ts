@@ -1,8 +1,9 @@
-import { Controller, Get, Param, Req } from '@nestjs/common'
+import { Controller, Get, Param, Req, UseGuards } from '@nestjs/common'
 import { UserService } from '@root/services/user.service'
 import { BadRequestException } from '@root/app/exception/httpException'
 import { httpFlags } from '@root/constant/flags'
 import { BaseController } from '@root/controller/base.controller'
+import { AdminGuard } from '@root/app/guard/admin.guard'
 
 import { Request } from 'express'
 import mongoose from 'mongoose'
@@ -14,6 +15,7 @@ export class UserController extends BaseController {
   }
 
   @Get()
+  @UseGuards(AdminGuard)
   async getAll(@Req() req: Request) {
     await this.validateRequest(req, BaseController.schemas.userSchema.getUser)
     const { isAdmin } = req.query
