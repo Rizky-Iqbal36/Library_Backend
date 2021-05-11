@@ -5,7 +5,7 @@ import { validHeaders } from '@root/__test__/util/set-header'
 
 const header: any = validHeaders
 const url = '/auth'
-let body: any
+let payload: any
 describe(`Authentication API`, () => {
   let app: INestApplication
   let server: any
@@ -18,7 +18,7 @@ describe(`Authentication API`, () => {
   })
 
   beforeEach(async () => {
-    body = {
+    payload = {
       email: 'coba@email.com',
       password: 'unchunch',
       fullName: 'siapa oii',
@@ -35,15 +35,15 @@ describe(`Authentication API`, () => {
   })
 
   it(`Success => Should register a user and return a token`, async () => {
-    const res = await request(server).post(`${url}/register`).send(body)
+    const res = await request(server).post(`${url}/register`).send(payload)
     expect(res.status).toBe(200)
     expect(res.body.result.data).toHaveProperty('token')
-    expect(res.body.result.data.email).toBe(body.email)
+    expect(res.body.result.data.email).toBe(payload.email)
   })
 
   it(`Success => Should login a user and return a token`, async () => {
-    await request(server).post(`${url}/register`).send(body)
-    const { email, password } = body
+    await request(server).post(`${url}/register`).send(payload)
+    const { email, password } = payload
     const res = await request(server).post(`${url}/login`).send({ email, password })
     expect(res.status).toBe(200)
     expect(res.body.result.message).toBe('Login success')
@@ -51,28 +51,28 @@ describe(`Authentication API`, () => {
   })
 
   it(`Error => login a user should got error: Wrong password or email`, async () => {
-    await request(server).post(`${url}/register`).send(body)
+    await request(server).post(`${url}/register`).send(payload)
 
     const fakeEmail = 'user@fake.com'
-    const res = await request(server).post(`${url}/login`).send({ email: fakeEmail, password: body.password })
+    const res = await request(server).post(`${url}/login`).send({ email: fakeEmail, password: payload.password })
     expect(res.status).toBe(400)
     expect(res.body.errors.flag).toBe('EMAIL_OR_PASSWORD_INVALID')
 
     const fakePassword = 'fakePassword'
-    const res1 = await request(server).post(`${url}/login`).send({ email: body.email, password: fakePassword })
+    const res1 = await request(server).post(`${url}/login`).send({ email: payload.email, password: fakePassword })
     expect(res1.status).toBe(400)
     expect(res1.body.errors.flag).toBe('EMAIL_OR_PASSWORD_INVALID')
   })
 
   it(`Error => Register a user should got error: Email already exist`, async () => {
-    await request(server).post(`${url}/register`).send(body)
-    const res = await request(server).post(`${url}/register`).send(body)
+    await request(server).post(`${url}/register`).send(payload)
+    const res = await request(server).post(`${url}/register`).send(payload)
     expect(res.status).toBe(400)
     expect(res.body.errors.flag).toBe('EMAIL_ALREADY_EXIST')
   })
 
   it(`Error => User access API should got error: User unauthorized`, async () => {
-    const registerUser = await request(server).post(`${url}/register`).send(body)
+    const registerUser = await request(server).post(`${url}/register`).send(payload)
     const registeredUser = registerUser.body.result.data
     header['x-user-id'] = registeredUser.userId
 
@@ -86,7 +86,7 @@ describe(`Authentication API`, () => {
   })
 
   it(`Error => User access API should got error: Invalid token`, async () => {
-    const registerUser = await request(server).post(`${url}/register`).send(body)
+    const registerUser = await request(server).post(`${url}/register`).send(payload)
     const registeredUser = registerUser.body.result.data
     header['x-user-id'] = registeredUser.userId
     header[
@@ -103,8 +103,8 @@ describe(`Authentication API`, () => {
   })
 
   it(`Error => Register a user should got error: Invalid body`, async () => {
-    delete body.email
-    const res = await request(server).post(`${url}/register`).send(body)
+    delete payload.email
+    const res = await request(server).post(`${url}/register`).send(payload)
     expect(res.status).toBe(400)
     expect(res.body.errors.flag).toBe('INVALID_BODY')
   })

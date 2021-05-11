@@ -202,6 +202,7 @@ describe(`Book API`, () => {
     expect(res.status).toBe(400)
     expect(res.body.errors.message).toBe('INVALID_PARAM')
   })
+
   it(`Error => Delete a book should got error: Book not found`, async () => {
     const userData = await seedUserData.createOne()
     const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
