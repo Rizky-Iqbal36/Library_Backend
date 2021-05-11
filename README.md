@@ -25,7 +25,7 @@ $ npm install
 
 ```bash
 # Start service
-npm run dependency:local
+$ npm run dependency:local
 
 # Development
 $ npm run start
