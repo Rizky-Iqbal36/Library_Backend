@@ -17,4 +17,8 @@ export class BookRepository {
   public async createBook(data: IBook) {
     return this.bookModel.create(data)
   }
+
+  public async deleteOneBook(id: string) {
+    return this.bookModel.findByIdAndRemove(id)
+  }
 }

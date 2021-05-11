@@ -53,7 +53,7 @@ export class BookService {
     body.status = 'WAIT'
     body.uploadBy = userId
     const createdBook = await this.bookRepository.createBook(body)
-    body.categoryIds ? await this.updateBookCategory(body.categoryIds, createdBook._id) : undefined
+    body.categoryIds ? await this.updateBookOnCategory(body.categoryIds, createdBook._id, 'ADD') : undefined
     return createdBook
   }
 
@@ -71,7 +71,9 @@ export class BookService {
       book.thumbnail = thumbnail ? thumbnail : book.thumbnail
       book.publication = publication ? publication : book.publication
       book.title = title ? title : book.title
-      const updatedBookCategory = categoryIds ? await this.updateBookCategory(categoryIds, book._id) : undefined
+      const updatedBookCategory = categoryIds
+        ? await this.updateBookOnCategory(categoryIds, book._id, 'ADD')
+        : undefined
       book.categoryIds =
         updatedBookCategory?.length > 0 ? book.categoryIds.concat(updatedBookCategory) : book.categoryIds
       await book.save()
@@ -81,13 +83,32 @@ export class BookService {
     }
   }
 
-  private async updateBookCategory(categories: string[], bookId: string) {
+  public async deleteBook(id: string) {
+    const book = await this.bookRepository.getOneBook(id, false)
+    if (book) {
+      await this.updateBookOnCategory(book.categoryIds, book._id, 'DELETE')
+      await this.bookRepository.deleteOneBook(id)
+      return {
+        message: `Book with id: ${id} has successfully deleted`
+      }
+    } else {
+      throw new BadRequestException(httpFlags.BOOK_NOT_FOUND)
+    }
+  }
+
+  private async updateBookOnCategory(categories: string[], bookId: string, method: 'ADD' | 'DELETE') {
     return Promise.all(
       categories.map(async categoryId => {
         const category = await this.categoryRepository.getCategoryById(categoryId)
         if (category) {
-          category.books.push(bookId)
-          category.numberOfBook += 1
+          if (method === 'ADD') {
+            category.books.push(bookId)
+            category.numberOfBook += 1
+          } else {
+            const bookIndex = category.books.indexOf(bookId)
+            category.books.splice(bookIndex, 1)
+            category.numberOfBook -= 1
+          }
           await category.save()
           return categoryId
         } else {

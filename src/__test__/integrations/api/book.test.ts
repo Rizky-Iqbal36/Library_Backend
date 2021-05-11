@@ -8,6 +8,8 @@ import { SeedBookData } from '@database/seeds/book.seed'
 import { SeedUserData } from '@database/seeds/user.seed'
 import { SeedCategoryData } from '@database/seeds/category.seed'
 
+import { CategoryRepository } from '@root/repositories/category.repository'
+
 const createUserUrl = '/auth/register'
 const url = '/book'
 const header: any = validHeaders
@@ -16,16 +18,22 @@ let payload: any
 describe(`Book API`, () => {
   let app: INestApplication
   let server: any
+
   let seedBookData: SeedBookData
   let seedUserData: SeedUserData
   let seedCategoryData: SeedCategoryData
 
+  let categoryRepository: CategoryRepository
+
   beforeAll(async () => {
     app = await initServerApp()
     server = app.getHttpServer()
+
     seedBookData = await app.get(SeedBookData)
     seedUserData = await app.get(SeedUserData)
     seedCategoryData = await app.get(SeedCategoryData)
+
+    categoryRepository = await app.get(CategoryRepository)
 
     await app.init()
   })
@@ -38,8 +46,8 @@ describe(`Book API`, () => {
       publication: '8 Juli 2000',
       pages: 882,
       aboutBook: "Harry Potter and the Goblet of Fire is the fourth book in J. K. Rowling's Harry Potter novel series",
-      file: 'harryPotterGobletOfFirer.epub',
-      thumbnail: 'harryPotterGobletOfFirer.jpg'
+      file: 'harryPotterGobletOfFire.epub',
+      thumbnail: 'harryPotterGobletOfFire.jpg'
     }
     await flushMongoDB()
   })
@@ -57,7 +65,7 @@ describe(`Book API`, () => {
 
     const category = await seedCategoryData.createOne({ name: 'Sci-fi' })
     payload.categoryIds.push(category._id)
-    const res = await request(app.getHttpServer()).post(url).set(header).send(payload)
+    const res = await request(server).post(url).set(header).send(payload)
     expect(res.status).toBe(200)
     expect(res.body.result.uploadBy).toBe(registeredUser.userId)
     expect(res.body.result.categoryIds[0]).toBe(category._id.toString())
@@ -72,7 +80,7 @@ describe(`Book API`, () => {
 
     const category = await seedCategoryData.createOne({ name: 'Fantasy' })
     const book = await seedBookData.createOne(category._id)
-    const res = await request(app.getHttpServer()).get(`${url}/${book._id}`).set(header).send()
+    const res = await request(server).get(`${url}/${book._id}`).set(header).send()
     expect(res.status).toBe(200)
     expect(res.body.result.isbn).toBe(book.isbn)
     expect(res.body.result.categoryIds[0].name).toBe(category.name)
@@ -94,11 +102,7 @@ describe(`Book API`, () => {
     expect(gotUser.body.result.bookmarkedBook.length).toBe(0)
     expect(gotUser.body.result.totalBookmarked).toBe(0)
 
-    const res = await request(app.getHttpServer())
-      .get(`${url}/${book._id}`)
-      .set(header)
-      .send()
-      .query({ bookmark: 'BOOKMARK' })
+    const res = await request(server).get(`${url}/${book._id}`).set(header).send().query({ bookmark: 'BOOKMARK' })
     expect(res.status).toBe(200)
     expect(res.body.result.bookMarked).toBe(1)
 
@@ -108,11 +112,7 @@ describe(`Book API`, () => {
     expect(res.body.result.bookMarkedBy[0]).toBe(registeredUser.userId.toString())
     expect(updatedUser.body.result.bookmarkedBook[0]._id).toBe(book._id.toString())
 
-    const res1 = await request(app.getHttpServer())
-      .get(`${url}/${book._id}`)
-      .set(header)
-      .send()
-      .query({ bookmark: 'UNBOOKMARK' })
+    const res1 = await request(server).get(`${url}/${book._id}`).set(header).send().query({ bookmark: 'UNBOOKMARK' })
     expect(res1.status).toBe(200)
     expect(res1.body.result.bookMarked).toBe(0)
 
@@ -155,6 +155,40 @@ describe(`Book API`, () => {
     const checkCategory = await request(server).get(`/category/${category1._id}`).set(header).send()
     expect(checkCategory.status).toBe(200)
     expect(checkCategory.body.result.books[0]).toBe(book._id.toString())
+  })
+
+  it(`Success => User should delete a book`, async () => {
+    const userData = await seedUserData.createOne()
+    const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
+    const registeredUser = registerUser.body.result.data
+    header['x-user-id'] = registeredUser.userId
+    header['Authorization'] = `Bearer ${registeredUser.token}`
+
+    const category = await seedCategoryData.createOne({ name: 'Fantasy' })
+    const category1 = await seedCategoryData.createOne({ name: 'Drama' })
+    payload.categoryIds.push(category._id, category1._id)
+    const createdBook = await request(server).post(url).set(header).send(payload)
+    const bookId = createdBook.body.result._id
+
+    const categoryBeforeDeleteBook = await categoryRepository.getAllCategory()
+    expect(categoryBeforeDeleteBook.length).toBe(2)
+    expect(categoryBeforeDeleteBook[0].numberOfBook).toBe(1)
+    expect(categoryBeforeDeleteBook[0].numberOfBook).toBe(categoryBeforeDeleteBook[1].numberOfBook)
+    expect(categoryBeforeDeleteBook[0].books.length).toBe(1)
+    expect(categoryBeforeDeleteBook[0].books[0].toString()).toBe(bookId)
+    expect(categoryBeforeDeleteBook[0].books[0].toString()).toBe(categoryBeforeDeleteBook[1].books[0].toString())
+
+    const res = await request(server).delete(`${url}/${bookId}`).set(header).send()
+
+    const categoryAfterDeleteBook = await categoryRepository.getAllCategory()
+    expect(categoryAfterDeleteBook.length).toBe(2)
+    expect(categoryAfterDeleteBook[0].numberOfBook).toBe(0)
+    expect(categoryAfterDeleteBook[0].numberOfBook).toBe(categoryAfterDeleteBook[1].numberOfBook)
+    expect(categoryAfterDeleteBook[0].books.length).toBe(0)
+    expect(categoryAfterDeleteBook[0].books.length).toBe(categoryAfterDeleteBook[1].books.length)
+
+    expect(res.status).toBe(200)
+    expect(res.body.result.message).toBe(`Book with id: ${bookId} has successfully deleted`)
   })
 
   it(`Error => Update a book should got error: Book not found`, async () => {
@@ -216,7 +250,7 @@ describe(`Book API`, () => {
     header['x-user-id'] = registeredUser.userId
     header['Authorization'] = `Bearer ${registeredUser.token}`
 
-    const res = await request(app.getHttpServer()).get(`${url}/607ea12bd21e76a4433ea592`).set(header).send()
+    const res = await request(server).get(`${url}/607ea12bd21e76a4433ea592`).set(header).send()
     expect(res.status).toBe(400)
     expect(res.body.errors.message).toBe('BOOK_NOT_FOUND')
   })
@@ -230,11 +264,7 @@ describe(`Book API`, () => {
 
     const category = await seedCategoryData.createOne({ name: 'Sci-fi' })
     const book = await seedBookData.createOne(category._id)
-    const res = await request(app.getHttpServer())
-      .get(`${url}/${book._id}`)
-      .set(header)
-      .send()
-      .query({ bookmark: 'UWAUW' })
+    const res = await request(server).get(`${url}/${book._id}`).set(header).send().query({ bookmark: 'UWAUW' })
     expect(res.status).toBe(400)
     expect(res.body.errors.message).toBe('INVALID_PARAM')
   })

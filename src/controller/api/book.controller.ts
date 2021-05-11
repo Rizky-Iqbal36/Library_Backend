@@ -1,4 +1,4 @@
-import { Controller, Get, Put, Post, Param, Req } from '@nestjs/common'
+import { Controller, Post, Get, Put, Delete, Param, Req } from '@nestjs/common'
 import { BookService } from '@root/services/book.service'
 import { BadRequestException } from '@root/app/exception/httpException'
 import { httpFlags } from '@root/constant/flags'
@@ -13,16 +13,16 @@ export class BookController extends BaseController {
     super()
   }
 
-  @Get()
-  async getBooks() {
-    return this.bookService.findAllBook()
-  }
-
   @Post()
   async createBook(@Req() req: Request) {
     await this.validateRequest(req, BaseController.schemas.bookSchema.createBook)
     const userId = req.header('x-user-id')
     return this.bookService.createBook(req.body, userId)
+  }
+
+  @Get()
+  async getBooks() {
+    return this.bookService.findAllBook()
   }
 
   @Get('/:id')
@@ -44,6 +44,16 @@ export class BookController extends BaseController {
     const isValidID = mongoose.Types.ObjectId.isValid(id)
     if (isValidID) {
       return this.bookService.updateBook(id, req.body)
+    } else {
+      throw new BadRequestException(httpFlags.INVALID_PARAM)
+    }
+  }
+
+  @Delete('/:id')
+  async deleteBook(@Param('id') id: string) {
+    const isValidID = mongoose.Types.ObjectId.isValid(id)
+    if (isValidID) {
+      return this.bookService.deleteBook(id)
     } else {
       throw new BadRequestException(httpFlags.INVALID_PARAM)
     }
