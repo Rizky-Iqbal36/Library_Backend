@@ -41,6 +41,11 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    env:
+      CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+      CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+      CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+      CLOUDINARY_ASSETS: ${{ secrets.CLOUDINARY_ASSETS }}
     steps:
       - uses: actions/checkout@v1
       - name: Run Tests
