@@ -89,20 +89,21 @@ describe(`User API`, () => {
     expect(res.body.result.length).toBe(10)
   })
 
-  // it(`Success => User should upload avatar`, async () => {
-  //   const userData = await seedUserData.createOne()
-  //   const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
-  //   const registeredUser = registerUser.body.result.data
-  //   header['x-user-id'] = registeredUser.userId
-  //   header['Authorization'] = `Bearer ${registeredUser.token}`
+  it(`Success => User should upload avatar`, async () => {
+    const userData = await seedUserData.createOne()
+    const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
+    const registeredUser = registerUser.body.result.data
+    header['x-user-id'] = registeredUser.userId
+    header['Authorization'] = `Bearer ${registeredUser.token}`
 
-  //   const res = await request(server)
-  //     .patch(`${url}/${registeredUser.userId}`)
-  //     .set(header)
-  //     .attach('file', __dirname + '/file/lynx.jpeg')
+    const res = await request(server)
+      .patch(`${url}/${registeredUser.userId}`)
+      .set(header)
+      .attach('avatar', __dirname + '/file/image.jpeg')
 
-  //   console.log(res.body)
-  // })
+    expect(res.status).toBe(200)
+    expect(res.body.result.avatar).toBe(`avatar-${registeredUser.userId}.jpg`)
+  })
 
   it(`Error => Get many user datas should got error: User is not admin`, async () => {
     const userData = await seedUserData.createOne()
@@ -136,6 +137,55 @@ describe(`User API`, () => {
     header['Authorization'] = `Bearer ${registeredUser.token}`
 
     const res = await request(server).get(`${url}/607ea12bd21e76a4433ea592`).set(header).send()
+    expect(res.status).toBe(400)
+    expect(res.body.errors.message).toBe('USER_NOT_FOUND')
+  })
+
+  it(`Error => Upload avatar should got error: File too large`, async () => {
+    const userData = await seedUserData.createOne()
+    const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
+    const registeredUser = registerUser.body.result.data
+    header['x-user-id'] = registeredUser.userId
+    header['Authorization'] = `Bearer ${registeredUser.token}`
+
+    const res = await request(server)
+      .patch(`${url}/${registeredUser.userId}`)
+      .set(header)
+      .attach('avatar', __dirname + '/file/image-big.jpg')
+
+    expect(res.status).toBe(413)
+    expect(res.body.errors.message).toBe('File too large')
+  })
+
+  it(`Error => Upload avatar should got error: Invalid file type`, async () => {
+    const userData = await seedUserData.createOne()
+    const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
+    const registeredUser = registerUser.body.result.data
+    header['x-user-id'] = registeredUser.userId
+    header['Authorization'] = `Bearer ${registeredUser.token}`
+
+    const res = await request(server)
+      .patch(`${url}/${registeredUser.userId}`)
+      .set(header)
+      .attach('avatar', __dirname + '/file/image.txt')
+    expect(res.status).toBe(400)
+    expect(res.body.errors).toMatchObject({
+      flag: 'INVALID_FILETYPE',
+      message: 'Please select an image file type'
+    })
+  })
+
+  it(`Error => Upload avatar should got error: User not found`, async () => {
+    const userData = await seedUserData.createOne()
+    const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
+    const registeredUser = registerUser.body.result.data
+    header['x-user-id'] = registeredUser.userId
+    header['Authorization'] = `Bearer ${registeredUser.token}`
+
+    const res = await request(server)
+      .patch(`${url}/607ea12bd21e76a4433ea592`)
+      .set(header)
+      .attach('avatar', __dirname + '/file/image.jpeg')
     expect(res.status).toBe(400)
     expect(res.body.errors.message).toBe('USER_NOT_FOUND')
   })

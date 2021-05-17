@@ -1,19 +1,20 @@
-import { Controller, Get, Param, Patch, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common'
+import { Controller, Get, Param, Patch, Req, UseGuards, UseInterceptors } from '@nestjs/common'
 import { FileInterceptor } from '@nestjs/platform-express'
 
-import { CloudinaryService } from '@root/services/cloudinary.service'
 import { UserService } from '@root/services/user.service'
 import { BadRequestException } from '@root/app/exception/httpException'
 import { httpFlags } from '@root/constant/flags'
 import { BaseController } from '@root/controller/base.controller'
 import { AdminGuard } from '@root/app/guard/admin.guard'
 
+import { CloudStorage } from '@app/utils/cloudinary/cloudinary.provider'
+
 import { Request } from 'express'
 import mongoose from 'mongoose'
 
 @Controller('user')
 export class UserController extends BaseController {
-  constructor(private readonly userService: UserService, private readonly cloudinaryService: CloudinaryService) {
+  constructor(private readonly userService: UserService) {
     super()
   }
 
@@ -37,6 +38,7 @@ export class UserController extends BaseController {
 
   @UseInterceptors(
     FileInterceptor('avatar', {
+      storage: CloudStorage,
       fileFilter: (req, file, cb) => {
         if (!file.mimetype.match('image')) {
           return cb(new BadRequestException(httpFlags.INVALID_FILETYPE, 'Please select an image file type'), false)
@@ -49,9 +51,7 @@ export class UserController extends BaseController {
     })
   )
   @Patch('/:id')
-  async uploadAvatar(@UploadedFile() avatar: Express.Multer.File, @Param('id') id: string, @Req() req: Request) {
-    console.log(id)
-    console.log(req.body)
-    return { message: 'avatar has been uploaded', filename: avatar.originalname }
+  async uploadAvatar(@Param('id') id: string) {
+    return this.userService.updateAvatar(id)
   }
 }

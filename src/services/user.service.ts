@@ -9,6 +9,17 @@ import { IUser, IUserLogin } from '@root/database/models/user.model'
 export class UserService {
   constructor(private readonly userRepository: UserRepository, private readonly authService: AuthService) {}
 
+  public async updateAvatar(id: string) {
+    const user = await this.userRepository.getOneUser(id, true)
+    if (user) {
+      user.avatar = `avatar-${id}.jpg`
+      await user.save()
+      return user
+    } else {
+      throw new BadRequestException(httpFlags.USER_NOT_FOUND)
+    }
+  }
+
   public async findAllUser(isAdmin?: boolean) {
     return this.userRepository.getAllUsers(isAdmin)
   }
