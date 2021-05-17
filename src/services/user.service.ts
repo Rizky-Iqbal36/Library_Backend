@@ -4,6 +4,7 @@ import { AuthService } from '@root/authentication/service/auth.service'
 import { BadRequestException } from '@root/app/exception/httpException'
 import { httpFlags } from '@root/constant/flags'
 import { IUser, IUserLogin } from '@root/database/models/user.model'
+import config from '@root/app/config/appConfig'
 
 @Injectable()
 export class UserService {
@@ -14,6 +15,7 @@ export class UserService {
     if (user) {
       user.avatar = `avatar-${id}.jpg`
       await user.save()
+      user.avatar = user.avatar !== null ? `${config.cloudinary}/avatars/${user.avatar}` : null
       return user
     } else {
       throw new BadRequestException(httpFlags.USER_NOT_FOUND)
@@ -27,6 +29,7 @@ export class UserService {
   public async findOneUser(id: string) {
     const user = await this.userRepository.getOneUser(id, true)
     if (user) {
+      user.avatar = user.avatar !== null ? `${user.avatar}` : null
       return user
     } else {
       throw new BadRequestException(httpFlags.USER_NOT_FOUND)

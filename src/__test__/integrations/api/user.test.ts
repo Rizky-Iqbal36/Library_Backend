@@ -7,6 +7,8 @@ import { SeedUserData } from '@database/seeds/user.seed'
 import { SeedBookData } from '@database/seeds/book.seed'
 import { SeedCategoryData } from '@database/seeds/category.seed'
 
+import config from '@root/app/config/appConfig'
+
 const createUserUrl = '/auth/register'
 const url = '/user'
 const header: any = validHeaders
@@ -102,7 +104,7 @@ describe(`User API`, () => {
       .attach('avatar', __dirname + '/file/image.jpeg')
 
     expect(res.status).toBe(200)
-    expect(res.body.result.avatar).toBe(`avatar-${registeredUser.userId}.jpg`)
+    expect(res.body.result.avatar).toBe(`${config.cloudinary}/avatars/avatar-${registeredUser.userId}.jpg`)
   })
 
   it(`Error => Get many user datas should got error: User is not admin`, async () => {
