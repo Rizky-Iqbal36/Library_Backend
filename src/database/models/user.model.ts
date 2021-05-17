@@ -39,7 +39,7 @@ const UserSchema = new Schema(
     uploadedBook: [{ type: Schema.Types.ObjectId, ref: 'Book', required: false, default: null }],
     bookmarkedBook: [{ type: Schema.Types.ObjectId, ref: 'Book', required: false, default: null }],
     totalBookmarked: { type: Number, required: false, default: 0 },
-    avatar: { type: String, required: false }
+    avatar: { type: String, required: false, default: null }
   },
   { timestamps: true }
 )

@@ -89,6 +89,21 @@ describe(`User API`, () => {
     expect(res.body.result.length).toBe(10)
   })
 
+  // it(`Success => User should upload avatar`, async () => {
+  //   const userData = await seedUserData.createOne()
+  //   const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
+  //   const registeredUser = registerUser.body.result.data
+  //   header['x-user-id'] = registeredUser.userId
+  //   header['Authorization'] = `Bearer ${registeredUser.token}`
+
+  //   const res = await request(server)
+  //     .patch(`${url}/${registeredUser.userId}`)
+  //     .set(header)
+  //     .attach('file', __dirname + '/file/lynx.jpeg')
+
+  //   console.log(res.body)
+  // })
+
   it(`Error => Get many user datas should got error: User is not admin`, async () => {
     const userData = await seedUserData.createOne()
     userData.isAdmin = false

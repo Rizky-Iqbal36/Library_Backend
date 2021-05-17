@@ -17,7 +17,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       status = exception.getStatus()
       result = exception.getResponse() as IExceptionResponse
     }
-    if (status !== 500) message = result.flag
+    if (status !== 500) message = result.message === '' || result.message === undefined ? result.flag : result.message
     const details = result?.options?.joiError?.details
     let errors = {
       flag: result?.flag,
