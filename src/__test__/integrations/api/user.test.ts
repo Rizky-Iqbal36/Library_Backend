@@ -26,7 +26,6 @@ describe(`User API`, () => {
     seedUserData = await app.get(SeedUserData)
     seedBookData = await app.get(SeedBookData)
     seedCategoryData = await app.get(SeedCategoryData)
-    console.log(config.cloudinary)
     await app.init()
   })
 

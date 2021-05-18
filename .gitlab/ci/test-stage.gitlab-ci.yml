@@ -35,5 +35,5 @@ test:integration:
     - npm install
     - npm run dependency:local
     - sleep 5
-    - npm run start
+    - mongo
     # - docker-compose -f docker-compose.yml run app npm run test
