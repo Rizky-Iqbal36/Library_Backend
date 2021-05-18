@@ -21,10 +21,19 @@ test:integration:
     when:
       - runner_system_failure
       - stuck_or_timeout_failure
+  variables:
+    APP_ENV: 'PIPELINE'
+    CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
+    CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
+    CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
+    CLOUDINARY_ASSETS: ${CLOUDINARY_ASSETS}
+    JWT_SECRET: ${JWT_SECRET}
+    ENCRYPT_JWT_SECRET: ${ENCRYPT_JWT_SECRET}
+    JWT_EXPIRATION: ${JWT_EXPIRATION}
   script:
     - cp .env.example .env
     - npm install
     - npm run dependency:local
     - sleep 5
-    - npm run test
+    - npm run start
     # - docker-compose -f docker-compose.yml run app npm run test
