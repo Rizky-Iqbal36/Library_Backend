@@ -22,7 +22,6 @@ test:integration:
       - runner_system_failure
       - stuck_or_timeout_failure
   variables:
-    APP_ENV: 'PIPELINE'
     CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
     CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
     CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
@@ -35,5 +34,12 @@ test:integration:
     - npm install
     - npm run dependency:local
     - sleep 5
-    - mongo
-    # - docker-compose -f docker-compose.yml run app npm run test
+    - docker-compose -f docker-compose.yml run
+      -e CLOUDINARY_CLOUD_NAME
+      -e CLOUDINARY_API_KEY
+      -e CLOUDINARY_API_SECRET
+      -e CLOUDINARY_ASSETS
+      -e JWT_SECRET
+      -e ENCRYPT_JWT_SECRET
+      -e JWT_EXPIRATION
+      app npm run test
