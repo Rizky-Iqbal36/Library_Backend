@@ -13,9 +13,10 @@ export class UserService {
   public async updateAvatar(id: string) {
     const user = await this.userRepository.getOneUser(id, true)
     if (user) {
-      user.avatar = `avatar-${id}.jpg`
+      const count = user.avatar ? parseInt(user.avatar.charAt(user.avatar.length - 5)) + 1 : 0
+      user.avatar = `avatar-${id}-${count}.jpg`
       await user.save()
-      user.avatar = user.avatar !== null ? `${config.cloudinary}/avatars/${user.avatar}` : null
+      user.avatar = `${config.cloudinary.assets}/avatars/${id}/${user.avatar}`
       return user
     } else {
       throw new BadRequestException(httpFlags.USER_NOT_FOUND)
@@ -29,7 +30,6 @@ export class UserService {
   public async findOneUser(id: string) {
     const user = await this.userRepository.getOneUser(id, true)
     if (user) {
-      user.avatar = user.avatar !== null ? `${user.avatar}` : null
       return user
     } else {
       throw new BadRequestException(httpFlags.USER_NOT_FOUND)

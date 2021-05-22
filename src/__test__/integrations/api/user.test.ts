@@ -101,9 +101,19 @@ describe(`User API`, () => {
       .patch(`${url}/${registeredUser.userId}`)
       .set(header)
       .attach('avatar', __dirname + '/file/image.jpeg')
-
     expect(res.status).toBe(200)
-    expect(res.body.result.avatar).toBe(`${config.cloudinary}/avatars/avatar-${registeredUser.userId}.jpg`)
+    expect(res.body.result.avatar).toBe(
+      `${config.cloudinary.assets}/avatars/${registeredUser.userId}/avatar-${registeredUser.userId}-0.jpg`
+    )
+
+    const res1 = await request(server)
+      .patch(`${url}/${registeredUser.userId}`)
+      .set(header)
+      .attach('avatar', __dirname + '/file/image.jpeg')
+    expect(res1.status).toBe(200)
+    expect(res1.body.result.avatar).toBe(
+      `${config.cloudinary.assets}/avatars/${registeredUser.userId}/avatar-${registeredUser.userId}-1.jpg`
+    )
   })
 
   it(`Error => Get many user datas should got error: User is not admin`, async () => {
@@ -187,6 +197,7 @@ describe(`User API`, () => {
       .patch(`${url}/607ea12bd21e76a4433ea592`)
       .set(header)
       .attach('avatar', __dirname + '/file/image.jpeg')
+
     expect(res.status).toBe(400)
     expect(res.body.errors.message).toBe('USER_NOT_FOUND')
   })
