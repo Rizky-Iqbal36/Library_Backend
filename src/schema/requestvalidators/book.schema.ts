@@ -35,15 +35,13 @@ export class BookSchema {
       isActive: Joi.boolean(),
       status: Joi.string().valid('WAIT', 'CANCEL', 'ACTIVE'),
       title: Joi.string().required(),
-      isbn: Joi.string(),
+      isbn: Joi.string().min(12),
       authors: Joi.array().required(),
-      categoryIds: Joi.array().required(),
+      categoryIds: Joi.array(),
       publication: Joi.string().required(),
-      pages: Joi.number().required(),
+      pages: Joi.alternatives(Joi.number(), Joi.string()).required(),
       views: Joi.number(),
       aboutBook: Joi.string().required(),
-      file: Joi.string().required(),
-      thumbnail: Joi.string().required(),
       bookMarked: Joi.number(),
       bookMarkedBy: Joi.array()
     }).required()

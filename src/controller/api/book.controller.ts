@@ -1,4 +1,8 @@
-import { Controller, Post, Get, Put, Delete, Param, Req } from '@nestjs/common'
+import { Controller, Post, Get, Put, Delete, Param, Req, UseInterceptors } from '@nestjs/common'
+import { FileFieldsInterceptor } from '@nestjs/platform-express'
+
+import { CloudStorage } from '@app/utils/cloudinary/cloudinary.provider'
+
 import { BookService } from '@root/services/book.service'
 import { BadRequestException } from '@root/app/exception/httpException'
 import { httpFlags } from '@root/constant/flags'
@@ -13,11 +17,43 @@ export class BookController extends BaseController {
     super()
   }
 
+  @UseInterceptors(
+    FileFieldsInterceptor(
+      [
+        { name: 'thumbnail', maxCount: 1 },
+        { name: 'file', maxCount: 1 }
+      ],
+      {
+        storage: CloudStorage,
+        fileFilter: (req, file, cb) => {
+          if (!file.mimetype.match('image') && file.fieldname == 'thumbnail') {
+            return cb(new BadRequestException(httpFlags.INVALID_FILETYPE, 'Please select an image file type'), false)
+          }
+          if (file.fieldname == 'file') {
+            if (!file.originalname.match(/\.(pdf|PDF)$/)) {
+              return cb(new BadRequestException(httpFlags.INVALID_FILETYPE, 'Only pdf files are allowed!'), false)
+            }
+          }
+          cb(null, true)
+        },
+        limits: {
+          fileSize: 15 * 1000 * 1000
+        }
+      }
+    )
+  )
   @Post()
   async createBook(@Req() req: Request) {
     await this.validateRequest(req, BaseController.schemas.bookSchema.createBook)
     const userId = req.header('x-user-id')
-    return this.bookService.createBook(req.body, userId)
+    try {
+      if (!req.files['thumbnail']) throw new Error('Book validation failed: thumbnail required')
+      else if (!req.files['file']) throw new Error('Book validation failed: file required')
+
+      return this.bookService.createBook(req.body, userId)
+    } catch (err) {
+      throw new BadRequestException(httpFlags.INVALID_BODY, err.message)
+    }
   }
 
   @Get()

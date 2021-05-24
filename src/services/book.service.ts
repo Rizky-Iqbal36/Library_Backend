@@ -5,6 +5,7 @@ import { UserRepository } from '@root/repositories/user.repository'
 import { CategoryRepository } from '@root/repositories/category.repository'
 import { BadRequestException } from '@root/app/exception/httpException'
 import { httpFlags } from '@root/constant/flags'
+import config from '@root/app/config/appConfig'
 
 @Injectable()
 export class BookService {
@@ -52,8 +53,22 @@ export class BookService {
     body.isActive = false
     body.status = 'WAIT'
     body.uploadBy = userId
+
+    const user = await this.userRepository.getOneUser(userId)
+    const count = user.uploadedBook.length || 0
+
+    body.file = 'file-' + userId + `-${count}.pdf`
+    body.thumbnail = 'thumbnail-' + userId + `-${count}.jpg`
+
     const createdBook = await this.bookRepository.createBook(body)
+
     body.categoryIds ? await this.updateBookOnCategory(body.categoryIds, createdBook._id, 'ADD') : undefined
+
+    createdBook.file = `${config.cloudinary.assets.replace(/rizkyiqbal/, 'rizkyiqbal/raw/upload')}/files/${userId}/${
+      createdBook.file
+    }`
+    createdBook.thumbnail = `${config.cloudinary.assets}/thumbnails/${userId}/${createdBook.thumbnail}`
+
     return createdBook
   }
 

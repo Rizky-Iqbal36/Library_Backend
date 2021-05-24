@@ -100,7 +100,7 @@ describe(`User API`, () => {
     const res = await request(server)
       .patch(`${url}/${registeredUser.userId}`)
       .set(header)
-      .attach('avatar', __dirname + '/file/image.jpeg')
+      .attach('avatar', __dirname + '/file/images/image.jpeg')
     expect(res.status).toBe(200)
     expect(res.body.result.avatar).toBe(
       `${config.cloudinary.assets}/avatars/${registeredUser.userId}/avatar-${registeredUser.userId}-0.jpg`
@@ -109,7 +109,7 @@ describe(`User API`, () => {
     const res1 = await request(server)
       .patch(`${url}/${registeredUser.userId}`)
       .set(header)
-      .attach('avatar', __dirname + '/file/image.jpeg')
+      .attach('avatar', __dirname + '/file/images/image.jpeg')
     expect(res1.status).toBe(200)
     expect(res1.body.result.avatar).toBe(
       `${config.cloudinary.assets}/avatars/${registeredUser.userId}/avatar-${registeredUser.userId}-1.jpg`
@@ -162,7 +162,7 @@ describe(`User API`, () => {
     const res = await request(server)
       .patch(`${url}/${registeredUser.userId}`)
       .set(header)
-      .attach('avatar', __dirname + '/file/image-big.jpg')
+      .attach('avatar', __dirname + '/file/images/image-big.jpg')
 
     expect(res.status).toBe(413)
     expect(res.body.errors.message).toBe('File too large')
@@ -178,7 +178,7 @@ describe(`User API`, () => {
     const res = await request(server)
       .patch(`${url}/${registeredUser.userId}`)
       .set(header)
-      .attach('avatar', __dirname + '/file/image.txt')
+      .attach('avatar', __dirname + '/file/docs/image.txt')
     expect(res.status).toBe(400)
     expect(res.body.errors).toMatchObject({
       flag: 'INVALID_FILETYPE',
@@ -196,7 +196,7 @@ describe(`User API`, () => {
     const res = await request(server)
       .patch(`${url}/607ea12bd21e76a4433ea592`)
       .set(header)
-      .attach('avatar', __dirname + '/file/image.jpeg')
+      .attach('avatar', __dirname + '/file/images/image.jpeg')
 
     expect(res.status).toBe(400)
     expect(res.body.errors.message).toBe('USER_NOT_FOUND')

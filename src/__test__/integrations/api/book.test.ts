@@ -3,6 +3,7 @@ import request from 'supertest'
 import { initServerApp, stopServerApp, flushMongoDB } from '@root/__test__/util/createApp'
 import { validHeaders } from '@root/__test__/util/set-header'
 import '@root/__test__/matcher/custom-matcher'
+import config from '@root/app/config/appConfig'
 
 import { SeedBookData } from '@database/seeds/book.seed'
 import { SeedUserData } from '@database/seeds/user.seed'
@@ -45,9 +46,9 @@ describe(`Book API`, () => {
       categoryIds: [],
       publication: '8 Juli 2000',
       pages: 882,
-      aboutBook: "Harry Potter and the Goblet of Fire is the fourth book in J. K. Rowling's Harry Potter novel series",
-      file: 'harryPotterGobletOfFire.epub',
-      thumbnail: 'harryPotterGobletOfFire.jpg'
+      aboutBook: "Harry Potter and the Goblet of Fire is the fourth book in J. K. Rowling's Harry Potter novel series"
+      // file: 'harryPotterGobletOfFire.epub',
+      // thumbnail: 'harryPotterGobletOfFire.jpg'
     }
     await flushMongoDB()
   })
@@ -64,11 +65,31 @@ describe(`Book API`, () => {
     header['Authorization'] = `Bearer ${registeredUser.token}`
 
     const category = await seedCategoryData.createOne({ name: 'Sci-fi' })
-    payload.categoryIds.push(category._id)
-    const res = await request(server).post(url).set(header).send(payload)
+
+    const res = await request(server)
+      .post(url)
+      .set(header)
+      .attach('thumbnail', __dirname + '/file/images/image.jpeg')
+      .attach('file', __dirname + '/file/docs/Learning_React_Native.pdf')
+      .field('title', 'Harry Potter and the Goblet of Fire')
+      .field('publication', '8 Juli 2000')
+      .field('authors[0]', 'J.K Rowling')
+      .field('categoryIds[0]', category._id.toString())
+      .field('pages', 882)
+      .field(
+        'aboutBook',
+        "Harry Potter and the Goblet of Fire is the fourth book in J. K. Rowling's Harry Potter novel series"
+      )
+
     expect(res.status).toBe(200)
-    expect(res.body.result.uploadBy).toBe(registeredUser.userId)
-    expect(res.body.result.categoryIds[0]).toBe(category._id.toString())
+    expect(res.body.result).toMatchObject({
+      uploadBy: registeredUser.userId,
+      categoryIds: [category._id.toString()],
+      file: `${config.cloudinary.assets.replace(/rizkyiqbal/, 'rizkyiqbal/raw/upload')}/files/${
+        registeredUser.userId
+      }/file-${registeredUser.userId}-0.pdf`,
+      thumbnail: `${config.cloudinary.assets}/thumbnails/${registeredUser.userId}/thumbnail-${registeredUser.userId}-0.jpg`
+    })
   })
 
   it(`Success => User should get a book`, async () => {
@@ -167,7 +188,22 @@ describe(`Book API`, () => {
     const category = await seedCategoryData.createOne({ name: 'Fantasy' })
     const category1 = await seedCategoryData.createOne({ name: 'Drama' })
     payload.categoryIds.push(category._id, category1._id)
-    const createdBook = await request(server).post(url).set(header).send(payload)
+    // const createdBook = await request(server).post(url).set(header).send(payload)
+    const createdBook = await request(server)
+      .post(url)
+      .set(header)
+      .attach('thumbnail', __dirname + '/file/images/image.jpeg')
+      .attach('file', __dirname + '/file/docs/Learning_React_Native.pdf')
+      .field('title', 'Harry Potter and the Goblet of Fire')
+      .field('publication', '8 Juli 2000')
+      .field('authors[0]', 'J.K Rowling')
+      .field('categoryIds[0]', category._id.toString())
+      .field('categoryIds[1]', category1._id.toString())
+      .field('pages', 882)
+      .field(
+        'aboutBook',
+        "Harry Potter and the Goblet of Fire is the fourth book in J. K. Rowling's Harry Potter novel series"
+      )
     const bookId = createdBook.body.result._id
 
     const categoryBeforeDeleteBook = await categoryRepository.getAllCategory()

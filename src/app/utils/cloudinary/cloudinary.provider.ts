@@ -16,9 +16,16 @@ export const CloudStorage = new CloudinaryStorage({
   params: async (req, file) => {
     const userId = req.header('x-user-id')
     const user = await userRepository.getOneUser(userId)
-    const count = user.avatar ? parseInt(user.avatar.charAt(user.avatar.length - 5)) + 1 : 0
     const extension = file.fieldname === 'file' ? '.pdf' : ''
     const projectFolder = process.env.APP_ENV === 'local' ? 'LibraryV2_test' : 'LibraryV2'
+
+    let count: number
+    if (file.fieldname === 'avatar') {
+      count = user.avatar ? parseInt(user.avatar.charAt(user.avatar.length - 5)) + 1 : 0
+    } else {
+      count = user.uploadedBook.length || 0
+    }
+
     return {
       folder: `${projectFolder}/${file.fieldname}s/${userId}/`,
       resource_type: file.fieldname === 'file' ? 'raw' : 'image',
