@@ -187,8 +187,7 @@ describe(`Book API`, () => {
 
     const category = await seedCategoryData.createOne({ name: 'Fantasy' })
     const category1 = await seedCategoryData.createOne({ name: 'Drama' })
-    payload.categoryIds.push(category._id, category1._id)
-    // const createdBook = await request(server).post(url).set(header).send(payload)
+
     const createdBook = await request(server)
       .post(url)
       .set(header)
@@ -225,6 +224,99 @@ describe(`Book API`, () => {
 
     expect(res.status).toBe(200)
     expect(res.body.result.message).toBe(`Book with id: ${bookId} has successfully deleted`)
+  })
+
+  it(`Error => User upload a book should got error: Invalid body`, async () => {
+    const userData = await seedUserData.createOne()
+    const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
+    const registeredUser = registerUser.body.result.data
+    header['x-user-id'] = registeredUser.userId
+    header['Authorization'] = `Bearer ${registeredUser.token}`
+
+    const category = await seedCategoryData.createOne({ name: 'Sci-fi' })
+
+    const res = await request(server)
+      .post(url)
+      .set(header)
+      .attach('thumbnail', __dirname + '/file/images/image.jpeg')
+      .field('title', 'Harry Potter and the Goblet of Fire')
+      .field('publication', '8 Juli 2000')
+      .field('authors[0]', 'J.K Rowling')
+      .field('categoryIds[0]', category._id.toString())
+      .field('pages', 882)
+      .field(
+        'aboutBook',
+        "Harry Potter and the Goblet of Fire is the fourth book in J. K. Rowling's Harry Potter novel series"
+      )
+
+    expect(res.status).toBe(400)
+    expect(res.body.errors.flag).toBe('INVALID_BODY')
+    expect(res.body.errors.message).toBe('Book validation failed: file required')
+
+    const res1 = await request(server)
+      .post(url)
+      .set(header)
+      .field('title', 'Harry Potter and the Goblet of Fire')
+      .field('publication', '8 Juli 2000')
+      .field('authors[0]', 'J.K Rowling')
+      .field('categoryIds[0]', category._id.toString())
+      .field('pages', 882)
+      .field(
+        'aboutBook',
+        "Harry Potter and the Goblet of Fire is the fourth book in J. K. Rowling's Harry Potter novel series"
+      )
+
+    expect(res1.status).toBe(400)
+    expect(res1.body.errors.flag).toBe('INVALID_BODY')
+    expect(res1.body.errors.message).toBe('Book validation failed: thumbnail required')
+  })
+
+  it(`Error => User upload a book should got error: Invalid type`, async () => {
+    const userData = await seedUserData.createOne()
+    const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
+    const registeredUser = registerUser.body.result.data
+    header['x-user-id'] = registeredUser.userId
+    header['Authorization'] = `Bearer ${registeredUser.token}`
+
+    const category = await seedCategoryData.createOne({ name: 'Sci-fi' })
+
+    const res = await request(server)
+      .post(url)
+      .set(header)
+      .attach('thumbnail', __dirname + '/file/docs/image.txt')
+      .attach('file', __dirname + '/file/docs/Learning_React_Native.pdf')
+      .field('title', 'Harry Potter and the Goblet of Fire')
+      .field('publication', '8 Juli 2000')
+      .field('authors[0]', 'J.K Rowling')
+      .field('categoryIds[0]', category._id.toString())
+      .field('pages', 882)
+      .field(
+        'aboutBook',
+        "Harry Potter and the Goblet of Fire is the fourth book in J. K. Rowling's Harry Potter novel series"
+      )
+
+    expect(res.status).toBe(400)
+    expect(res.body.errors.flag).toBe('INVALID_FILETYPE')
+    expect(res.body.errors.message).toBe('Please select an image file type')
+
+    const res1 = await request(server)
+      .post(url)
+      .set(header)
+      .attach('thumbnail', __dirname + '/file/images/image.jpeg')
+      .attach('file', __dirname + '/file/docs/practicalmachinelearningwithh2o.epub')
+      .field('title', 'Harry Potter and the Goblet of Fire')
+      .field('publication', '8 Juli 2000')
+      .field('authors[0]', 'J.K Rowling')
+      .field('categoryIds[0]', category._id.toString())
+      .field('pages', 882)
+      .field(
+        'aboutBook',
+        "Harry Potter and the Goblet of Fire is the fourth book in J. K. Rowling's Harry Potter novel series"
+      )
+
+    expect(res1.status).toBe(400)
+    expect(res1.body.errors.flag).toBe('INVALID_FILETYPE')
+    expect(res1.body.errors.message).toBe('Only pdf files are allowed!')
   })
 
   it(`Error => Delete a book should got error: Invalid param`, async () => {
