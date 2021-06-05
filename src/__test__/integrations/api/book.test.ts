@@ -162,7 +162,7 @@ describe(`Book API`, () => {
     expect(res.body.result[1].publication).not.dateNewerThan(res.body.result[0].publication)
   })
 
-  it(`Success => User should update a book and admin will approve the book`, async () => {
+  it(`Success => User should update a book and book approval functionality should work properly`, async () => {
     let adminData: any = await seedUserData.createOne()
     adminData.isAdmin = true
     const registeredAdmin = await request(server).post(`${createUserUrl}`).send(adminData)
@@ -195,17 +195,35 @@ describe(`Book API`, () => {
     header['x-user-id'] = adminData.userId
     header['Authorization'] = `Bearer ${adminData.token}`
 
-    const adminApproval = await request(server).put(`${url}/approve/${book._id}`).set(header).send({ status: 'ACTIVE' })
-    const categoryAfterApproval = await categoryRepository.getAllCategory()
+    const adminApprovalSetActive = await request(server)
+      .put(`${url}/approve/${book._id}`)
+      .set(header)
+      .send({ status: 'ACTIVE' })
+    const categoryAfterApprovalSetActive = await categoryRepository.getAllCategory()
 
-    expect(adminApproval.status).toBe(200)
-    expect(adminApproval.body.result.status).toBe('ACTIVE')
-    expect(adminApproval.body.result.isActive).toBe(true)
+    expect(adminApprovalSetActive.status).toBe(200)
+    expect(adminApprovalSetActive.body.result.status).toBe('ACTIVE')
+    expect(adminApprovalSetActive.body.result.isActive).toBe(true)
 
-    expect(categoryAfterApproval[0].numberOfBook).toBe(1)
-    expect(categoryAfterApproval[0].books[0].toString()).toBe(book._id.toString())
-    expect(categoryAfterApproval[1].numberOfBook).toBe(1)
-    expect(categoryAfterApproval[1].books[0].toString()).toBe(book._id.toString())
+    expect(categoryAfterApprovalSetActive[0].numberOfBook).toBe(1)
+    expect(categoryAfterApprovalSetActive[0].books[0].toString()).toBe(book._id.toString())
+    expect(categoryAfterApprovalSetActive[1].numberOfBook).toBe(1)
+    expect(categoryAfterApprovalSetActive[1].books[0].toString()).toBe(book._id.toString())
+
+    const adminApprovalSetCancel = await request(server)
+      .put(`${url}/approve/${book._id}`)
+      .set(header)
+      .send({ status: 'CANCEL' })
+    const categoryAfterApprovalSetCancel = await categoryRepository.getAllCategory()
+
+    expect(adminApprovalSetCancel.status).toBe(200)
+    expect(adminApprovalSetCancel.body.result.status).toBe('CANCEL')
+    expect(adminApprovalSetCancel.body.result.isActive).toBe(false)
+
+    expect(categoryAfterApprovalSetCancel[0].numberOfBook).toBe(0)
+    expect(categoryAfterApprovalSetCancel[0].books.length).toBe(0)
+    expect(categoryAfterApprovalSetCancel[1].numberOfBook).toBe(0)
+    expect(categoryAfterApprovalSetCancel[1].books.length).toBe(0)
   })
 
   it(`Success => User should delete a book`, async () => {
@@ -461,5 +479,39 @@ describe(`Book API`, () => {
     const res = await request(server).get(`${url}/${book._id}`).set(header).send().query({ bookmark: 'UWAUW' })
     expect(res.status).toBe(400)
     expect(res.body.errors.message).toBe('INVALID_PARAM')
+  })
+
+  it(`Error => Approve a book should got error: Invalid param`, async () => {
+    let adminData: any = await seedUserData.createOne()
+    adminData.isAdmin = true
+    const registeredAdmin = await request(server).post(`${createUserUrl}`).send(adminData)
+
+    adminData = registeredAdmin.body.result.data
+
+    header['x-user-id'] = adminData.userId
+    header['Authorization'] = `Bearer ${adminData.token}`
+
+    const res = await request(server).put(`${url}/approve/0123456789`).set(header).send({ status: 'ACTIVE' })
+
+    expect(res.status).toBe(400)
+    expect(res.body.errors.message).toBe('INVALID_PARAM')
+  })
+
+  it(`Error => Approve a book should got error: Book not found`, async () => {
+    let adminData: any = await seedUserData.createOne()
+    adminData.isAdmin = true
+    const registeredAdmin = await request(server).post(`${createUserUrl}`).send(adminData)
+
+    adminData = registeredAdmin.body.result.data
+
+    header['x-user-id'] = adminData.userId
+    header['Authorization'] = `Bearer ${adminData.token}`
+
+    const res = await request(server)
+      .put(`${url}/approve/6098a9867105050cf0550956`)
+      .set(header)
+      .send({ status: 'ACTIVE' })
+    expect(res.status).toBe(400)
+    expect(res.body.errors.message).toBe('BOOK_NOT_FOUND')
   })
 })

@@ -86,10 +86,10 @@ export class BookService {
       book.publication = publication || book.publication
       book.title = title || book.title
       await Promise.all(
-        categoryIds?.map(async id => {
-          const category = await this.categoryRepository.getCategoryById(id)
+        categoryIds?.map(async categoryId => {
+          const category = await this.categoryRepository.getCategoryById(categoryId)
           if (!category) throw new BadRequestException(httpFlags.CATEGORY_NOT_FOUND)
-          book.categoryIds.push(id)
+          book.categoryIds.push(categoryId)
         })
       )
       await book.save()
@@ -103,9 +103,8 @@ export class BookService {
     const { status } = body
     const book = await this.bookRepository.getOneBook(id, false)
 
-    if (status === book.status) throw new BadRequestException(httpFlags.BOOK_SAME_STATUS)
-
     if (book) {
+      if (status === book.status) throw new BadRequestException(httpFlags.BOOK_SAME_STATUS)
       switch (status) {
         case 'ACTIVE':
           book.isActive = true
