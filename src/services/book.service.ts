@@ -5,6 +5,7 @@ import { UserRepository } from '@root/repositories/user.repository'
 import { CategoryRepository } from '@root/repositories/category.repository'
 import { BadRequestException } from '@root/app/exception/httpException'
 import { httpFlags } from '@root/constant/flags'
+import { UpdateBookEnum } from '@root/interfaces/enum'
 import config from '@root/app/config/appConfig'
 
 @Injectable()
@@ -62,8 +63,6 @@ export class BookService {
 
     const createdBook = await this.bookRepository.createBook(body)
 
-    body.categoryIds ? await this.updateBookOnCategory(body.categoryIds, createdBook._id, 'ADD') : undefined
-
     createdBook.file = `${config.cloudinary.assets.replace(/rizkyiqbal/, 'rizkyiqbal/raw/upload')}/files/${userId}/${
       createdBook.file
     }`
@@ -78,20 +77,51 @@ export class BookService {
     if (book) {
       book.isActive = false
       book.status = 'WAIT'
-      book.aboutBook = aboutBook ? aboutBook : book.aboutBook
+      book.aboutBook = aboutBook || book.aboutBook
       authors?.map(result => book.authors.push(result))
-      book.file = file ? file : book.file
-      book.isbn = isbn ? isbn : book.isbn
-      book.pages = pages ? pages : book.pages
-      book.thumbnail = thumbnail ? thumbnail : book.thumbnail
-      book.publication = publication ? publication : book.publication
-      book.title = title ? title : book.title
-      const updatedBookCategory = categoryIds
-        ? await this.updateBookOnCategory(categoryIds, book._id, 'ADD')
-        : undefined
-      book.categoryIds =
-        updatedBookCategory?.length > 0 ? book.categoryIds.concat(updatedBookCategory) : book.categoryIds
+      book.file = file || book.file
+      book.isbn = isbn || book.isbn
+      book.pages = pages || book.pages
+      book.thumbnail = thumbnail || book.thumbnail
+      book.publication = publication || book.publication
+      book.title = title || book.title
+      await Promise.all(
+        categoryIds?.map(async id => {
+          const category = await this.categoryRepository.getCategoryById(id)
+          if (!category) throw new BadRequestException(httpFlags.CATEGORY_NOT_FOUND)
+          book.categoryIds.push(id)
+        })
+      )
       await book.save()
+      return book
+    } else {
+      throw new BadRequestException(httpFlags.BOOK_NOT_FOUND)
+    }
+  }
+
+  public async bookApprover(id: string, body: IBook) {
+    const { status } = body
+    const book = await this.bookRepository.getOneBook(id, false)
+
+    if (status === book.status) throw new BadRequestException(httpFlags.BOOK_SAME_STATUS)
+
+    if (book) {
+      switch (status) {
+        case 'ACTIVE':
+          book.isActive = true
+          book.status = status
+          await this.updateBookOnCategory(book.categoryIds, book._id, UpdateBookEnum.ADD)
+          await book.save()
+          break
+        default:
+          book.isActive = false
+          book.status === 'ACTIVE'
+            ? await this.updateBookOnCategory(book.categoryIds, book._id, UpdateBookEnum.DELETE)
+            : []
+          book.status = status
+          await book.save()
+          break
+      }
       return book
     } else {
       throw new BadRequestException(httpFlags.BOOK_NOT_FOUND)
@@ -101,7 +131,7 @@ export class BookService {
   public async deleteBook(id: string) {
     const book = await this.bookRepository.getOneBook(id, false)
     if (book) {
-      await this.updateBookOnCategory(book.categoryIds, book._id, 'DELETE')
+      book.isActive ? await this.updateBookOnCategory(book.categoryIds, book._id, UpdateBookEnum.DELETE) : null
       await this.bookRepository.deleteOneBook(id)
       return {
         message: `Book with id: ${id} has successfully deleted`
@@ -111,7 +141,7 @@ export class BookService {
     }
   }
 
-  private async updateBookOnCategory(categories: string[], bookId: string, method: 'ADD' | 'DELETE') {
+  private async updateBookOnCategory(categories: string[], bookId: string, method: UpdateBookEnum) {
     return Promise.all(
       categories.map(async categoryId => {
         const category = await this.categoryRepository.getCategoryById(categoryId)

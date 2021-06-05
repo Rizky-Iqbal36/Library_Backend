@@ -74,15 +74,15 @@ describe(`User API`, () => {
 
   it(`Success => Should get many user datas without query`, async () => {
     let userData: any
-    let registerUser: request.Response
+    let admin: request.Response
     for (let i = 0; i < 10; i++) {
       userData = await seedUserData.createOne()
       if (i === 9) userData.isAdmin = true
-      registerUser = await request(server).post(`${createUserUrl}`).send(userData)
+      admin = await request(server).post(`${createUserUrl}`).send(userData)
     }
-    const registeredUser = registerUser.body.result.data
-    header['x-user-id'] = registeredUser.userId
-    header['Authorization'] = `Bearer ${registeredUser.token}`
+    const registeredAdmin = admin.body.result.data
+    header['x-user-id'] = registeredAdmin.userId
+    header['Authorization'] = `Bearer ${registeredAdmin.token}`
 
     const res = await request(server).get(url).set(header).send()
     expect(res.status).toBe(200)

@@ -1,7 +1,9 @@
-import { Controller, Post, Get, Put, Delete, Param, Req, UseInterceptors } from '@nestjs/common'
+import { Controller, Post, Get, Put, Delete, Param, Req, UseInterceptors, UseGuards } from '@nestjs/common'
 import { FileFieldsInterceptor } from '@nestjs/platform-express'
 
 import { CloudStorage } from '@app/utils/cloudinary/cloudinary.provider'
+
+import { AdminGuard } from '@root/app/guard/admin.guard'
 
 import { BookService } from '@root/services/book.service'
 import { BadRequestException } from '@root/app/exception/httpException'
@@ -31,7 +33,7 @@ export class BookController extends BaseController {
           }
           if (file.fieldname == 'file') {
             if (!file.originalname.match(/\.(pdf|PDF)$/)) {
-              return cb(new BadRequestException(httpFlags.INVALID_FILETYPE, 'Only pdf files are allowed!'), false)
+              return cb(new BadRequestException(httpFlags.INVALID_FILETYPE, 'Only pdf file is allowed!'), false)
             }
           }
           cb(null, true)
@@ -80,6 +82,18 @@ export class BookController extends BaseController {
     const isValidID = mongoose.Types.ObjectId.isValid(id)
     if (isValidID) {
       return this.bookService.updateBook(id, req.body)
+    } else {
+      throw new BadRequestException(httpFlags.INVALID_PARAM)
+    }
+  }
+
+  @Put('approve/:id')
+  @UseGuards(AdminGuard)
+  async bookApprover(@Param('id') id: string, @Req() req: Request) {
+    await this.validateRequest(req, BaseController.schemas.bookSchema.approveBook)
+    const isValidID = mongoose.Types.ObjectId.isValid(id)
+    if (isValidID) {
+      return this.bookService.bookApprover(id, req.body)
     } else {
       throw new BadRequestException(httpFlags.INVALID_PARAM)
     }

@@ -30,6 +30,12 @@ export class BookSchema {
     }).required()
   }
 
+  approveBook = {
+    body: Joi.object({
+      status: Joi.string().valid('WAIT', 'CANCEL', 'ACTIVE')
+    }).required()
+  }
+
   createBook = {
     body: Joi.object({
       isActive: Joi.boolean(),

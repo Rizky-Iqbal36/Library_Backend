@@ -81,15 +81,19 @@ describe(`Book API`, () => {
         "Harry Potter and the Goblet of Fire is the fourth book in J. K. Rowling's Harry Potter novel series"
       )
 
+    const categoryAfterUpload = await categoryRepository.getCategoryById(category._id)
     expect(res.status).toBe(200)
     expect(res.body.result).toMatchObject({
       uploadBy: registeredUser.userId,
+      status: 'WAIT',
       categoryIds: [category._id.toString()],
       file: `${config.cloudinary.assets.replace(/rizkyiqbal/, 'rizkyiqbal/raw/upload')}/files/${
         registeredUser.userId
       }/file-${registeredUser.userId}-0.pdf`,
       thumbnail: `${config.cloudinary.assets}/thumbnails/${registeredUser.userId}/thumbnail-${registeredUser.userId}-0.jpg`
     })
+    expect(categoryAfterUpload.books.length).toBe(0)
+    expect(categoryAfterUpload.numberOfBook).toBe(0)
   })
 
   it(`Success => User should get a book`, async () => {
@@ -102,6 +106,7 @@ describe(`Book API`, () => {
     const category = await seedCategoryData.createOne({ name: 'Fantasy' })
     const book = await seedBookData.createOne(category._id)
     const res = await request(server).get(`${url}/${book._id}`).set(header).send()
+
     expect(res.status).toBe(200)
     expect(res.body.result.isbn).toBe(book.isbn)
     expect(res.body.result.categoryIds[0].name).toBe(category.name)
@@ -157,28 +162,59 @@ describe(`Book API`, () => {
     expect(res.body.result[1].publication).not.dateNewerThan(res.body.result[0].publication)
   })
 
-  it(`Success => User should update a book`, async () => {
+  it(`Success => User should update a book and admin will approve the book`, async () => {
+    let adminData: any = await seedUserData.createOne()
+    adminData.isAdmin = true
+    const registeredAdmin = await request(server).post(`${createUserUrl}`).send(adminData)
+
+    adminData = registeredAdmin.body.result.data
+
     const userData = await seedUserData.createOne()
     const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
     const registeredUser = registerUser.body.result.data
+
     header['x-user-id'] = registeredUser.userId
     header['Authorization'] = `Bearer ${registeredUser.token}`
 
     const category = await seedCategoryData.createOne({ name: 'Sci-fi' })
     const book = await seedBookData.createOne(category._id)
     const category1 = await seedCategoryData.createOne({ name: 'Magic' })
+
     payload.title = 'Stardenburdenhardenbart'
     payload.categoryIds.push(category1._id)
+
     const res = await request(server).put(`${url}/${book._id}`).set(header).send(payload)
     expect(res.status).toBe(200)
     expect(res.body.result.categoryIds.length).toBe(2)
+    expect(res.body.result.status).toBe('WAIT')
 
-    const checkCategory = await request(server).get(`/category/${category1._id}`).set(header).send()
-    expect(checkCategory.status).toBe(200)
-    expect(checkCategory.body.result.books[0]).toBe(book._id.toString())
+    const checkCategory = await categoryRepository.getCategoryById(category1._id)
+    expect(checkCategory.numberOfBook).toBe(0)
+    expect(checkCategory.books.length).toBe(0)
+
+    header['x-user-id'] = adminData.userId
+    header['Authorization'] = `Bearer ${adminData.token}`
+
+    const adminApproval = await request(server).put(`${url}/approve/${book._id}`).set(header).send({ status: 'ACTIVE' })
+    const categoryAfterApproval = await categoryRepository.getAllCategory()
+
+    expect(adminApproval.status).toBe(200)
+    expect(adminApproval.body.result.status).toBe('ACTIVE')
+    expect(adminApproval.body.result.isActive).toBe(true)
+
+    expect(categoryAfterApproval[0].numberOfBook).toBe(1)
+    expect(categoryAfterApproval[0].books[0].toString()).toBe(book._id.toString())
+    expect(categoryAfterApproval[1].numberOfBook).toBe(1)
+    expect(categoryAfterApproval[1].books[0].toString()).toBe(book._id.toString())
   })
 
   it(`Success => User should delete a book`, async () => {
+    let adminData: any = await seedUserData.createOne()
+    adminData.isAdmin = true
+    const registeredAdmin = await request(server).post(`${createUserUrl}`).send(adminData)
+
+    adminData = registeredAdmin.body.result.data
+
     const userData = await seedUserData.createOne()
     const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
     const registeredUser = registerUser.body.result.data
@@ -204,6 +240,11 @@ describe(`Book API`, () => {
         "Harry Potter and the Goblet of Fire is the fourth book in J. K. Rowling's Harry Potter novel series"
       )
     const bookId = createdBook.body.result._id
+
+    header['x-user-id'] = adminData.userId
+    header['Authorization'] = `Bearer ${adminData.token}`
+
+    await request(server).put(`${url}/approve/${bookId}`).set(header).send({ status: 'ACTIVE' })
 
     const categoryBeforeDeleteBook = await categoryRepository.getAllCategory()
     expect(categoryBeforeDeleteBook.length).toBe(2)
@@ -316,7 +357,7 @@ describe(`Book API`, () => {
 
     expect(res1.status).toBe(400)
     expect(res1.body.errors.flag).toBe('INVALID_FILETYPE')
-    expect(res1.body.errors.message).toBe('Only pdf files are allowed!')
+    expect(res1.body.errors.message).toBe('Only pdf file is allowed!')
   })
 
   it(`Error => Delete a book should got error: Invalid param`, async () => {
