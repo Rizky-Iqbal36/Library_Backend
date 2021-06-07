@@ -1,6 +1,7 @@
 import faker from 'faker'
 import { BookRepository } from '@root/repositories/book.repository'
 import { Injectable } from '@nestjs/common'
+import { BookStatusEnum } from '@root/interfaces/enum'
 
 @Injectable()
 export class SeedBookData {
@@ -15,9 +16,10 @@ export class SeedBookData {
 
   async createOne(categoryId?: string[], bookMarkedBy?: string[]) {
     //, authors?: string[]) {
+    const BookStatus = Object.keys(BookStatusEnum).map(val => BookStatusEnum[val])
     return this.bookRepository.createBook({
       isActive: faker.datatype.boolean(),
-      status: faker.random.arrayElement(['WAIT', 'CANCEL', 'ACTIVE']),
+      status: faker.random.arrayElement(BookStatus),
       title: faker.name.title(),
       isbn: faker.finance.creditCardNumber(),
       authors: [`${faker.name.firstName()} ${faker.name.middleName()} ${faker.name.lastName()}`],

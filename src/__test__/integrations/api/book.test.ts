@@ -514,4 +514,21 @@ describe(`Book API`, () => {
     expect(res.status).toBe(400)
     expect(res.body.errors.message).toBe('BOOK_NOT_FOUND')
   })
+
+  it(`Error => Approve a book should got error: Book update with same status`, async () => {
+    let adminData: any = await seedUserData.createOne()
+    adminData.isAdmin = true
+    const registeredAdmin = await request(server).post(`${createUserUrl}`).send(adminData)
+
+    const book = await seedBookData.createOne()
+
+    adminData = registeredAdmin.body.result.data
+
+    header['x-user-id'] = adminData.userId
+    header['Authorization'] = `Bearer ${adminData.token}`
+
+    const res = await request(server).put(`${url}/approve/${book._id}`).set(header).send({ status: book.status })
+    expect(res.status).toBe(400)
+    expect(res.body.errors.message).toBe('BOOK_SAME_STATUS')
+  })
 })

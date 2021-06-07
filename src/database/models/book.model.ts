@@ -1,5 +1,6 @@
 import { Document, model, Schema } from 'mongoose'
 import { BookStatusEnum } from '@root/interfaces/enum'
+
 export interface IBook {
   isActive?: boolean
   status?: BookStatusEnum
