@@ -105,22 +105,21 @@ export class BookService {
 
     if (book) {
       if (status === book.status) throw new BadRequestException(httpFlags.BOOK_SAME_STATUS)
-      switch (status) {
-        case 'ACTIVE':
-          book.isActive = true
-          book.status = BookStatusEnum.ACTIVE
-          await this.updateBookOnCategory(book.categoryIds, book._id, UpdateBookEnum.ADD)
-          await book.save()
-          break
-        default:
-          book.isActive = false
-          book.status === BookStatusEnum.ACTIVE
-            ? await this.updateBookOnCategory(book.categoryIds, book._id, UpdateBookEnum.DELETE)
-            : []
-          book.status = status
-          await book.save()
-          break
+
+      if (status === BookStatusEnum.ACTIVE) {
+        book.isActive = true
+        book.status = BookStatusEnum.ACTIVE
+        await this.updateBookOnCategory(book.categoryIds, book._id, UpdateBookEnum.ADD)
+        await book.save()
+      } else {
+        book.isActive = false
+        book.status === BookStatusEnum.ACTIVE
+          ? await this.updateBookOnCategory(book.categoryIds, book._id, UpdateBookEnum.DELETE)
+          : []
+        book.status = status
+        await book.save()
       }
+
       return book
     } else {
       throw new BadRequestException(httpFlags.BOOK_NOT_FOUND)
