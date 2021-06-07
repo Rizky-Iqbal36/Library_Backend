@@ -1,8 +1,8 @@
 import { Document, model, Schema } from 'mongoose'
-
+import { BookStatusEnum } from '@root/interfaces/enum'
 export interface IBook {
   isActive?: boolean
-  status?: string
+  status?: BookStatusEnum
   title?: string
   isbn?: string
   authors?: string[]

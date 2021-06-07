@@ -5,7 +5,7 @@ import { UserRepository } from '@root/repositories/user.repository'
 import { CategoryRepository } from '@root/repositories/category.repository'
 import { BadRequestException } from '@root/app/exception/httpException'
 import { httpFlags } from '@root/constant/flags'
-import { UpdateBookEnum } from '@root/interfaces/enum'
+import { UpdateBookEnum, BookStatusEnum } from '@root/interfaces/enum'
 import config from '@root/app/config/appConfig'
 
 @Injectable()
@@ -52,7 +52,7 @@ export class BookService {
 
   public async createBook(body: IBook, userId: string) {
     body.isActive = false
-    body.status = 'WAIT'
+    body.status = BookStatusEnum.WAIT
     body.uploadBy = userId
 
     const user = await this.userRepository.getOneUser(userId)
@@ -76,7 +76,7 @@ export class BookService {
     const book = await this.bookRepository.getOneBook(id, false)
     if (book) {
       book.isActive = false
-      book.status = 'WAIT'
+      book.status = BookStatusEnum.WAIT
       book.aboutBook = aboutBook || book.aboutBook
       authors?.map(result => book.authors.push(result))
       book.file = file || book.file
@@ -108,13 +108,13 @@ export class BookService {
       switch (status) {
         case 'ACTIVE':
           book.isActive = true
-          book.status = status
+          book.status = BookStatusEnum.ACTIVE
           await this.updateBookOnCategory(book.categoryIds, book._id, UpdateBookEnum.ADD)
           await book.save()
           break
         default:
           book.isActive = false
-          book.status === 'ACTIVE'
+          book.status === BookStatusEnum.ACTIVE
             ? await this.updateBookOnCategory(book.categoryIds, book._id, UpdateBookEnum.DELETE)
             : []
           book.status = status
@@ -145,7 +145,7 @@ export class BookService {
       categories.map(async categoryId => {
         const category = await this.categoryRepository.getCategoryById(categoryId)
         if (category) {
-          if (method === 'ADD') {
+          if (method === UpdateBookEnum.ADD) {
             category.books.push(bookId)
             category.numberOfBook += 1
           } else {
