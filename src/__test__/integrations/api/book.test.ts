@@ -58,42 +58,46 @@ describe(`Book API`, () => {
   })
 
   it(`Success => User should post a book`, async () => {
-    const userData = await seedUserData.createOne()
-    const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
-    const registeredUser = registerUser.body.result.data
-    header['x-user-id'] = registeredUser.userId
-    header['Authorization'] = `Bearer ${registeredUser.token}`
+    try {
+      const userData = await seedUserData.createOne()
+      const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
+      const registeredUser = registerUser.body.result.data
+      header['x-user-id'] = registeredUser.userId
+      header['Authorization'] = `Bearer ${registeredUser.token}`
 
-    const category = await seedCategoryData.createOne({ name: 'Sci-fi' })
+      const category = await seedCategoryData.createOne({ name: 'Sci-fi' })
 
-    const res = await request(server)
-      .post(url)
-      .set(header)
-      .attach('thumbnail', __dirname + '/file/images/image.jpeg')
-      .attach('file', __dirname + '/file/docs/Learning_React_Native.pdf')
-      .field('title', 'Harry Potter and the Goblet of Fire')
-      .field('publication', '8 Juli 2000')
-      .field('authors[0]', 'J.K Rowling')
-      .field('categoryIds[0]', category._id.toString())
-      .field('pages', 882)
-      .field(
-        'aboutBook',
-        "Harry Potter and the Goblet of Fire is the fourth book in J. K. Rowling's Harry Potter novel series"
-      )
+      const res = await request(server)
+        .post(url)
+        .set(header)
+        .attach('thumbnail', __dirname + '/file/images/image.jpeg')
+        .attach('file', __dirname + '/file/docs/Learning_React_Native.pdf')
+        .field('title', 'Harry Potter and the Goblet of Fire')
+        .field('publication', '8 Juli 2000')
+        .field('authors[0]', 'J.K Rowling')
+        .field('categoryIds[0]', category._id.toString())
+        .field('pages', 882)
+        .field(
+          'aboutBook',
+          "Harry Potter and the Goblet of Fire is the fourth book in J. K. Rowling's Harry Potter novel series"
+        )
 
-    const categoryAfterUpload = await categoryRepository.getCategoryById(category._id)
-    expect(res.status).toBe(200)
-    expect(res.body.result).toMatchObject({
-      uploadBy: registeredUser.userId,
-      status: 'WAIT',
-      categoryIds: [category._id.toString()],
-      file: `${config.cloudinary.assets.replace(/rizkyiqbal/, 'rizkyiqbal/raw/upload')}/files/${
-        registeredUser.userId
-      }/file-${registeredUser.userId}-0.pdf`,
-      thumbnail: `${config.cloudinary.assets}/thumbnails/${registeredUser.userId}/thumbnail-${registeredUser.userId}-0.jpg`
-    })
-    expect(categoryAfterUpload.books.length).toBe(0)
-    expect(categoryAfterUpload.numberOfBook).toBe(0)
+      const categoryAfterUpload = await categoryRepository.getCategoryById(category._id)
+      expect(res.status).toBe(200)
+      expect(res.body.result).toMatchObject({
+        uploadBy: registeredUser.userId,
+        status: 'WAIT',
+        categoryIds: [category._id.toString()],
+        file: `${config.cloudinary.assets.replace(/rizkyiqbal/, 'rizkyiqbal/raw/upload')}/files/${
+          registeredUser.userId
+        }/file-${registeredUser.userId}-0.pdf`,
+        thumbnail: `${config.cloudinary.assets}/thumbnails/${registeredUser.userId}/thumbnail-${registeredUser.userId}-0.jpg`
+      })
+      expect(categoryAfterUpload.books.length).toBe(0)
+      expect(categoryAfterUpload.numberOfBook).toBe(0)
+    } catch (err) {
+      console.log
+    }
   })
 
   it(`Success => User should get a book`, async () => {
