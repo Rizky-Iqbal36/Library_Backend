@@ -28,3 +28,6 @@ jobs:
           heroku_api_key: ${{secrets.HEROKU_API_KEY_STAGING}}
           heroku_app_name: ${{secrets.HEROKU_APP_STAGING}}
           heroku_email: 'rizkiiqbal36@gmail.com'
+          healthcheck: 'https://${{secrets.HEROKU_APP_STAGING}}.herokuapp.com/health'
+          checkstring: 'ok'
+          rollbackonhealthcheckfailed: true
