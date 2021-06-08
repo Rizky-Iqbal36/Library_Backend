@@ -8,19 +8,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
-      CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
-      CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
-      CLOUDINARY_ASSETS: ${{ secrets.CLOUDINARY_ASSETS }}
-      JWT_SECRET: ${{secrets.JWT_SECRET}}
-      ENCRYPT_JWT_SECRET: ${{secrets.ENCRYPT_JWT_SECRET}}
-      JWT_EXPIRATION: ${{secrets.JWT_EXPIRATION}}
-      MONGO_DB_URI: ${{secrets.MONGO_DB_URI_STAGING}}
-      MONGO_DB_DB_NAME: ${{secrets.MONGO_DB_DB_NAME}}
-      MONGO_DB_USER: ${{secrets.MONGO_DB_USER_STAGING}}
-      MONGO_DB_PASS: ${{secrets.MONGO_DB_PASS_STAGING}}
-      MONGO_DB_AUTH_SOURCE: ${{secrets.MONGO_DB_AUTH_SOURCE}}
     steps:
       - uses: actions/checkout@v2
       - uses: akhileshns/heroku-deploy@v3.12.12
@@ -31,3 +18,16 @@ jobs:
           healthcheck: 'https://${{secrets.HEROKU_APP_STAGING}}.herokuapp.com/health'
           checkstring: 'ok'
           rollbackonhealthcheckfailed: true
+        env:
+          CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+          CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+          CLOUDINARY_ASSETS: ${{ secrets.CLOUDINARY_ASSETS }}
+          JWT_SECRET: ${{secrets.JWT_SECRET}}
+          ENCRYPT_JWT_SECRET: ${{secrets.ENCRYPT_JWT_SECRET}}
+          JWT_EXPIRATION: ${{secrets.JWT_EXPIRATION}}
+          MONGO_DB_URI: ${{secrets.MONGO_DB_URI_STAGING}}
+          MONGO_DB_DB_NAME: ${{secrets.MONGO_DB_DB_NAME}}
+          MONGO_DB_USER: ${{secrets.MONGO_DB_USER_STAGING}}
+          MONGO_DB_PASS: ${{secrets.MONGO_DB_PASS_STAGING}}
+          MONGO_DB_AUTH_SOURCE: ${{secrets.MONGO_DB_AUTH_SOURCE}}
