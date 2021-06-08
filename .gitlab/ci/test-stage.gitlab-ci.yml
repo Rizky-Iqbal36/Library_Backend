@@ -27,7 +27,6 @@ test:integration:
     - npm run dependency:local
     - sleep 5
     - docker-compose -f docker-compose.yml run
-      -e APP_ENV="test"
       -e CLOUDINARY_CLOUD_NAME="${CLOUDINARY_CLOUD_NAME}"
       -e CLOUDINARY_API_KEY="${CLOUDINARY_API_KEY}"
       -e CLOUDINARY_API_SECRET="${CLOUDINARY_API_SECRET}"
