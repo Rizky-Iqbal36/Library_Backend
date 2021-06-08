@@ -7,12 +7,11 @@ export const databaseProviders = [
   {
     provide: 'DATABASE_CONNECTION',
     useFactory: async (): Promise<typeof mongoose> =>
-      mongoose.connect(config.mongodb.uri, {
+      mongoose.connect(`${config.mongodb.uri()}/${dbName}?retryWrites=true`, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
         user: config.mongodb.user,
         pass: config.mongodb.pass,
-        dbName: dbName,
         authSource: config.mongodb.authSource,
         useFindAndModify: false,
         useCreateIndex: true

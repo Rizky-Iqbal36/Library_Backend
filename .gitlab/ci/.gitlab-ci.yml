@@ -15,3 +15,4 @@ services:
 include:
   - local: '.gitlab/ci/build-stage.gitlab-ci.yml'
   - local: '.gitlab/ci/test-stage.gitlab-ci.yml'
+  - local: '.gitlab/ci/deploy-stage.gitlab-ci.yml'
