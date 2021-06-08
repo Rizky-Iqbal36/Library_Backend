@@ -23,11 +23,11 @@ jobs:
           HD_CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
           HD_CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
           HD_CLOUDINARY_ASSETS: ${{ secrets.CLOUDINARY_ASSETS }}
-          HD_JWT_SECRET: ${{secrets.JWT_SECRET}}
-          HD_ENCRYPT_JWT_SECRET: ${{secrets.ENCRYPT_JWT_SECRET}}
-          HD_JWT_EXPIRATION: ${{secrets.JWT_EXPIRATION}}
-          HD_MONGO_DB_URI: ${{secrets.MONGO_DB_URI_STAGING}}
-          HD_MONGO_DB_DB_NAME: ${{secrets.MONGO_DB_DB_NAME}}
-          HD_MONGO_DB_USER: ${{secrets.MONGO_DB_USER_STAGING}}
-          HD_MONGO_DB_PASS: ${{secrets.MONGO_DB_PASS_STAGING}}
-          HD_MONGO_DB_AUTH_SOURCE: ${{secrets.MONGO_DB_AUTH_SOURCE}}
+          HD_JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          HD_ENCRYPT_JWT_SECRET: ${{ secrets.ENCRYPT_JWT_SECRET }}
+          HD_JWT_EXPIRATION: ${{ secrets.JWT_EXPIRATION }}
+          HD_MONGO_DB_URI: ${{ secrets.MONGO_DB_URI_STAGING }}
+          HD_MONGO_DB_DB_NAME: ${{ secrets.MONGO_DB_DB_NAME }}
+          HD_MONGO_DB_USER: ${{ secrets.MONGO_DB_USER_STAGING }}
+          HD_MONGO_DB_PASS: ${{ secrets.MONGO_DB_PASS_STAGING }}
+          HD_MONGO_DB_AUTH_SOURCE: ${{ secrets.MONGO_DB_AUTH_SOURCE }}
