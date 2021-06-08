@@ -1,6 +1,9 @@
 staging:
   type: deploy
   stage: deploy-staging
+  needs:
+    - job: test:integration
+      artifacts: true
   image: ruby:latest
   before_script:
     - apt-get update -qy

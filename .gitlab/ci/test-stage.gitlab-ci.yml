@@ -36,3 +36,6 @@ test:integration:
       -e ENCRYPT_JWT_SECRET="${ENCRYPT_JWT_SECRET}"
       -e JWT_EXPIRATION="${JWT_EXPIRATION}"
       app npm run test
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "develop"'
+      when: on_success
