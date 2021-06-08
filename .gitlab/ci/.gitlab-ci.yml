@@ -3,6 +3,7 @@ image: rizkyiqbal/dind-nodejs
 stages:
   - build
   - test
+  - deploy-staging
 
 variables:
   DOCKER_HOST: tcp://docker:2375/
