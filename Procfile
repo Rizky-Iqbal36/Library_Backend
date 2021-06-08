@@ -1,1 +1,1 @@
-web: npm install && sleep 5 && npm run start
+web: npm run start:prod
