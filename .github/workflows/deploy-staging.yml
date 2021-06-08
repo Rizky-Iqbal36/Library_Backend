@@ -15,8 +15,9 @@ jobs:
           heroku_api_key: ${{secrets.HEROKU_API_KEY_STAGING}}
           heroku_app_name: ${{secrets.HEROKU_APP_STAGING}}
           heroku_email: 'rizkiiqbal36@gmail.com'
-          healthcheck: 'https://${{secrets.HEROKU_APP_STAGING}}.herokuapp.com/health'
+          healthcheck: 'https://${{secrets.HEROKU_APP_STAGING}}.herokuapp.com/api/v2/health'
           checkstring: 'ok'
+          rollbackonhealthcheckfailed: true
         env:
           HD_CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
           HD_CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
