@@ -18,5 +18,6 @@
       "@app/*": ["./src/app/*"],
       "@database/*": ["./src/database/*"]
     }
-  }
+  },
+  "exclude": ["node_modules", "dist"]
 }

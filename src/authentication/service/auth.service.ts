@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common'
 import config from '@root/app/config/appConfig'
 import Bcrypt from 'bcrypt'
 import Jwt from 'jsonwebtoken'
-// const Bcrypt = require('bcrypt')
 
 @Injectable()
 export class AuthService {

@@ -1,0 +1,33 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: akhileshns/heroku-deploy@v3.12.12
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY_STAGING}}
+          heroku_app_name: ${{secrets.HEROKU_APP_STAGING}}
+          heroku_email: 'rizkiiqbal36@gmail.com'
+          # healthcheck: 'https://${{secrets.HEROKU_APP_STAGING}}.herokuapp.com/api/v2/health'
+          # checkstring: 'ok'
+          # rollbackonhealthcheckfailed: true
+        env:
+          HD_CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          HD_CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+          HD_CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+          HD_CLOUDINARY_ASSETS: ${{ secrets.CLOUDINARY_ASSETS }}
+          HD_JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          HD_ENCRYPT_JWT_SECRET: ${{ secrets.ENCRYPT_JWT_SECRET }}
+          HD_JWT_EXPIRATION: ${{ secrets.JWT_EXPIRATION }}
+          HD_MONGO_DB_URI: ${{ secrets.MONGO_DB_URI_STAGING }}
+          HD_MONGO_DB_DB_NAME: ${{ secrets.MONGO_DB_DB_NAME }}
+          HD_MONGO_DB_USER: ${{ secrets.MONGO_DB_USER_STAGING }}
+          HD_MONGO_DB_PASS: ${{ secrets.MONGO_DB_PASS_STAGING }}
+          HD_MONGO_DB_AUTH_SOURCE: ${{ secrets.MONGO_DB_AUTH_SOURCE }}
