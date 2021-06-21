@@ -15,9 +15,9 @@ jobs:
           heroku_api_key: ${{secrets.HEROKU_API_KEY_STAGING}}
           heroku_app_name: ${{secrets.HEROKU_APP_STAGING}}
           heroku_email: 'rizkiiqbal36@gmail.com'
-          # healthcheck: 'https://${{secrets.HEROKU_APP_STAGING}}.herokuapp.com/api/v2/health'
-          # checkstring: 'ok'
-          # rollbackonhealthcheckfailed: true
+          healthcheck: 'https://${{secrets.HEROKU_APP_STAGING}}.herokuapp.com/api/v2/health'
+          checkstring: 'ok'
+          rollbackonhealthcheckfailed: true
         env:
           HD_CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
           HD_CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
@@ -31,3 +31,22 @@ jobs:
           HD_MONGO_DB_USER: ${{ secrets.MONGO_DB_USER_STAGING }}
           HD_MONGO_DB_PASS: ${{ secrets.MONGO_DB_PASS_STAGING }}
           HD_MONGO_DB_AUTH_SOURCE: ${{ secrets.MONGO_DB_AUTH_SOURCE }}
+  test:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+      CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+      CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+      CLOUDINARY_ASSETS: ${{ secrets.CLOUDINARY_ASSETS }}
+      JWT_SECRET: ${{secrets.JWT_SECRET}}
+      ENCRYPT_JWT_SECRET: ${{secrets.ENCRYPT_JWT_SECRET}}
+      JWT_EXPIRATION: ${{secrets.JWT_EXPIRATION}}
+    steps:
+      - uses: actions/checkout@v1
+      - name: Run Tests
+        run: |
+          cp .env.example .env
+          npm install
+          npm run dependency:local
+          sleep 5
+          npm run test
