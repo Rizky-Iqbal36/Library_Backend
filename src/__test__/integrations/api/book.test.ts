@@ -154,12 +154,22 @@ describe(`Book API`, () => {
     header['x-user-id'] = registeredUser.userId
     header['Authorization'] = `Bearer ${registeredUser.token}`
 
-    await seedBookData.createMany(10)
-    const res = await request(server).get(url).set(header).send()
+    await seedBookData.createMany(15)
+    const res = await request(server).get(url).set(header).query({ page: 1 }).send()
     expect(res.status).toBe(200)
-    expect(res.body.result.length).toBe(10)
-    expect(res.body.result[0].publication).dateNewerThan(res.body.result[9].publication)
-    expect(res.body.result[1].publication).not.dateNewerThan(res.body.result[0].publication)
+    expect(res.body.result.currentPage).toBe(1)
+    expect(res.body.result.totalPage).toBe(2)
+    expect(res.body.result.totalBookOnThisPage).toBe(10)
+    expect(res.body.result.data[0].publication).dateNewerThan(res.body.result.data[9].publication)
+    expect(res.body.result.data[1].publication).not.dateNewerThan(res.body.result.data[0].publication)
+
+    const res2 = await request(server).get(url).set(header).query({ page: 2 }).send()
+    expect(res2.status).toBe(200)
+    expect(res2.body.result.currentPage).toBe(2)
+    expect(res2.body.result.totalPage).toBe(2)
+    expect(res2.body.result.totalBookOnThisPage).toBe(5)
+    expect(res2.body.result.data[0].publication).dateNewerThan(res2.body.result.data[4].publication)
+    expect(res2.body.result.data[1].publication).not.dateNewerThan(res2.body.result.data[0].publication)
   })
 
   it(`Success => User should update a book and book approval functionality should work properly`, async () => {

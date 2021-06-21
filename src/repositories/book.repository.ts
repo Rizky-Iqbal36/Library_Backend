@@ -1,12 +1,27 @@
 import { Injectable } from '@nestjs/common'
 import { BookModel, IBook } from '@database/models/book.model'
 
+interface IGetBookQuery {
+  options: {
+    skip: number
+    take: number
+  }
+}
+
 @Injectable()
 export class BookRepository {
   private readonly bookModel = BookModel
 
-  public async getAllBooks() {
-    return this.bookModel.find().sort({ publication: -1 })
+  public async getAllBooks(query: IGetBookQuery) {
+    return this.bookModel
+      .find()
+      .sort({ publication: -1 })
+      .skip(query.options.skip || 0)
+      .limit(query.options.take || 10)
+  }
+
+  public async countBooks() {
+    return this.bookModel.count()
   }
 
   public async getOneBook(id: string, populate?: boolean) {

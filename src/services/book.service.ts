@@ -16,8 +16,17 @@ export class BookService {
     private readonly categoryRepository: CategoryRepository
   ) {}
 
-  public async findAllBook() {
-    return this.bookRepository.getAllBooks()
+  public async findAllBook(page: number) {
+    const take = 10
+    const skip = (page - 1) * take
+    const books = await this.bookRepository.getAllBooks({ options: { skip, take } })
+    const totalBooks = await this.bookRepository.countBooks()
+    return {
+      currentPage: page,
+      totalPage: Math.ceil(totalBooks / take),
+      totalBookOnThisPage: books.length,
+      data: books
+    }
   }
 
   public async findOneBook(id: string, userId: string, bookmark?: string) {

@@ -59,8 +59,10 @@ export class BookController extends BaseController {
   }
 
   @Get()
-  async getBooks() {
-    return this.bookService.findAllBook()
+  async getBooks(@Req() req: Request) {
+    await this.validateRequest(req, BaseController.schemas.bookSchema.getBooks)
+    const page = parseInt(req.query.page as any) || 1
+    return this.bookService.findAllBook(page)
   }
 
   @Get('/:id')

@@ -1,6 +1,15 @@
 import Joi from 'joi'
 
 export class BookSchema {
+  getBooks = {
+    header: Joi.object({
+      'x-user-id': Joi.string().required()
+    }).required(),
+    query: Joi.object({
+      page: Joi.number()
+    }).required()
+  }
+
   getBook = {
     header: Joi.object({
       'x-user-id': Joi.string().required()
