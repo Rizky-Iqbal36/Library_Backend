@@ -1,18 +1,12 @@
 import { Injectable } from '@nestjs/common'
 import { BookModel, IBook } from '@database/models/book.model'
-
-interface IGetBookQuery {
-  options: {
-    skip: number
-    take: number
-  }
-}
+import { IQueryGetAll } from '@root/interfaces'
 
 @Injectable()
 export class BookRepository {
   private readonly bookModel = BookModel
 
-  public async getAllBooks(query: IGetBookQuery) {
+  public async getAllBooks(query: IQueryGetAll) {
     return this.bookModel
       .find()
       .sort({ publication: -1 })

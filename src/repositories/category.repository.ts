@@ -6,7 +6,7 @@ export class CategoryRepository {
   private readonly categoryModel = CategoryModel
 
   public async getAllCategory() {
-    return this.categoryModel.find({ isActive: true }).populate('bookId')
+    return this.categoryModel.find({ isActive: true }).populate('books')
   }
 
   public async getCategoryByName(name: string) {
@@ -14,7 +14,7 @@ export class CategoryRepository {
   }
 
   public async getCategoryById(id: string) {
-    return this.categoryModel.findById(id)
+    return this.categoryModel.findById(id).populate('books')
   }
 
   public async createCategory(data: ICategory) {

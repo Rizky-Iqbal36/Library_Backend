@@ -9,13 +9,20 @@ export class SeedBookData {
   async createMany(loop: number) {
     const all = []
     for (let i = 0; i < loop; i++) {
-      all.push(await this.createOne())
+      all.push(await this.createOne({}))
     }
     return all
   }
 
-  async createOne(categoryId?: string[], bookMarkedBy?: string[]) {
-    //, authors?: string[]) {
+  async createOne({
+    categoryIds = [],
+    bookMarkedBy = [],
+    uploadBy = '607ea12bd21e76a4433ea592'
+  }: {
+    categoryIds?: string[]
+    bookMarkedBy?: string[]
+    uploadBy?: string
+  }) {
     const BookStatus = Object.keys(BookStatusEnum).map(val => BookStatusEnum[val])
     return this.bookRepository.createBook({
       isActive: faker.datatype.boolean(),
@@ -23,16 +30,16 @@ export class SeedBookData {
       title: faker.name.title(),
       isbn: faker.finance.creditCardNumber(),
       authors: [`${faker.name.firstName()} ${faker.name.middleName()} ${faker.name.lastName()}`],
-      ...(categoryId ? { categoryIds: categoryId } : {}),
+      ...(categoryIds.length > 0 ? { categoryIds } : {}),
       publication: faker.date.past(10, new Date()),
       pages: faker.datatype.number(),
-      uploadBy: '607ea12bd21e76a4433ea592', //temporary, wait for user integration
+      uploadBy,
       views: 0,
       aboutBook: faker.commerce.productDescription(),
       file: `file_${faker.lorem.sentence(1)}epub`,
       thumbnail: faker.image.animals(),
       bookMarked: 0,
-      ...(bookMarkedBy ? { bookMarkedBy: bookMarkedBy } : {})
+      ...(bookMarkedBy.length > 0 ? { bookMarkedBy } : {})
     })
   }
 }

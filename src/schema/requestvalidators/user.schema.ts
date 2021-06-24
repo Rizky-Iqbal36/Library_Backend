@@ -17,18 +17,36 @@ export class UserSchema {
       uploadedBook: Joi.array()
     })
   }
+
   loginUser = {
     body: Joi.object({
       email: Joi.string().email().required(),
       password: Joi.string().min(8).required()
     })
   }
+
   getUser = {
-    query: Joi.object({
-      isAdmin: Joi.boolean()
-    }).required(),
     header: Joi.object({
       'x-user-id': Joi.string().required()
-    })
+    }),
+    query: Joi.object({
+      isAdmin: Joi.boolean().required()
+    }).required()
+  }
+
+  getUsers = {
+    header: Joi.object({
+      'x-user-id': Joi.string().required()
+    }).required(),
+    query: Joi.object({
+      page: Joi.number()
+    }).required()
+  }
+
+  blockUser = {
+    query: Joi.object({
+      setActive: Joi.boolean().required(),
+      setStatus: Joi.string().valid('BLOCKED', 'ACTIVE').required()
+    }).required()
   }
 }

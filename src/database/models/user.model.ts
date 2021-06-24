@@ -1,4 +1,5 @@
 import { Document, model, Schema } from 'mongoose'
+import { UserGenderEnum, UserStatusEnum } from '@root/interfaces/enum'
 
 export interface IUserLogin {
   email: string
@@ -12,10 +13,11 @@ export interface IUser {
   password: string
   fullName: string
   userName: string
-  gender: string
+  gender: UserGenderEnum
   phone: string
   address: string
   isAdmin?: boolean
+  status?: UserStatusEnum
   bookmarkedBook?: string[]
   uploadedBook?: string[]
   totalBookmarked?: number
@@ -28,7 +30,7 @@ const UserSchema = new Schema(
   {
     isActive: { type: Boolean, required: true, default: true },
     userIsAuthor: { type: Boolean, required: true, default: false },
-    email: { type: String, required: true, unique: true, lowercase: true },
+    email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     fullName: { type: String, required: true },
     userName: { type: String, required: true },
@@ -36,6 +38,7 @@ const UserSchema = new Schema(
     phone: { type: String, required: true },
     address: { type: String, required: true },
     isAdmin: { type: Boolean, required: true, default: false },
+    status: { type: String, required: true, enum: ['BLOCKED', 'ACTIVE'], default: 'ACTIVE' },
     uploadedBook: [{ type: Schema.Types.ObjectId, ref: 'Book', required: false, default: null }],
     bookmarkedBook: [{ type: Schema.Types.ObjectId, ref: 'Book', required: false, default: null }],
     totalBookmarked: { type: Number, required: false, default: 0 },

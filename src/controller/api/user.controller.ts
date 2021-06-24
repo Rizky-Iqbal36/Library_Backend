@@ -1,11 +1,10 @@
-import { Controller, Get, Param, Patch, Req, UseGuards, UseInterceptors } from '@nestjs/common'
+import { Controller, Get, Param, Patch, Req, UseInterceptors } from '@nestjs/common'
 import { FileInterceptor } from '@nestjs/platform-express'
 
 import { UserService } from '@root/services/user.service'
-import { BadRequestException } from '@root/app/exception/httpException'
+import { BadRequestException, UnauthorizedException } from '@root/app/exception/httpException'
 import { httpFlags } from '@root/constant/flags'
 import { BaseController } from '@root/controller/base.controller'
-import { AdminGuard } from '@root/app/guard/admin.guard'
 
 import { CloudStorage } from '@app/utils/cloudinary/cloudinary.provider'
 
@@ -18,18 +17,13 @@ export class UserController extends BaseController {
     super()
   }
 
-  @Get()
-  @UseGuards(AdminGuard)
-  async getAll(@Req() req: Request) {
-    await this.validateRequest(req, BaseController.schemas.userSchema.getUser)
-    const { isAdmin } = req.query
-    return this.userService.findAllUser((isAdmin as unknown) as boolean)
-  }
-
   @Get('/:id')
-  async getOne(@Param('id') id: string) {
+  async getOne(@Param('id') id: string, @Req() req: Request) {
     const isValidID = mongoose.Types.ObjectId.isValid(id)
     if (isValidID) {
+      const userId = req.header('x-user-id')
+      if (userId !== id)
+        throw new UnauthorizedException(httpFlags.UNAUTHORIZED, "You are not allowed to see other user's data")
       return this.userService.findOneUser(id)
     } else {
       throw new BadRequestException(httpFlags.INVALID_PARAM)
@@ -51,7 +45,15 @@ export class UserController extends BaseController {
     })
   )
   @Patch('/:id')
-  async uploadAvatar(@Param('id') id: string) {
-    return this.userService.updateAvatar(id)
+  async uploadAvatar(@Param('id') id: string, @Req() req: Request) {
+    const isValidID = mongoose.Types.ObjectId.isValid(id)
+    if (isValidID) {
+      const userId = req.header('x-user-id')
+      if (userId !== id)
+        throw new UnauthorizedException(httpFlags.UNAUTHORIZED, "You are not allowed to change other user's data")
+      return this.userService.updateAvatar(id)
+    } else {
+      throw new BadRequestException(httpFlags.INVALID_PARAM)
+    }
   }
 }
