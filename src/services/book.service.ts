@@ -177,7 +177,7 @@ export class BookService {
           await category.save()
           return categoryId
         } else {
-          throw new BadRequestException(httpFlags.CATEGORY_NOT_FOUND)
+          throw new BadRequestException(httpFlags.CATEGORY_NOT_FOUND, `Category with id: ${categoryId}`)
         }
       })
     )

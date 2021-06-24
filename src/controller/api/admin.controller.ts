@@ -23,6 +23,7 @@ export class AdminController extends BaseController {
     super()
   }
 
+  //User API
   @Get('get-users')
   async getAll(@Req() req: Request) {
     await this.validateRequest(req, BaseController.schemas.userSchema.getUsers)
@@ -63,7 +64,7 @@ export class AdminController extends BaseController {
     }
   }
 
-  //Book
+  //Book API
   @Put('approve-book/:id')
   async bookApprover(@Param('id') id: string, @Req() req: Request) {
     await this.validateRequest(req, BaseController.schemas.bookSchema.approveBook)
@@ -75,7 +76,7 @@ export class AdminController extends BaseController {
     }
   }
 
-  //Category
+  //Category API
   @Post('/create-category')
   async createOne(@Req() req: Request) {
     await this.validateRequest(req, BaseController.schemas.categorySchema.createCategory)

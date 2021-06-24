@@ -15,7 +15,7 @@ export class BookRepository {
   }
 
   public async countBooks() {
-    return this.bookModel.count()
+    return this.bookModel.countDocuments()
   }
 
   public async getOneBook(id: string, populate?: boolean) {

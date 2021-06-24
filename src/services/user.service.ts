@@ -45,7 +45,7 @@ export class UserService {
 
   public async findAllUser(page: number) {
     const take = 10
-    const skip = (page - 1) * take
+    const skip = (page - 1) * take || 0
     const users = await this.userRepository.getAllUsers({ options: { skip, take } })
     const totalUsers = await this.userRepository.countUsers()
     return {
@@ -66,16 +66,12 @@ export class UserService {
   }
 
   public async updateAvatar(id: string) {
-    const user = await this.userRepository.getOneUser(id, true)
-    if (user) {
-      const count = user.avatar ? parseInt(user.avatar.charAt(user.avatar.length - 5)) + 1 : 0
-      user.avatar = `avatar-${id}-${count}.jpg`
-      await user.save()
-      user.avatar = `${config.cloudinary.assets}/avatars/${id}/${user.avatar}`
-      return user
-    } else {
-      throw new BadRequestException(httpFlags.USER_NOT_FOUND)
-    }
+    const user = await this.findOneUser(id)
+    const count = user.avatar ? parseInt(user.avatar.charAt(user.avatar.length - 5)) + 1 : 0
+    user.avatar = `avatar-${id}-${count}.jpg`
+    await user.save()
+    user.avatar = `${config.cloudinary.assets}/avatars/${id}/${user.avatar}`
+    return user
   }
 
   public async blockUser(id: string, setActive: boolean, setStatus: UserStatusEnum) {

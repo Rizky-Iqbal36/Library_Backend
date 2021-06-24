@@ -341,6 +341,27 @@ describe(`Book API`, () => {
     expect(res.body.errors.message).toBe('BOOK_NOT_FOUND')
   })
 
+  it(`Error => Delete a book should got error: Unauthorized`, async () => {
+    const user = await seedUserData.createOne({ admin: false })
+
+    const category = await seedCategoryData.createOne({ name: 'Fantasy' })
+    const category1 = await seedCategoryData.createOne({ name: 'Drama' })
+
+    const book = await seedBookData.createOne({ categoryIds: [category._id, category1._id], uploadBy: user.userId })
+
+    expect(user.userId).toBe(book.uploadBy)
+
+    const anotherUser = await seedUserData.createOne({ admin: false })
+    header['x-user-id'] = anotherUser.userId
+    header['Authorization'] = `Bearer ${anotherUser.token}`
+
+    const res = await request(server).delete(`${url}/${book._id}`).set(header).send()
+
+    expect(res.status).toBe(401)
+    expect(res.body.errors.flag).toBe('UNAUTHORIZED')
+    expect(res.body.errors.message).toBe(`You don't have permission to delete book with id: ${book._id}`)
+  })
+
   it(`Error => Update a book should got error: Book not found`, async () => {
     const user = await seedUserData.createOne({ admin: false })
     header['x-user-id'] = user.userId

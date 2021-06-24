@@ -56,7 +56,7 @@ describe(`Admin API`, () => {
     header['x-user-id'] = admin.userId
     header['Authorization'] = `Bearer ${admin.token}`
 
-    const res = await request(server).get(`${url}/get-users`).set(header).query({ page: 1 }).send()
+    const res = await request(server).get(`${url}/get-users`).set(header).send()
 
     expect(res.status).toBe(200)
     expect(res.body.result.currentPage).toBe(1)
@@ -74,6 +74,18 @@ describe(`Admin API`, () => {
     expect(res2.body.result.data[1].createdAt).not.dateNewerThan(res2.body.result.data[0].createdAt)
 
     expect(res.body.result.data[9].createdAt).dateNewerThan(res2.body.result.data[0].createdAt)
+  })
+
+  it(`Success => Should get a user`, async () => {
+    const admin = await seedUserData.createOne({ admin: true })
+    const user = await seedUserData.createOne({ admin: false })
+    header['x-user-id'] = admin.userId
+    header['Authorization'] = `Bearer ${admin.token}`
+
+    const res = await request(server).get(`${url}/get-user/${user.userId}`).set(header).send()
+
+    expect(res.status).toBe(200)
+    expect(res.body.result._id).toBe(user.userId.toString())
   })
 
   it(`Success => Should delete a user`, async () => {
@@ -228,6 +240,17 @@ describe(`Admin API`, () => {
       categoryName: payload.name,
       categoryDescription: payload.description
     })
+  })
+
+  it(`Error => Admin get a user should got error: Invalid param`, async () => {
+    const admin = await seedUserData.createOne({ admin: true })
+    header['x-user-id'] = admin.userId
+    header['Authorization'] = `Bearer ${admin.token}`
+
+    const res = await request(server).get(`${url}/get-user/123`).set(header).send()
+
+    expect(res.status).toBe(400)
+    expect(res.body.errors.message).toBe('INVALID_PARAM')
   })
 
   it(`Error => Create category should got error: Category is already exist`, async () => {

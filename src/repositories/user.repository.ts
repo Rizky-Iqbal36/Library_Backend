@@ -7,15 +7,11 @@ export class UserRepository {
   private readonly userModel = UserModel
 
   public async getAllUsers(query: IQueryGetAll) {
-    return this.userModel
-      .find()
-      .sort({ createdAt: -1 })
-      .skip(query.options.skip || 0)
-      .limit(query.options.take || 10)
+    return this.userModel.find().sort({ createdAt: -1 }).skip(query.options.skip).limit(query.options.take)
   }
 
   public async countUsers() {
-    return this.userModel.count()
+    return this.userModel.countDocuments()
   }
   public async getOneUser(id: string, populate?: boolean) {
     if (populate) return this.userModel.findById(id).populate('bookmarkedBook')
