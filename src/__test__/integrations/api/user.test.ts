@@ -107,7 +107,6 @@ describe(`User API`, () => {
       .patch(`${url}/${user.userId}`)
       .set(header)
       .attach('avatar', __dirname + '/file/images/image-big.jpg')
-
     expect(res.status).toBe(413)
     expect(res.body.errors.message).toBe('File too large')
   })

@@ -11,11 +11,11 @@ export interface IUser {
   userIsAuthor?: boolean
   email: string
   password: string
-  fullName: string
   userName: string
-  gender: UserGenderEnum
-  phone: string
-  address: string
+  fullName?: string
+  gender?: UserGenderEnum
+  phone?: string
+  address?: string
   isAdmin?: boolean
   status?: UserStatusEnum
   bookmarkedBook?: string[]
@@ -28,21 +28,21 @@ export type IUserDoc = IUser & Document
 
 const UserSchema = new Schema(
   {
-    isActive: { type: Boolean, required: true, default: true },
-    userIsAuthor: { type: Boolean, required: true, default: false },
+    isActive: { type: Boolean, default: true },
+    userIsAuthor: { type: Boolean, default: false },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    fullName: { type: String, required: true },
     userName: { type: String, required: true },
-    gender: { type: String, enum: ['MALE', 'SHEMALE'], required: true },
-    phone: { type: String, required: true },
-    address: { type: String, required: true },
-    isAdmin: { type: Boolean, required: true, default: false },
-    status: { type: String, required: true, enum: ['BLOCKED', 'ACTIVE'], default: 'ACTIVE' },
-    uploadedBook: [{ type: Schema.Types.ObjectId, ref: 'Book', required: false, default: null }],
-    bookmarkedBook: [{ type: Schema.Types.ObjectId, ref: 'Book', required: false, default: null }],
-    totalBookmarked: { type: Number, required: false, default: 0 },
-    avatar: { type: String, required: false, default: null }
+    fullName: { type: String, default: null },
+    gender: { type: String, enum: ['MALE', 'SHEMALE', 'OTHER'], default: 'OTHER' },
+    phone: { type: String, default: null },
+    address: { type: String, default: null },
+    isAdmin: { type: Boolean, default: false },
+    status: { type: String, enum: ['BLOCKED', 'ACTIVE'], default: 'ACTIVE' },
+    uploadedBook: [{ type: Schema.Types.ObjectId, ref: 'Book', default: null }],
+    bookmarkedBook: [{ type: Schema.Types.ObjectId, ref: 'Book', default: null }],
+    totalBookmarked: { type: Number, default: 0 },
+    avatar: { type: String, default: null }
   },
   { timestamps: true }
 )

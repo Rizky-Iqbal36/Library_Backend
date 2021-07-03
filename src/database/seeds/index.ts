@@ -18,6 +18,7 @@ export default class Seeds {
   }
 
   private async registerSeeder() {
+    await this.seedUserData.createOne({ admin: true, email: 'admin@admin.com', password: 'lumosmaxima' })
     await this.bookDataSeed.createMany(10)
     await this.seedUserData.createMany(10)
   }

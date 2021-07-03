@@ -21,11 +21,7 @@ describe(`Authentication API`, () => {
     payload = {
       email: 'coba@email.com',
       password: 'unchunch',
-      fullName: 'siapa oii',
-      userName: 'oii siapa',
-      gender: 'MALE',
-      phone: '82290260388',
-      address: 'itu di sana'
+      userName: 'magicUser'
     }
     await flushMongoDB()
   })
