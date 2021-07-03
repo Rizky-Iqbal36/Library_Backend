@@ -1,6 +1,6 @@
 module.exports = {
   verbose: true,
-  testTimeout: 30000,
+  testTimeout: 50000,
   moduleFileExtensions: ['js', 'json', 'ts'],
   rootDir: 'src',
   testEnvironment: 'node',

@@ -21,3 +21,10 @@ export interface IRequestValidationSchema {
   headers?: Joi.Schema
   header?: Joi.Schema
 }
+
+export interface IQueryGetAll {
+  options: {
+    skip: number
+    take: number
+  }
+}

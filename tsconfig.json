@@ -17,7 +17,8 @@
       "@root/*": ["./src/*"],
       "@app/*": ["./src/app/*"],
       "@database/*": ["./src/database/*"]
-    }
+    },
+    "plugins": [{ "transform": "@zerollup/ts-transform-paths" }]
   },
   "exclude": ["node_modules", "dist"]
 }

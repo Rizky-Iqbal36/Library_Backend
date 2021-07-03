@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Req, Post } from '@nestjs/common'
+import { Controller, Get, Param, Req } from '@nestjs/common'
 import { CategoryService } from '@root/services/category.service'
 import { BadRequestException } from '@root/app/exception/httpException'
 import { httpFlags } from '@root/constant/flags'
@@ -27,11 +27,5 @@ export class CategoryController extends BaseController {
     } else {
       throw new BadRequestException(httpFlags.INVALID_PARAM)
     }
-  }
-
-  @Post('/create')
-  async createOne(@Req() req: Request) {
-    await this.validateRequest(req, BaseController.schemas.categorySchema.createCategory)
-    return this.categoryService.createCategory(req.body)
   }
 }

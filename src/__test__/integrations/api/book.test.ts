@@ -4,6 +4,7 @@ import { initServerApp, stopServerApp, flushMongoDB } from '@root/__test__/util/
 import { validHeaders } from '@root/__test__/util/set-header'
 import '@root/__test__/matcher/custom-matcher'
 import config from '@root/app/config/appConfig'
+import { BookStatusEnum } from '@root/interfaces/enum'
 
 import { SeedBookData } from '@database/seeds/book.seed'
 import { SeedUserData } from '@database/seeds/user.seed'
@@ -11,7 +12,6 @@ import { SeedCategoryData } from '@database/seeds/category.seed'
 
 import { CategoryRepository } from '@root/repositories/category.repository'
 
-const createUserUrl = '/auth/register'
 const url = '/book'
 const header: any = validHeaders
 let payload: any
@@ -58,11 +58,9 @@ describe(`Book API`, () => {
   })
 
   it(`Success => User should post a book`, async () => {
-    const userData = await seedUserData.createOne()
-    const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
-    const registeredUser = registerUser.body.result.data
-    header['x-user-id'] = registeredUser.userId
-    header['Authorization'] = `Bearer ${registeredUser.token}`
+    const user = await seedUserData.createOne({ admin: false })
+    header['x-user-id'] = user.userId
+    header['Authorization'] = `Bearer ${user.token}`
 
     const category = await seedCategoryData.createOne({ name: 'Sci-fi' })
 
@@ -84,27 +82,25 @@ describe(`Book API`, () => {
     const categoryAfterUpload = await categoryRepository.getCategoryById(category._id)
     expect(res.status).toBe(200)
     expect(res.body.result).toMatchObject({
-      uploadBy: registeredUser.userId,
-      status: 'WAIT',
+      uploadBy: user.userId.toString(),
+      status: BookStatusEnum.WAIT,
       categoryIds: [category._id.toString()],
-      file: `${config.cloudinary.assets.replace(/rizkyiqbal/, 'rizkyiqbal/raw/upload')}/files/${
-        registeredUser.userId
-      }/file-${registeredUser.userId}-0.pdf`,
-      thumbnail: `${config.cloudinary.assets}/thumbnails/${registeredUser.userId}/thumbnail-${registeredUser.userId}-0.jpg`
+      file: `${config.cloudinary.assets.replace(/rizkyiqbal/, 'rizkyiqbal/raw/upload')}/files/${user.userId}/file-${
+        user.userId
+      }-0.pdf`,
+      thumbnail: `${config.cloudinary.assets}/thumbnails/${user.userId}/thumbnail-${user.userId}-0.jpg`
     })
     expect(categoryAfterUpload.books.length).toBe(0)
     expect(categoryAfterUpload.numberOfBook).toBe(0)
   })
 
   it(`Success => User should get a book`, async () => {
-    const userData = await seedUserData.createOne()
-    const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
-    const registeredUser = registerUser.body.result.data
-    header['x-user-id'] = registeredUser.userId
-    header['Authorization'] = `Bearer ${registeredUser.token}`
+    const user = await seedUserData.createOne({ admin: false })
+    header['x-user-id'] = user.userId
+    header['Authorization'] = `Bearer ${user.token}`
 
     const category = await seedCategoryData.createOne({ name: 'Fantasy' })
-    const book = await seedBookData.createOne(category._id)
+    const book = await seedBookData.createOne({ categoryIds: [category._id] })
     const res = await request(server).get(`${url}/${book._id}`).set(header).send()
 
     expect(res.status).toBe(200)
@@ -115,16 +111,14 @@ describe(`Book API`, () => {
   })
 
   it(`Success => User should bookmark and unbookmark a book`, async () => {
-    const userData = await seedUserData.createOne()
-    const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
-    const registeredUser = registerUser.body.result.data
-    header['x-user-id'] = registeredUser.userId
-    header['Authorization'] = `Bearer ${registeredUser.token}`
+    const user = await seedUserData.createOne({ admin: false })
+    header['x-user-id'] = user.userId
+    header['Authorization'] = `Bearer ${user.token}`
 
     const category = await seedCategoryData.createOne({ name: 'Sci-fi' })
-    const book = await seedBookData.createOne(category._id)
+    const book = await seedBookData.createOne({ categoryIds: [category._id] })
 
-    const gotUser = await request(server).get(`/user/${registeredUser.userId}`).set(header).send()
+    const gotUser = await request(server).get(`/user/${user.userId}`).set(header).send()
     expect(gotUser.body.result.bookmarkedBook.length).toBe(0)
     expect(gotUser.body.result.totalBookmarked).toBe(0)
 
@@ -132,112 +126,48 @@ describe(`Book API`, () => {
     expect(res.status).toBe(200)
     expect(res.body.result.bookMarked).toBe(1)
 
-    const updatedUser = await request(server).get(`/user/${registeredUser.userId}`).set(header).send()
+    const updatedUser = await request(server).get(`/user/${user.userId}`).set(header).send()
     expect(updatedUser.body.result.bookmarkedBook.length).toBe(1)
     expect(updatedUser.body.result.totalBookmarked).toBe(1)
-    expect(res.body.result.bookMarkedBy[0]).toBe(registeredUser.userId.toString())
+    expect(res.body.result.bookMarkedBy[0]).toBe(user.userId.toString())
     expect(updatedUser.body.result.bookmarkedBook[0]._id).toBe(book._id.toString())
 
     const res1 = await request(server).get(`${url}/${book._id}`).set(header).send().query({ bookmark: 'UNBOOKMARK' })
     expect(res1.status).toBe(200)
     expect(res1.body.result.bookMarked).toBe(0)
 
-    const updatedUser1 = await request(server).get(`/user/${registeredUser.userId}`).set(header).send()
+    const updatedUser1 = await request(server).get(`/user/${user.userId}`).set(header).send()
     expect(updatedUser1.body.result.bookmarkedBook.length).toBe(0)
     expect(updatedUser1.body.result.totalBookmarked).toBe(0)
   })
 
   it(`Success => User should get many books that sorted by most recent publication date`, async () => {
-    const userData = await seedUserData.createOne()
-    const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
-    const registeredUser = registerUser.body.result.data
-    header['x-user-id'] = registeredUser.userId
-    header['Authorization'] = `Bearer ${registeredUser.token}`
+    const user = await seedUserData.createOne({ admin: false })
+    header['x-user-id'] = user.userId
+    header['Authorization'] = `Bearer ${user.token}`
 
-    await seedBookData.createMany(10)
-    const res = await request(server).get(url).set(header).send()
+    await seedBookData.createMany(15)
+    const res = await request(server).get(url).set(header).query({ page: 1 }).send()
     expect(res.status).toBe(200)
-    expect(res.body.result.length).toBe(10)
-    expect(res.body.result[0].publication).dateNewerThan(res.body.result[9].publication)
-    expect(res.body.result[1].publication).not.dateNewerThan(res.body.result[0].publication)
+    expect(res.body.result.currentPage).toBe(1)
+    expect(res.body.result.totalPage).toBe(2)
+    expect(res.body.result.totalBookOnThisPage).toBe(10)
+    expect(res.body.result.data[0].publication).dateNewerThan(res.body.result.data[9].publication)
+    expect(res.body.result.data[1].publication).not.dateNewerThan(res.body.result.data[0].publication)
+
+    const res2 = await request(server).get(url).set(header).query({ page: 2 }).send()
+    expect(res2.status).toBe(200)
+    expect(res2.body.result.currentPage).toBe(2)
+    expect(res2.body.result.totalPage).toBe(2)
+    expect(res2.body.result.totalBookOnThisPage).toBe(5)
+    expect(res2.body.result.data[0].publication).dateNewerThan(res2.body.result.data[4].publication)
+    expect(res2.body.result.data[1].publication).not.dateNewerThan(res2.body.result.data[0].publication)
   })
 
-  it(`Success => User should update a book and book approval functionality should work properly`, async () => {
-    let adminData: any = await seedUserData.createOne()
-    adminData.isAdmin = true
-    const registeredAdmin = await request(server).post(`${createUserUrl}`).send(adminData)
-
-    adminData = registeredAdmin.body.result.data
-
-    const userData = await seedUserData.createOne()
-    const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
-    const registeredUser = registerUser.body.result.data
-
-    header['x-user-id'] = registeredUser.userId
-    header['Authorization'] = `Bearer ${registeredUser.token}`
-
-    const category = await seedCategoryData.createOne({ name: 'Sci-fi' })
-    const book = await seedBookData.createOne(category._id)
-    const category1 = await seedCategoryData.createOne({ name: 'Magic' })
-
-    payload.title = 'Stardenburdenhardenbart'
-    payload.categoryIds.push(category1._id)
-
-    const res = await request(server).put(`${url}/${book._id}`).set(header).send(payload)
-    expect(res.status).toBe(200)
-    expect(res.body.result.categoryIds.length).toBe(2)
-    expect(res.body.result.status).toBe('WAIT')
-
-    const checkCategory = await categoryRepository.getCategoryById(category1._id)
-    expect(checkCategory.numberOfBook).toBe(0)
-    expect(checkCategory.books.length).toBe(0)
-
-    header['x-user-id'] = adminData.userId
-    header['Authorization'] = `Bearer ${adminData.token}`
-
-    const adminApprovalSetActive = await request(server)
-      .put(`${url}/approve/${book._id}`)
-      .set(header)
-      .send({ status: 'ACTIVE' })
-    const categoryAfterApprovalSetActive = await categoryRepository.getAllCategory()
-
-    expect(adminApprovalSetActive.status).toBe(200)
-    expect(adminApprovalSetActive.body.result.status).toBe('ACTIVE')
-    expect(adminApprovalSetActive.body.result.isActive).toBe(true)
-
-    expect(categoryAfterApprovalSetActive[0].numberOfBook).toBe(1)
-    expect(categoryAfterApprovalSetActive[0].books[0].toString()).toBe(book._id.toString())
-    expect(categoryAfterApprovalSetActive[1].numberOfBook).toBe(1)
-    expect(categoryAfterApprovalSetActive[1].books[0].toString()).toBe(book._id.toString())
-
-    const adminApprovalSetCancel = await request(server)
-      .put(`${url}/approve/${book._id}`)
-      .set(header)
-      .send({ status: 'CANCEL' })
-    const categoryAfterApprovalSetCancel = await categoryRepository.getAllCategory()
-
-    expect(adminApprovalSetCancel.status).toBe(200)
-    expect(adminApprovalSetCancel.body.result.status).toBe('CANCEL')
-    expect(adminApprovalSetCancel.body.result.isActive).toBe(false)
-
-    expect(categoryAfterApprovalSetCancel[0].numberOfBook).toBe(0)
-    expect(categoryAfterApprovalSetCancel[0].books.length).toBe(0)
-    expect(categoryAfterApprovalSetCancel[1].numberOfBook).toBe(0)
-    expect(categoryAfterApprovalSetCancel[1].books.length).toBe(0)
-  })
-
-  it(`Success => User should delete a book`, async () => {
-    let adminData: any = await seedUserData.createOne()
-    adminData.isAdmin = true
-    const registeredAdmin = await request(server).post(`${createUserUrl}`).send(adminData)
-
-    adminData = registeredAdmin.body.result.data
-
-    const userData = await seedUserData.createOne()
-    const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
-    const registeredUser = registerUser.body.result.data
-    header['x-user-id'] = registeredUser.userId
-    header['Authorization'] = `Bearer ${registeredUser.token}`
+  it(`Success => Uploader should delete the book that he or her upload`, async () => {
+    const user = await seedUserData.createOne({ admin: false })
+    header['x-user-id'] = user.userId
+    header['Authorization'] = `Bearer ${user.token}`
 
     const category = await seedCategoryData.createOne({ name: 'Fantasy' })
     const category1 = await seedCategoryData.createOne({ name: 'Drama' })
@@ -257,24 +187,41 @@ describe(`Book API`, () => {
         'aboutBook',
         "Harry Potter and the Goblet of Fire is the fourth book in J. K. Rowling's Harry Potter novel series"
       )
+
+    expect(createdBook.body.result).toMatchObject({
+      uploadBy: user.userId.toString(),
+      status: BookStatusEnum.WAIT,
+      categoryIds: [category._id.toString(), category1._id.toString()],
+      file: `${config.cloudinary.assets.replace(/rizkyiqbal/, 'rizkyiqbal/raw/upload')}/files/${user.userId}/file-${
+        user.userId
+      }-0.pdf`,
+      thumbnail: `${config.cloudinary.assets}/thumbnails/${user.userId}/thumbnail-${user.userId}-0.jpg`
+    })
+
     const bookId = createdBook.body.result._id
 
-    header['x-user-id'] = adminData.userId
-    header['Authorization'] = `Bearer ${adminData.token}`
+    const admin = await seedUserData.createOne({ admin: true })
 
-    await request(server).put(`${url}/approve/${bookId}`).set(header).send({ status: 'ACTIVE' })
+    header['x-user-id'] = admin.userId
+    header['Authorization'] = `Bearer ${admin.token}`
 
-    const categoryBeforeDeleteBook = await categoryRepository.getAllCategory()
+    await request(server).put(`/admin/approve-book/${bookId}`).set(header).send({ status: BookStatusEnum.ACTIVE })
+
+    const categoryBeforeDeleteBook: any = await categoryRepository.getAllCategory()
     expect(categoryBeforeDeleteBook.length).toBe(2)
     expect(categoryBeforeDeleteBook[0].numberOfBook).toBe(1)
     expect(categoryBeforeDeleteBook[0].numberOfBook).toBe(categoryBeforeDeleteBook[1].numberOfBook)
     expect(categoryBeforeDeleteBook[0].books.length).toBe(1)
-    expect(categoryBeforeDeleteBook[0].books[0].toString()).toBe(bookId)
-    expect(categoryBeforeDeleteBook[0].books[0].toString()).toBe(categoryBeforeDeleteBook[1].books[0].toString())
+    expect(categoryBeforeDeleteBook[0].books[0]._id.toString()).toBe(bookId)
+    expect(categoryBeforeDeleteBook[0].books[0]._id).toBe(categoryBeforeDeleteBook[1].books[0]._id)
+
+    header['x-user-id'] = user.userId
+    header['Authorization'] = `Bearer ${user.token}`
 
     const res = await request(server).delete(`${url}/${bookId}`).set(header).send()
 
     const categoryAfterDeleteBook = await categoryRepository.getAllCategory()
+
     expect(categoryAfterDeleteBook.length).toBe(2)
     expect(categoryAfterDeleteBook[0].numberOfBook).toBe(0)
     expect(categoryAfterDeleteBook[0].numberOfBook).toBe(categoryAfterDeleteBook[1].numberOfBook)
@@ -286,11 +233,9 @@ describe(`Book API`, () => {
   })
 
   it(`Error => User upload a book should got error: Invalid body`, async () => {
-    const userData = await seedUserData.createOne()
-    const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
-    const registeredUser = registerUser.body.result.data
-    header['x-user-id'] = registeredUser.userId
-    header['Authorization'] = `Bearer ${registeredUser.token}`
+    const user = await seedUserData.createOne({ admin: false })
+    header['x-user-id'] = user.userId
+    header['Authorization'] = `Bearer ${user.token}`
 
     const category = await seedCategoryData.createOne({ name: 'Sci-fi' })
 
@@ -331,11 +276,9 @@ describe(`Book API`, () => {
   })
 
   it(`Error => User upload a book should got error: Invalid type`, async () => {
-    const userData = await seedUserData.createOne()
-    const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
-    const registeredUser = registerUser.body.result.data
-    header['x-user-id'] = registeredUser.userId
-    header['Authorization'] = `Bearer ${registeredUser.token}`
+    const user = await seedUserData.createOne({ admin: false })
+    header['x-user-id'] = user.userId
+    header['Authorization'] = `Bearer ${user.token}`
 
     const category = await seedCategoryData.createOne({ name: 'Sci-fi' })
 
@@ -379,11 +322,9 @@ describe(`Book API`, () => {
   })
 
   it(`Error => Delete a book should got error: Invalid param`, async () => {
-    const userData = await seedUserData.createOne()
-    const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
-    const registeredUser = registerUser.body.result.data
-    header['x-user-id'] = registeredUser.userId
-    header['Authorization'] = `Bearer ${registeredUser.token}`
+    const user = await seedUserData.createOne({ admin: false })
+    header['x-user-id'] = user.userId
+    header['Authorization'] = `Bearer ${user.token}`
 
     const res = await request(server).delete(`${url}/0123456789`).set(header).send()
     expect(res.status).toBe(400)
@@ -391,23 +332,40 @@ describe(`Book API`, () => {
   })
 
   it(`Error => Delete a book should got error: Book not found`, async () => {
-    const userData = await seedUserData.createOne()
-    const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
-    const registeredUser = registerUser.body.result.data
-    header['x-user-id'] = registeredUser.userId
-    header['Authorization'] = `Bearer ${registeredUser.token}`
+    const user = await seedUserData.createOne({ admin: false })
+    header['x-user-id'] = user.userId
+    header['Authorization'] = `Bearer ${user.token}`
 
     const res = await request(server).delete(`${url}/6098a9867105050cf0550956`).set(header).send()
     expect(res.status).toBe(400)
     expect(res.body.errors.message).toBe('BOOK_NOT_FOUND')
   })
 
+  it(`Error => Delete a book should got error: Unauthorized`, async () => {
+    const user = await seedUserData.createOne({ admin: false })
+
+    const category = await seedCategoryData.createOne({ name: 'Fantasy' })
+    const category1 = await seedCategoryData.createOne({ name: 'Drama' })
+
+    const book = await seedBookData.createOne({ categoryIds: [category._id, category1._id], uploadBy: user.userId })
+
+    expect(user.userId).toBe(book.uploadBy)
+
+    const anotherUser = await seedUserData.createOne({ admin: false })
+    header['x-user-id'] = anotherUser.userId
+    header['Authorization'] = `Bearer ${anotherUser.token}`
+
+    const res = await request(server).delete(`${url}/${book._id}`).set(header).send()
+
+    expect(res.status).toBe(401)
+    expect(res.body.errors.flag).toBe('UNAUTHORIZED')
+    expect(res.body.errors.message).toBe(`You don't have permission to delete book with id: ${book._id}`)
+  })
+
   it(`Error => Update a book should got error: Book not found`, async () => {
-    const userData = await seedUserData.createOne()
-    const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
-    const registeredUser = registerUser.body.result.data
-    header['x-user-id'] = registeredUser.userId
-    header['Authorization'] = `Bearer ${registeredUser.token}`
+    const user = await seedUserData.createOne({ admin: false })
+    header['x-user-id'] = user.userId
+    header['Authorization'] = `Bearer ${user.token}`
 
     payload.title = 'Wingardium Leviosa'
     const res = await request(server).put(`${url}/6098a9867105050cf0550956`).set(header).send(payload)
@@ -416,13 +374,11 @@ describe(`Book API`, () => {
   })
 
   it(`Error => Update a book should got error: Category not found`, async () => {
-    const userData = await seedUserData.createOne()
-    const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
-    const registeredUser = registerUser.body.result.data
-    header['x-user-id'] = registeredUser.userId
-    header['Authorization'] = `Bearer ${registeredUser.token}`
+    const user = await seedUserData.createOne({ admin: false })
+    header['x-user-id'] = user.userId
+    header['Authorization'] = `Bearer ${user.token}`
 
-    const book = await seedBookData.createOne()
+    const book = await seedBookData.createOne({})
     payload.title = 'Expeliarmus'
     payload.categoryIds.push('6098a9d6e45c890d2df28438')
     const res = await request(server).put(`${url}/${book._id}`).set(header).send(payload)
@@ -431,11 +387,9 @@ describe(`Book API`, () => {
   })
 
   it(`Error => Update a book should got error: Invalid param`, async () => {
-    const userData = await seedUserData.createOne()
-    const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
-    const registeredUser = registerUser.body.result.data
-    header['x-user-id'] = registeredUser.userId
-    header['Authorization'] = `Bearer ${registeredUser.token}`
+    const user = await seedUserData.createOne({ admin: false })
+    header['x-user-id'] = user.userId
+    header['Authorization'] = `Bearer ${user.token}`
 
     payload.title = 'Vershmeltzen'
     const res = await request(server).put(`${url}/0123456789`).set(header).send(payload)
@@ -444,11 +398,9 @@ describe(`Book API`, () => {
   })
 
   it(`Error => Get book should got error: Invalid param`, async () => {
-    const userData = await seedUserData.createOne()
-    const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
-    const registeredUser = registerUser.body.result.data
-    header['x-user-id'] = registeredUser.userId
-    header['Authorization'] = `Bearer ${registeredUser.token}`
+    const user = await seedUserData.createOne({ admin: false })
+    header['x-user-id'] = user.userId
+    header['Authorization'] = `Bearer ${user.token}`
 
     const res = await request(server).get(`${url}/0123456789`).set(header).send()
     expect(res.status).toBe(400)
@@ -456,11 +408,9 @@ describe(`Book API`, () => {
   })
 
   it(`Error => Get Book Should got error: No such a book`, async () => {
-    const userData = await seedUserData.createOne()
-    const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
-    const registeredUser = registerUser.body.result.data
-    header['x-user-id'] = registeredUser.userId
-    header['Authorization'] = `Bearer ${registeredUser.token}`
+    const user = await seedUserData.createOne({ admin: false })
+    header['x-user-id'] = user.userId
+    header['Authorization'] = `Bearer ${user.token}`
 
     const res = await request(server).get(`${url}/607ea12bd21e76a4433ea592`).set(header).send()
     expect(res.status).toBe(400)
@@ -468,67 +418,14 @@ describe(`Book API`, () => {
   })
 
   it(`Error => Bookmark a book should got error: Invalid param`, async () => {
-    const userData = await seedUserData.createOne()
-    const registerUser = await request(server).post(`${createUserUrl}`).send(userData)
-    const registeredUser = registerUser.body.result.data
-    header['x-user-id'] = registeredUser.userId
-    header['Authorization'] = `Bearer ${registeredUser.token}`
+    const user = await seedUserData.createOne({ admin: false })
+    header['x-user-id'] = user.userId
+    header['Authorization'] = `Bearer ${user.token}`
 
     const category = await seedCategoryData.createOne({ name: 'Sci-fi' })
     const book = await seedBookData.createOne(category._id)
     const res = await request(server).get(`${url}/${book._id}`).set(header).send().query({ bookmark: 'UWAUW' })
     expect(res.status).toBe(400)
     expect(res.body.errors.message).toBe('INVALID_PARAM')
-  })
-
-  it(`Error => Approve a book should got error: Invalid param`, async () => {
-    let adminData: any = await seedUserData.createOne()
-    adminData.isAdmin = true
-    const registeredAdmin = await request(server).post(`${createUserUrl}`).send(adminData)
-
-    adminData = registeredAdmin.body.result.data
-
-    header['x-user-id'] = adminData.userId
-    header['Authorization'] = `Bearer ${adminData.token}`
-
-    const res = await request(server).put(`${url}/approve/0123456789`).set(header).send({ status: 'ACTIVE' })
-
-    expect(res.status).toBe(400)
-    expect(res.body.errors.message).toBe('INVALID_PARAM')
-  })
-
-  it(`Error => Approve a book should got error: Book not found`, async () => {
-    let adminData: any = await seedUserData.createOne()
-    adminData.isAdmin = true
-    const registeredAdmin = await request(server).post(`${createUserUrl}`).send(adminData)
-
-    adminData = registeredAdmin.body.result.data
-
-    header['x-user-id'] = adminData.userId
-    header['Authorization'] = `Bearer ${adminData.token}`
-
-    const res = await request(server)
-      .put(`${url}/approve/6098a9867105050cf0550956`)
-      .set(header)
-      .send({ status: 'ACTIVE' })
-    expect(res.status).toBe(400)
-    expect(res.body.errors.message).toBe('BOOK_NOT_FOUND')
-  })
-
-  it(`Error => Approve a book should got error: Book update with same status`, async () => {
-    let adminData: any = await seedUserData.createOne()
-    adminData.isAdmin = true
-    const registeredAdmin = await request(server).post(`${createUserUrl}`).send(adminData)
-
-    const book = await seedBookData.createOne()
-
-    adminData = registeredAdmin.body.result.data
-
-    header['x-user-id'] = adminData.userId
-    header['Authorization'] = `Bearer ${adminData.token}`
-
-    const res = await request(server).put(`${url}/approve/${book._id}`).set(header).send({ status: book.status })
-    expect(res.status).toBe(400)
-    expect(res.body.errors.message).toBe('BOOK_SAME_STATUS')
   })
 })

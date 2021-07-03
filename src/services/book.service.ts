@@ -1,23 +1,37 @@
 import { Injectable } from '@nestjs/common'
+import config from '@root/app/config/appConfig'
+
+import { BadRequestException, UnauthorizedException } from '@root/app/exception/httpException'
+import { httpFlags } from '@root/constant/flags'
+
 import { IBook } from '@root/database/models/book.model'
+import { UpdateBookEnum, BookStatusEnum } from '@root/interfaces/enum'
+
 import { BookRepository } from '@root/repositories/book.repository'
 import { UserRepository } from '@root/repositories/user.repository'
 import { CategoryRepository } from '@root/repositories/category.repository'
-import { BadRequestException } from '@root/app/exception/httpException'
-import { httpFlags } from '@root/constant/flags'
-import { UpdateBookEnum, BookStatusEnum } from '@root/interfaces/enum'
-import config from '@root/app/config/appConfig'
 
+import { UserService } from '@root/services/user.service'
 @Injectable()
 export class BookService {
   constructor(
     private readonly bookRepository: BookRepository,
     private readonly userRepository: UserRepository,
-    private readonly categoryRepository: CategoryRepository
+    private readonly categoryRepository: CategoryRepository,
+    private readonly userService: UserService
   ) {}
 
-  public async findAllBook() {
-    return this.bookRepository.getAllBooks()
+  public async findAllBook(page: number) {
+    const take = 10
+    const skip = (page - 1) * take
+    const books = await this.bookRepository.getAllBooks({ options: { skip, take } })
+    const totalBooks = await this.bookRepository.countBooks()
+    return {
+      currentPage: page,
+      totalPage: Math.ceil(totalBooks / take),
+      totalBookOnThisPage: books.length,
+      data: books
+    }
   }
 
   public async findOneBook(id: string, userId: string, bookmark?: string) {
@@ -55,7 +69,7 @@ export class BookService {
     body.status = BookStatusEnum.WAIT
     body.uploadBy = userId
 
-    const user = await this.userRepository.getOneUser(userId)
+    const user = await this.userService.findOneUser(userId)
     const count = user.uploadedBook.length || 0
 
     body.file = 'file-' + userId + `-${count}.pdf`
@@ -126,13 +140,21 @@ export class BookService {
     }
   }
 
-  public async deleteBook(id: string) {
+  public async deleteBook(id: string, userId: string) {
     const book = await this.bookRepository.getOneBook(id, false)
+    const user = await this.userService.findOneUser(userId)
     if (book) {
-      book.isActive ? await this.updateBookOnCategory(book.categoryIds, book._id, UpdateBookEnum.DELETE) : null
-      await this.bookRepository.deleteOneBook(id)
-      return {
-        message: `Book with id: ${id} has successfully deleted`
+      if (user.isAdmin || book.uploadBy.toString() === userId) {
+        book.isActive ? await this.updateBookOnCategory(book.categoryIds, book._id, UpdateBookEnum.DELETE) : null
+        await this.bookRepository.deleteOneBook(id)
+        return {
+          message: `Book with id: ${id} has successfully deleted`
+        }
+      } else {
+        throw new UnauthorizedException(
+          httpFlags.UNAUTHORIZED,
+          `You don't have permission to delete book with id: ${id}`
+        )
       }
     } else {
       throw new BadRequestException(httpFlags.BOOK_NOT_FOUND)
@@ -155,7 +177,7 @@ export class BookService {
           await category.save()
           return categoryId
         } else {
-          throw new BadRequestException(httpFlags.CATEGORY_NOT_FOUND)
+          throw new BadRequestException(httpFlags.CATEGORY_NOT_FOUND, `Category with id: ${categoryId}`)
         }
       })
     )

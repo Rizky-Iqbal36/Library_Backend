@@ -7,16 +7,16 @@ export interface IBook {
   title?: string
   isbn?: string
   authors?: string[]
-  categoryIds?: any[]
+  categoryIds?: string[]
   publication?: Date
   pages?: number
-  uploadBy?: any
+  uploadBy?: string
   views?: number
   aboutBook?: string
   file?: string
   thumbnail?: string
   bookMarked?: number
-  bookMarkedBy?: any[]
+  bookMarkedBy?: string[]
 }
 
 export type IBookDoc = IBook & Document

@@ -1,9 +1,7 @@
-import { Controller, Post, Get, Put, Delete, Param, Req, UseInterceptors, UseGuards } from '@nestjs/common'
+import { Controller, Post, Get, Put, Delete, Param, Req, UseInterceptors } from '@nestjs/common'
 import { FileFieldsInterceptor } from '@nestjs/platform-express'
 
 import { CloudStorage } from '@app/utils/cloudinary/cloudinary.provider'
-
-import { AdminGuard } from '@root/app/guard/admin.guard'
 
 import { BookService } from '@root/services/book.service'
 import { BadRequestException } from '@root/app/exception/httpException'
@@ -59,8 +57,10 @@ export class BookController extends BaseController {
   }
 
   @Get()
-  async getBooks() {
-    return this.bookService.findAllBook()
+  async getBooks(@Req() req: Request) {
+    await this.validateRequest(req, BaseController.schemas.bookSchema.getBooks)
+    const page = parseInt(req.query.page as any) || 1
+    return this.bookService.findAllBook(page)
   }
 
   @Get('/:id')
@@ -87,23 +87,12 @@ export class BookController extends BaseController {
     }
   }
 
-  @Put('approve/:id')
-  @UseGuards(AdminGuard)
-  async bookApprover(@Param('id') id: string, @Req() req: Request) {
-    await this.validateRequest(req, BaseController.schemas.bookSchema.approveBook)
-    const isValidID = mongoose.Types.ObjectId.isValid(id)
-    if (isValidID) {
-      return this.bookService.bookApprover(id, req.body)
-    } else {
-      throw new BadRequestException(httpFlags.INVALID_PARAM)
-    }
-  }
-
   @Delete('/:id')
-  async deleteBook(@Param('id') id: string) {
+  async deleteBook(@Param('id') id: string, @Req() req: Request) {
     const isValidID = mongoose.Types.ObjectId.isValid(id)
     if (isValidID) {
-      return this.bookService.deleteBook(id)
+      const userId = req.header('x-user-id')
+      return this.bookService.deleteBook(id, userId)
     } else {
       throw new BadRequestException(httpFlags.INVALID_PARAM)
     }
