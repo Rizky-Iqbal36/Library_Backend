@@ -4,11 +4,18 @@ import { UserRepository } from '@root/repositories/user.repository'
 import { AuthService } from '@root/authentication/service/auth.service'
 import { UserStatusEnum, UserGenderEnum } from '@root/interfaces/enum'
 
+interface ISeedUser {
+  userId: any
+  email: string
+  password: string
+  token: string
+}
+
 @Injectable()
 export class SeedUserData {
   constructor(private readonly userRepository: UserRepository, private readonly authService: AuthService) {}
   async createMany(loop: number) {
-    const all = []
+    const all: ISeedUser[] = []
     for (let i = 0; i < loop; i++) {
       all.push(await this.createOne({ admin: false }))
     }
