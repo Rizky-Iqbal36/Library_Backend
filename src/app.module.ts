@@ -5,6 +5,7 @@ import { databaseProviders } from '@database/index'
 import { repositories } from '@root/repositories'
 import { services } from '@root/services/index'
 import { HttpExceptionFilter } from '@root/app/exception/http-exception.filter'
+import { ChattingGateway } from '@root/events/chatting.event'
 import ResponseInterceptor from '@root/app/utils/interceptor/response.interceptor'
 
 import { UserMiddleware } from '@app/middlewares/user.middleware'
@@ -16,6 +17,7 @@ import { CategoryController } from '@root/controller/api/category.controller'
 @Module({
   controllers,
   providers: [
+    ChattingGateway,
     ...databaseProviders,
     ...repositories,
     ...services,
