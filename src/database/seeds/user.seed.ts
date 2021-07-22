@@ -29,7 +29,8 @@ export class SeedUserData {
     active = true,
     userStatus = UserStatusEnum.ACTIVE,
     bookmarkedBook = [],
-    uploadedBook = []
+    uploadedBook = [],
+    connections = []
   }: {
     email?: string
     password?: string
@@ -38,6 +39,7 @@ export class SeedUserData {
     userStatus?: UserStatusEnum
     bookmarkedBook?: string[]
     uploadedBook?: string[]
+    connections?: string[]
   }) {
     const hashedPassword = await this.authService.hashPassword(password)
     const UserGender = Object.keys(UserGenderEnum).map(val => UserGenderEnum[val])
@@ -48,12 +50,13 @@ export class SeedUserData {
       fullName: `${faker.name.firstName()} ${faker.name.middleName()} ${faker.name.lastName()}`,
       userName: faker.internet.userName(),
       gender: faker.random.arrayElement(UserGender),
-      phone: faker.phone.phoneNumber('62822########'),
+      phone: faker.phone.phoneNumber('628##########'),
       address: faker.address.streetAddress(),
       isAdmin: admin,
       status: userStatus || UserStatusEnum.ACTIVE,
-      ...(bookmarkedBook.length > 0 ? { bookmarkedBook: bookmarkedBook } : {}),
-      ...(uploadedBook.length > 0 ? { uploadedBook: uploadedBook } : {})
+      ...(bookmarkedBook.length > 0 ? { bookmarkedBook } : {}),
+      ...(uploadedBook.length > 0 ? { uploadedBook } : {}),
+      ...(connections.length > 0 ? { connections } : {})
     })
     const token = await this.authService.generateToken(data._id)
     return {

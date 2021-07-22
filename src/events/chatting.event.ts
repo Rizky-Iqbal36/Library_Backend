@@ -1,4 +1,5 @@
 import {
+  SubscribeMessage,
   WebSocketGateway,
   OnGatewayInit,
   WebSocketServer,
@@ -6,14 +7,18 @@ import {
   OnGatewayDisconnect
 } from '@nestjs/websockets'
 import { Logger } from '@nestjs/common'
-import { Socket } from 'socket.io'
-import { Server } from 'ws'
+import { Socket, Server } from 'socket.io'
 
 interface IOnlineUser {
   socketId: string
   userId: string
 }
 
+interface IMessage {
+  senderId: string
+  receiverId: string
+  text: string
+}
 let onlineUsers: IOnlineUser[] = []
 
 @WebSocketGateway(80, {
@@ -21,9 +26,19 @@ let onlineUsers: IOnlineUser[] = []
   transports: ['websocket']
 })
 export class ChattingGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
-  @WebSocketServer() server: Server
+  @WebSocketServer()
+  server: Server
 
   private logger: Logger = new Logger('ChattingGateway')
+
+  @SubscribeMessage('sendMessage')
+  onEvent(client: Socket, payload: IMessage) {
+    const receiver = this.getUser(payload.receiverId)
+    this.server.to(receiver.socketId).emit('getMessage', {
+      senderId: payload.senderId,
+      text: payload.text
+    })
+  }
 
   public afterInit(): void {
     return this.logger.log('Chatting Gateway Initialized')
