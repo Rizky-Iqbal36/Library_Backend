@@ -23,7 +23,8 @@ let onlineUsers: IOnlineUser[] = []
 
 @WebSocketGateway(80, {
   namespace: '/chat',
-  transports: ['websocket']
+  transports: ['websocket'],
+  cors: true
 })
 export class ChattingGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
