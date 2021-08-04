@@ -18,17 +18,17 @@ export abstract class BaseController {
 
     if (schema.body)
       await schema.body.validateAsync(body, { convert: false }).catch(joiError => {
-        throw new BadRequestException(httpFlags.INVALID_BODY, '', { joiError })
+        throw new BadRequestException(httpFlags.INVALID_BODY, { joiError })
       })
 
     if (schema.query)
       await schema.query.validateAsync(query).catch(joiError => {
-        throw new BadRequestException(httpFlags.INVALID_PARAM, '', { joiError })
+        throw new BadRequestException(httpFlags.INVALID_PARAM, { joiError })
       })
 
     if (schema.headers)
       await schema.headers.validateAsync(headers).catch(joiError => {
-        throw new BadRequestException(httpFlags.INVALID_HEADERS, '', { joiError })
+        throw new BadRequestException(httpFlags.INVALID_HEADERS, { joiError })
       })
   }
 }
