@@ -299,7 +299,7 @@ describe(`Book API`, () => {
 
     expect(res.status).toBe(400)
     expect(res.body.errors.flag).toBe('INVALID_FILETYPE')
-    expect(res.body.errors.message).toBe('Please select an image file type')
+    expect(res.body.errors.message).toBe('Only image type files are allowed!')
 
     const res1 = await request(server)
       .post(url)
@@ -337,8 +337,8 @@ describe(`Book API`, () => {
     header['Authorization'] = `Bearer ${user.token}`
 
     const res = await request(server).delete(`${url}/6098a9867105050cf0550956`).set(header).send()
-    expect(res.status).toBe(400)
-    expect(res.body.errors.message).toBe('BOOK_NOT_FOUND')
+    expect(res.status).toBe(404)
+    expect(res.body.errors.flag).toBe('BOOK_NOT_FOUND')
   })
 
   it(`Error => Delete a book should got error: Unauthorized`, async () => {
@@ -369,8 +369,8 @@ describe(`Book API`, () => {
 
     payload.title = 'Wingardium Leviosa'
     const res = await request(server).put(`${url}/6098a9867105050cf0550956`).set(header).send(payload)
-    expect(res.status).toBe(400)
-    expect(res.body.errors.message).toBe('BOOK_NOT_FOUND')
+    expect(res.status).toBe(404)
+    expect(res.body.errors.flag).toBe('BOOK_NOT_FOUND')
   })
 
   it(`Error => Update a book should got error: Category not found`, async () => {
@@ -382,8 +382,8 @@ describe(`Book API`, () => {
     payload.title = 'Expeliarmus'
     payload.categoryIds.push('6098a9d6e45c890d2df28438')
     const res = await request(server).put(`${url}/${book._id}`).set(header).send(payload)
-    expect(res.status).toBe(400)
-    expect(res.body.errors.message).toBe('CATEGORY_NOT_FOUND')
+    expect(res.status).toBe(404)
+    expect(res.body.errors.flag).toBe('CATEGORY_NOT_FOUND')
   })
 
   it(`Error => Update a book should got error: Invalid param`, async () => {
@@ -413,8 +413,8 @@ describe(`Book API`, () => {
     header['Authorization'] = `Bearer ${user.token}`
 
     const res = await request(server).get(`${url}/607ea12bd21e76a4433ea592`).set(header).send()
-    expect(res.status).toBe(400)
-    expect(res.body.errors.message).toBe('BOOK_NOT_FOUND')
+    expect(res.status).toBe(404)
+    expect(res.body.errors.flag).toBe('BOOK_NOT_FOUND')
   })
 
   it(`Error => Bookmark a book should got error: Invalid param`, async () => {

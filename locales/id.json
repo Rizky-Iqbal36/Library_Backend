@@ -1,0 +1,21 @@
+{
+  "INVALID_HEADERS": "ADA YANG SALAH",
+  "USER_UNAUTHORIZED": "API ini hanya dapat diakses oleh admin",
+  "BOOK_REMOVE_UNAUTHORIZED": "Anda tidak memiliki izin untuk menghapus buku dengan id: {{ bookId }}",
+  "CATEGORY_NOT_FOUND": "Kategori dengan id: {{ categoryId }} tidak dapat ditemukan",
+  "BOOK_NOT_FOUND": "Buku dengan id: {{ bookId }} tidak dapat ditemukan",
+  "BOOK_SAME_STATUS": "Untuk mengubah status buku, status buku saat ini harus berbeda dari status yang diminta, status buku saat ini: {{ bookStatus }}",
+  "PDF_ONLY": "Hanya file pdf yang diperbolehkan!",
+  "IMAGE_ONLY": "Hanya file jenis gambar yang diperbolehkan!",
+  "INACTIVE_CATEGORY": "Kategori dalam keadaan tidak aktif",
+  "CATEGORY_EXIST": "Kategori ini sudah ada sebelumnya",
+  "USER_NOT_FOUND": "User tidak ditemukan",
+  "EMAIL_OR_PASSWORD_INVALID": "Email atau password salah!",
+  "USER_UNAUTHORIZED_GET_DATA": "Anda tidak diijinkan untuk melihat data user lain",
+  "USER_UNAUTHORIZED_UPDATE_DATA": "Anda tidak diijinkan untuk mengubah data user lain",
+  "SPAM_MESSAGE": "Anda mengirim terlalu banyak pesan dalam waktu singkat, silakan coba lagi dalam {{ time }}.",
+  "MESSAGE_REQUEST_BANNED": "Anda dilarang mengirim pesan karena Anda mengirim terlalu banyak pesan menggunakan kata-kata kasar, silakan coba lagi dalam {{ time }}.",
+  "%s HOUR": "%s Jam",
+  "%s MINUTE": "%s Menit",
+  "%s SECOND": "%s detik"
+}

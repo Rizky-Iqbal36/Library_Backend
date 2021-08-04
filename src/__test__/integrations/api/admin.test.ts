@@ -267,7 +267,7 @@ describe(`Admin API`, () => {
 
     const res = await request(server).post(`${url}/create-category`).set(header).send(payload)
     expect(res.status).toBe(400)
-    expect(res.body.errors.message).toBe('CATEGORY_IS_ALREADY_EXIST')
+    expect(res.body.errors.flag).toBe('CATEGORY_IS_ALREADY_EXIST')
   })
 
   it(`Error => Should got error: user can't access Admin API`, async () => {
@@ -276,6 +276,7 @@ describe(`Admin API`, () => {
     header['x-user-id'] = user.userId
     header['Authorization'] = `Bearer ${user.token}`
     const res = await request(server).get(`${url}/get-users`).set(header).send()
+
     expect(res.status).toBe(401)
     expect(res.body.errors.flag).toBe('USER_UNAUTHORIZED')
   })
@@ -298,7 +299,7 @@ describe(`Admin API`, () => {
     const res = await request(server).delete(`${url}/607ea12bd21e76a4433ea592`).set(header).send()
 
     expect(res.status).toBe(404)
-    expect(res.body.errors.message).toBe('USER_NOT_FOUND')
+    expect(res.body.errors.flag).toBe('USER_NOT_FOUND')
   })
 
   it(`Error => Blocking a user should got error: Invalid param`, async () => {
@@ -327,7 +328,7 @@ describe(`Admin API`, () => {
       .send()
 
     expect(res.status).toBe(404)
-    expect(res.body.errors.message).toBe('USER_NOT_FOUND')
+    expect(res.body.errors.flag).toBe('USER_NOT_FOUND')
   })
 
   it(`Error => Should block and unblocking a user: Required query not set `, async () => {
@@ -373,8 +374,8 @@ describe(`Admin API`, () => {
       .put(`${url}/approve-book/6098a9867105050cf0550956`)
       .set(header)
       .send({ status: 'ACTIVE' })
-    expect(res.status).toBe(400)
-    expect(res.body.errors.message).toBe('BOOK_NOT_FOUND')
+    expect(res.status).toBe(404)
+    expect(res.body.errors.flag).toBe('BOOK_NOT_FOUND')
   })
 
   it(`Error => Approve a book should got error: Book update with same status`, async () => {
@@ -386,7 +387,8 @@ describe(`Admin API`, () => {
     header['Authorization'] = `Bearer ${admin.token}`
 
     const res = await request(server).put(`${url}/approve-book/${book._id}`).set(header).send({ status: book.status })
-    expect(res.status).toBe(400)
-    expect(res.body.errors.message).toBe('BOOK_SAME_STATUS')
+
+    expect(res.status).toBe(406)
+    expect(res.body.errors.flag).toBe('BOOK_SAME_STATUS')
   })
 })

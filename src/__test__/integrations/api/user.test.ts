@@ -123,7 +123,7 @@ describe(`User API`, () => {
     expect(res.status).toBe(400)
     expect(res.body.errors).toMatchObject({
       flag: 'INVALID_FILETYPE',
-      message: 'Please select an image file type'
+      message: 'Only image type files are allowed!'
     })
   })
 

@@ -24,8 +24,8 @@ let onlineUsers: IOnlineUser[] = []
 
 @WebSocketGateway(config.app.websocketPort, {
   namespace: '/chat',
-  transports: ['websocket'],
-  cors: true
+  transports: ['websocket']
+  // cors: true
 })
 export class ChattingGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()

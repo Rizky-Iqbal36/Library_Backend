@@ -8,6 +8,7 @@ export interface IGetLocalizedMsgOption {
 export interface IHttpExceptionOptions {
   joiError?: ValidationError
   localeMessage?: IGetLocalizedMsgOption
+  plainMessage?: string
 }
 
 export interface IExceptionResponse {

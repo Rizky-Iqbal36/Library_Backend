@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import config from '@root/app/config/appConfig'
 
-import { BadRequestException, UnauthorizedException } from '@root/app/exception/httpException'
+import { NotFoundException, UnauthorizedException, NotAcceptableException } from '@root/app/exception/httpException'
 import { httpFlags } from '@root/constant/flags'
 
 import { IBook } from '@root/database/models/book.model'
@@ -60,7 +60,9 @@ export class BookService {
       await book.save()
       return book
     } else {
-      throw new BadRequestException(httpFlags.BOOK_NOT_FOUND)
+      throw new NotFoundException(httpFlags.BOOK_NOT_FOUND, {
+        localeMessage: { key: 'BOOK_NOT_FOUND', vars: { bookId: id } }
+      })
     }
   }
 
@@ -102,14 +104,19 @@ export class BookService {
       await Promise.all(
         categoryIds?.map(async categoryId => {
           const category = await this.categoryRepository.getCategoryById(categoryId)
-          if (!category) throw new BadRequestException(httpFlags.CATEGORY_NOT_FOUND)
+          if (!category)
+            throw new NotFoundException(httpFlags.CATEGORY_NOT_FOUND, {
+              localeMessage: { key: 'CATEGORY_NOT_FOUND', vars: { categoryId } }
+            })
           book.categoryIds.push(categoryId)
         })
       )
       await book.save()
       return book
     } else {
-      throw new BadRequestException(httpFlags.BOOK_NOT_FOUND)
+      throw new NotFoundException(httpFlags.BOOK_NOT_FOUND, {
+        localeMessage: { key: 'BOOK_NOT_FOUND', vars: { bookId: id } }
+      })
     }
   }
 
@@ -118,7 +125,10 @@ export class BookService {
     const book = await this.bookRepository.getOneBook(id, false)
 
     if (book) {
-      if (status === book.status) throw new BadRequestException(httpFlags.BOOK_SAME_STATUS)
+      if (status === book.status)
+        throw new NotAcceptableException(httpFlags.BOOK_SAME_STATUS, {
+          localeMessage: { key: 'BOOK_SAME_STATUS', vars: { bookStatus: book.status } }
+        })
 
       if (status === BookStatusEnum.ACTIVE) {
         book.isActive = true
@@ -136,7 +146,9 @@ export class BookService {
 
       return book
     } else {
-      throw new BadRequestException(httpFlags.BOOK_NOT_FOUND)
+      throw new NotFoundException(httpFlags.BOOK_NOT_FOUND, {
+        localeMessage: { key: 'BOOK_NOT_FOUND', vars: { bookId: id } }
+      })
     }
   }
 
@@ -151,13 +163,14 @@ export class BookService {
           message: `Book with id: ${id} has successfully deleted`
         }
       } else {
-        throw new UnauthorizedException(
-          httpFlags.UNAUTHORIZED,
-          `You don't have permission to delete book with id: ${id}`
-        )
+        throw new UnauthorizedException(httpFlags.UNAUTHORIZED, {
+          localeMessage: { key: 'BOOK_REMOVE_UNAUTHORIZED', vars: { bookId: id } }
+        })
       }
     } else {
-      throw new BadRequestException(httpFlags.BOOK_NOT_FOUND)
+      throw new NotFoundException(httpFlags.BOOK_NOT_FOUND, {
+        localeMessage: { key: 'BOOK_NOT_FOUND', vars: { bookId: id } }
+      })
     }
   }
 
@@ -177,7 +190,9 @@ export class BookService {
           await category.save()
           return categoryId
         } else {
-          throw new BadRequestException(httpFlags.CATEGORY_NOT_FOUND, `Category with id: ${categoryId}`)
+          throw new NotFoundException(httpFlags.CATEGORY_NOT_FOUND, {
+            localeMessage: { key: 'CATEGORY_NOT_FOUND', vars: { categoryId } }
+          })
         }
       })
     )

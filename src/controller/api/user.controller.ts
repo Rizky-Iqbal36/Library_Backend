@@ -23,7 +23,9 @@ export class UserController extends BaseController {
     if (isValidID) {
       const userId = req.header('x-user-id')
       if (userId !== id)
-        throw new UnauthorizedException(httpFlags.UNAUTHORIZED, "You are not allowed to see other user's data")
+        throw new UnauthorizedException(httpFlags.UNAUTHORIZED, {
+          localeMessage: { key: 'USER_UNAUTHORIZED_GET_DATA' }
+        })
       return this.userService.findOneUser(id)
     } else {
       throw new BadRequestException(httpFlags.INVALID_PARAM)
@@ -35,7 +37,10 @@ export class UserController extends BaseController {
       storage: CloudStorage,
       fileFilter: (req, file, cb) => {
         if (!file.mimetype.match('image')) {
-          return cb(new BadRequestException(httpFlags.INVALID_FILETYPE, 'Please select an image file type'), false)
+          return cb(
+            new BadRequestException(httpFlags.INVALID_FILETYPE, { localeMessage: { key: 'IMAGE_ONLY' } }),
+            false
+          )
         }
         cb(null, true)
       },
@@ -50,7 +55,9 @@ export class UserController extends BaseController {
     if (isValidID) {
       const userId = req.header('x-user-id')
       if (userId !== id)
-        throw new UnauthorizedException(httpFlags.UNAUTHORIZED, "You are not allowed to change other user's data")
+        throw new UnauthorizedException(httpFlags.UNAUTHORIZED, {
+          localeMessage: { key: 'USER_UNAUTHORIZED_UPDATE_DATA' }
+        })
       return this.userService.updateAvatar(id)
     } else {
       throw new BadRequestException(httpFlags.INVALID_PARAM)

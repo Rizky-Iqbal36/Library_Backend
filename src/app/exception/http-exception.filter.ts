@@ -1,13 +1,13 @@
 import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common'
-import { Request, Response } from 'express'
 import { IExceptionResponse } from '@root/interfaces'
+import { getLocalizedMsg } from '@app/i18n/translation'
 
 @Catch(HttpException, Error)
 export class HttpExceptionFilter implements ExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost) {
     const ctx = host.switchToHttp()
-    const response = ctx.getResponse<Response>()
-    const request = ctx.getRequest<Request>()
+    const response = ctx.getResponse()
+    const request = ctx.getRequest()
     let status = HttpStatus.INTERNAL_SERVER_ERROR
     let message = 'INTERNAL_SERVER_ERROR'
 
@@ -18,6 +18,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
       result = exception.getResponse() as IExceptionResponse
     }
     if (status !== 500) message = result.message === '' || result.message === undefined ? result.flag : result.message
+    if (result?.options?.localeMessage) message = getLocalizedMsg(result.options.localeMessage, request.language)
+    if (result?.options?.plainMessage) message = result?.options?.plainMessage
+
     const details = result?.options?.joiError?.details
     let errors = {
       flag: result?.flag,
