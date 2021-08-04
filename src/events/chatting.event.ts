@@ -8,6 +8,7 @@ import {
 } from '@nestjs/websockets'
 import { Logger } from '@nestjs/common'
 import { Socket, Server } from 'socket.io'
+import config from '@root/app/config/appConfig'
 
 interface IOnlineUser {
   socketId: string
@@ -21,7 +22,7 @@ interface IMessage {
 }
 let onlineUsers: IOnlineUser[] = []
 
-@WebSocketGateway(80, {
+@WebSocketGateway(config.app.websocketPort, {
   namespace: '/chat',
   transports: ['websocket'],
   cors: true
