@@ -2,6 +2,7 @@ import { INestApplication } from '@nestjs/common'
 import { initServerApp, stopServerApp, flushMongoDB } from '@root/__test__/util/createApp'
 import { io, Socket } from 'socket.io-client'
 import { SeedUserData } from '@database/seeds/user.seed'
+import config from '@root/app/config/appConfig'
 
 describe('Messaging Event', () => {
   let senderSocket: Socket, receiverSocket: Socket, app: INestApplication
@@ -14,7 +15,7 @@ describe('Messaging Event', () => {
 
     await app.init()
     const httpServer = await app.getHttpServer().listen().address()
-    baseSocketAddress = `http://[${httpServer.address}]:80`
+    baseSocketAddress = `http://[${httpServer.address}]:${config.app.websocketPort}`
   })
 
   beforeEach(async () => {

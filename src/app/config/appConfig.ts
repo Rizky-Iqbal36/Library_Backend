@@ -6,7 +6,8 @@ const appConfig = {
   app: {
     name: pjson.name,
     version: pjson.version,
-    port: parseInt(process.env.PORT) || 3001
+    port: parseInt(process.env.PORT) || 3001,
+    websocketPort: parseInt(process.env.WEBSOCKET_PORT) || 8080
   },
   mongodb: {
     host: process.env.MONGO_DB_HOST,
