@@ -27,11 +27,17 @@ export class BookController extends BaseController {
         storage: CloudStorage,
         fileFilter: (req, file, cb) => {
           if (!file.mimetype.match('image') && file.fieldname == 'thumbnail') {
-            return cb(new BadRequestException(httpFlags.INVALID_FILETYPE, 'Please select an image file type'), false)
+            return cb(
+              new BadRequestException(httpFlags.INVALID_FILETYPE, { localeMessage: { key: 'IMAGE_ONLY' } }),
+              false
+            )
           }
           if (file.fieldname == 'file') {
             if (!file.originalname.match(/\.(pdf|PDF)$/)) {
-              return cb(new BadRequestException(httpFlags.INVALID_FILETYPE, 'Only pdf file is allowed!'), false)
+              return cb(
+                new BadRequestException(httpFlags.INVALID_FILETYPE, { localeMessage: { key: 'PDF_ONLY' } }),
+                false
+              )
             }
           }
           cb(null, true)
@@ -52,7 +58,7 @@ export class BookController extends BaseController {
 
       return this.bookService.createBook(req.body, userId)
     } catch (err) {
-      throw new BadRequestException(httpFlags.INVALID_BODY, err.message)
+      throw new BadRequestException(httpFlags.INVALID_BODY, { plainMessage: err.message })
     }
   }
 

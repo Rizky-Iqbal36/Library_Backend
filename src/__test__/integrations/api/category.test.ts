@@ -86,7 +86,7 @@ describe(`Category API`, () => {
     const res = await request(server).get(`${url}/${category._id}`).set(header).send()
 
     expect(res.status).toBe(400)
-    expect(res.body.errors.message).toBe('CATEGORY_IS_INACTIVE')
+    expect(res.body.errors.flag).toBe('CATEGORY_IS_INACTIVE')
   })
 
   it(`Error => Get category should got error: Category not found`, async () => {
@@ -96,8 +96,8 @@ describe(`Category API`, () => {
 
     const res = await request(server).get(`${url}/6096120b0606f97175e26095`).set(header).send()
 
-    expect(res.status).toBe(400)
-    expect(res.body.errors.message).toBe('CATEGORY_NOT_FOUND')
+    expect(res.status).toBe(404)
+    expect(res.body.errors.flag).toBe('CATEGORY_NOT_FOUND')
   })
 
   it(`Error => Get category should got error: Invalid param`, async () => {

@@ -1,0 +1,30 @@
+{
+  "INVALID_HEADERS": "SOMETHING WENT WRONG",
+  "USER_UNAUTHORIZED": "This API can only be accessed by admin role",
+  "BOOK_REMOVE_UNAUTHORIZED": "You don't have permission to delete book with id: {{ bookId }}",
+  "CATEGORY_NOT_FOUND": "Category with id: {{ categoryId }} not found",
+  "BOOK_SAME_STATUS": "To change the status of a book, the current state of the book must be different from the requested state, current state: {{ bookStatus }}",
+  "BOOK_NOT_FOUND": "Book with id: {{ bookId }} not found",
+  "PDF_ONLY": "Only pdf file is allowed!",
+  "IMAGE_ONLY": "Only image type files are allowed!",
+  "INACTIVE_CATEGORY": "This category is inactive",
+  "CATEGORY_EXIST": "Category is already exist",
+  "USER_NOT_FOUND": "User not exist",
+  "EMAIL_OR_PASSWORD_INVALID": "Wrong email or password!",
+  "USER_UNAUTHORIZED_GET_DATA": "You are not allowed to see other user's data",
+  "USER_UNAUTHORIZED_UPDATE_DATA": "You are not allowed to change other user's data",
+  "SPAM_MESSAGE": "You sent too many messages in a short time, please try again in {{ time }}.",
+  "MESSAGE_REQUEST_BANNED": "You are prohibited from sending messages because you sent too many messages using harsh words, please try again in {{ time }}",
+  "%s HOUR": {
+    "one": "%s Hour",
+    "other": "%s Hours"
+  },
+  "%s MINUTE": {
+    "one": "%s Minute",
+    "other": "%s Minutes"
+  },
+  "%s SECOND": {
+    "one": "%s second",
+    "other": "%s seconds"
+  }
+}

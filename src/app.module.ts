@@ -1,4 +1,4 @@
-import { Module, MiddlewareConsumer } from '@nestjs/common'
+import { Module, MiddlewareConsumer, RequestMethod } from '@nestjs/common'
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core'
 import { controllers } from '@root/controller'
 import { databaseProviders } from '@database/index'
@@ -8,6 +8,7 @@ import { HttpExceptionFilter } from '@root/app/exception/http-exception.filter'
 import { ChattingGateway } from '@root/events/chatting.event'
 import ResponseInterceptor from '@root/app/utils/interceptor/response.interceptor'
 
+import { HeaderMiddleware } from '@app/middlewares/header.middleware'
 import { UserMiddleware } from '@app/middlewares/user.middleware'
 import { UserAuthMiddleware } from '@root/authentication/middleware/auth.middleware'
 
@@ -28,5 +29,9 @@ import { CategoryController } from '@root/controller/api/category.controller'
 export class AppModule {
   async configure(consumer: MiddlewareConsumer) {
     consumer.apply(UserAuthMiddleware, UserMiddleware).forRoutes(CategoryController, BookController, UserController)
+    consumer
+      .apply(HeaderMiddleware)
+      .exclude({ path: 'health', method: RequestMethod.ALL })
+      .forRoutes({ path: '*', method: RequestMethod.ALL })
   }
 }
