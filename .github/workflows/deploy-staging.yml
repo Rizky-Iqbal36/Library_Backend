@@ -31,6 +31,9 @@ jobs:
           HD_MONGO_DB_USER: ${{ secrets.MONGO_DB_USER_STAGING }}
           HD_MONGO_DB_PASS: ${{ secrets.MONGO_DB_PASS_STAGING }}
           HD_MONGO_DB_AUTH_SOURCE: ${{ secrets.MONGO_DB_AUTH_SOURCE }}
+          HD_REDIS_HOST: ${{ secrets.REDIS_HOST_STAGING }}
+          HD_REDIS_PORT: ${{ secrets.REDIS_PORT_STAGING }}
+          HD_REDIS_PASS: ${{ secrets.REDIS_PASS_STAGING }}
   test:
     runs-on: ubuntu-latest
     env:
