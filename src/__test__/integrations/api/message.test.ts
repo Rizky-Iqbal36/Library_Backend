@@ -98,4 +98,54 @@ describe(`Message API`, () => {
       ]
     })
   })
+
+  it(`Error => Too much request`, async () => {
+    const users = await seedUserData.createMany(2)
+    header['x-user-id'] = users[0].userId
+    header['Authorization'] = `Bearer ${users[0].token}`
+    const conversation = await conversationSeedData.createOne({
+      senderId: users[0].userId,
+      receiverId: users[1].userId
+    })
+
+    for (let i = 0; i < 30; i++) {
+      await request(server).post(`${url}`).set(header).send({
+        conversationId: conversation._id,
+        senderId: users[0].userId,
+        text: 'Lorem ipsum dolor sit amet'
+      })
+    }
+    const res = await request(server).post(`${url}`).set(header).send({
+      conversationId: conversation._id,
+      senderId: users[0].userId,
+      text: 'consectetur adipiscing elit'
+    })
+    expect(res.status).toBe(429)
+    expect(res.body.errors.flag).toBe('TOO_MANY_REQUEST')
+  })
+
+  it(`Error => banned because of sending inappropriate messages`, async () => {
+    const users = await seedUserData.createMany(2)
+    header['x-user-id'] = users[0].userId
+    header['Authorization'] = `Bearer ${users[0].token}`
+    const conversation = await conversationSeedData.createOne({
+      senderId: users[0].userId,
+      receiverId: users[1].userId
+    })
+
+    for (let i = 0; i < 3; i++) {
+      await request(server).post(`${url}`).set(header).send({
+        conversationId: conversation._id,
+        senderId: users[0].userId,
+        text: "Don't be an ash0le"
+      })
+    }
+    const res = await request(server).post(`${url}`).set(header).send({
+      conversationId: conversation._id,
+      senderId: users[0].userId,
+      text: "Don't be an ash0le"
+    })
+    expect(res.status).toBe(429)
+    expect(res.body.errors.flag).toBe('REQUEST_BANNED')
+  })
 })

@@ -1,12 +1,16 @@
 import { Module, MiddlewareConsumer, RequestMethod } from '@nestjs/common'
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core'
+import { ThrottlerModule } from '@nestjs/throttler'
+
 import { controllers } from '@root/controller'
 import { databaseProviders } from '@database/index'
 import { repositories } from '@root/repositories'
 import { services } from '@root/services/index'
-import { HttpExceptionFilter } from '@root/app/exception/http-exception.filter'
 import { ChattingGateway } from '@root/events/chatting.event'
-import ResponseInterceptor from '@root/app/utils/interceptor/response.interceptor'
+
+import { ClientConnections } from '@app/providers/clientConnection'
+import { HttpExceptionFilter } from '@app/exception/http-exception.filter'
+import ResponseInterceptor from '@app/utils/interceptor/response.interceptor'
 
 import { HeaderMiddleware } from '@app/middlewares/header.middleware'
 import { UserMiddleware } from '@app/middlewares/user.middleware'
@@ -16,8 +20,15 @@ import { BookController } from '@root/controller/api/book.controller'
 import { UserController } from '@root/controller/api/user.controller'
 import { CategoryController } from '@root/controller/api/category.controller'
 @Module({
+  imports: [
+    ThrottlerModule.forRoot({
+      ttl: 60,
+      limit: 30
+    })
+  ],
   controllers,
   providers: [
+    ClientConnections,
     ChattingGateway,
     ...databaseProviders,
     ...repositories,
