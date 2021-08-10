@@ -164,7 +164,7 @@ describe(`Book API`, () => {
     expect(res2.body.result.data[1].publication).not.dateNewerThan(res2.body.result.data[0].publication)
   })
 
-  it(`Success => Uploader should delete the book that he or her upload`, async () => {
+  it(`Success => Uploader should delete the book that he or she upload`, async () => {
     const user = await seedUserData.createOne({ admin: false })
     header['x-user-id'] = user.userId
     header['Authorization'] = `Bearer ${user.token}`

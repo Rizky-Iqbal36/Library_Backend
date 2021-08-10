@@ -1,4 +1,3 @@
-/* eslint-disable prefer-rest-params */
 import redis, { ClientOpts, RedisClient } from 'redis'
 import { promisify } from 'util'
 
