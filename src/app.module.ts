@@ -42,7 +42,7 @@ export class AppModule {
     consumer.apply(UserAuthMiddleware, UserMiddleware).forRoutes(CategoryController, BookController, UserController)
     consumer
       .apply(HeaderMiddleware)
-      .exclude({ path: 'health', method: RequestMethod.ALL })
+      .exclude({ path: '/api/v2/health', method: RequestMethod.ALL }, { path: 'health', method: RequestMethod.ALL })
       .forRoutes({ path: '*', method: RequestMethod.ALL })
   }
 }
