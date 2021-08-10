@@ -4,9 +4,11 @@ import { controllers } from '@root/controller'
 import { databaseProviders } from '@database/index'
 import { repositories } from '@root/repositories'
 import { services } from '@root/services/index'
-import { HttpExceptionFilter } from '@root/app/exception/http-exception.filter'
 import { ChattingGateway } from '@root/events/chatting.event'
-import ResponseInterceptor from '@root/app/utils/interceptor/response.interceptor'
+
+import { ClientConnections } from '@app/providers/clientConnection'
+import { HttpExceptionFilter } from '@app/exception/http-exception.filter'
+import ResponseInterceptor from '@app/utils/interceptor/response.interceptor'
 
 import { HeaderMiddleware } from '@app/middlewares/header.middleware'
 import { UserMiddleware } from '@app/middlewares/user.middleware'
@@ -18,6 +20,7 @@ import { CategoryController } from '@root/controller/api/category.controller'
 @Module({
   controllers,
   providers: [
+    ClientConnections,
     ChattingGateway,
     ...databaseProviders,
     ...repositories,

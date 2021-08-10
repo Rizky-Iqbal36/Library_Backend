@@ -31,6 +31,12 @@ const appConfig = {
     jwtSecret: process.env.JWT_SECRET,
     jwtExpiration: process.env.JWT_EXPIRATION,
     ecryptJwtSecret: process.env.ENCRYPT_JWT_SECRET
+  },
+  redis: {
+    host: process.env.REDIS_HOST,
+    port: parseInt(process.env.REDIS_PORT) || 6379,
+    auth_pass: process.env.REDIS_PASS,
+    db: 3
   }
 }
 
