@@ -17,9 +17,8 @@ export class RedisCustomClient {
   }
 
   public get(key: string) {
-    console.log(key, arguments)
     if (!this.client) throw new Error('redis client not created')
-    return promisify(this.client.get).apply(this.client, arguments as any)
+    return promisify(this.client.get).apply(this.client, [key])
   }
 
   public set(
@@ -36,9 +35,8 @@ export class RedisCustomClient {
   }
 
   public del(key: string) {
-    console.log(key, arguments)
     if (!this.client) throw new Error('redis client not created')
-    return promisify(this.client.del).apply(this.client, arguments as any)
+    return promisify(this.client.del).apply(this.client, [key])
   }
 
   public getRemainingTime(key: string) {

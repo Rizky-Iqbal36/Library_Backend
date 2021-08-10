@@ -1,5 +1,7 @@
 import { Module, MiddlewareConsumer, RequestMethod } from '@nestjs/common'
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core'
+import { ThrottlerModule } from '@nestjs/throttler'
+
 import { controllers } from '@root/controller'
 import { databaseProviders } from '@database/index'
 import { repositories } from '@root/repositories'
@@ -18,6 +20,12 @@ import { BookController } from '@root/controller/api/book.controller'
 import { UserController } from '@root/controller/api/user.controller'
 import { CategoryController } from '@root/controller/api/category.controller'
 @Module({
+  imports: [
+    ThrottlerModule.forRoot({
+      ttl: 60,
+      limit: 30
+    })
+  ],
   controllers,
   providers: [
     ClientConnections,

@@ -1,4 +1,6 @@
-import { Controller, Post, Req, Get, Param } from '@nestjs/common'
+import { Controller, Post, Req, Get, Param, UseGuards } from '@nestjs/common'
+
+import { RateThrottlerGuard } from '@app/guard/rateThrottler.guard'
 
 import { ChatServie } from '@root/services/chat.service'
 import { BaseController } from '@root/controller/base.controller'
@@ -12,6 +14,7 @@ export class MessageController extends BaseController {
   }
 
   @Post()
+  @UseGuards(RateThrottlerGuard)
   async createMessage(@Req() req: Request) {
     return this.chatServie.createMessage(req.body)
   }
