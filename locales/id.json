@@ -4,6 +4,7 @@
   "BOOK_REMOVE_UNAUTHORIZED": "Anda tidak memiliki izin untuk menghapus buku dengan id: {{ bookId }}",
   "CATEGORY_NOT_FOUND": "Kategori dengan id: {{ categoryId }} tidak dapat ditemukan",
   "BOOK_NOT_FOUND": "Buku dengan id: {{ bookId }} tidak dapat ditemukan",
+  "BLOG_NOT_FOUND": "Blog dengan id: {{ blogId }} tidak dapat ditemukan",
   "BOOK_SAME_STATUS": "Untuk mengubah status buku, status buku saat ini harus berbeda dari status yang diminta, status buku saat ini: {{ bookStatus }}",
   "PDF_ONLY": "Hanya file pdf yang diperbolehkan!",
   "IMAGE_ONLY": "Hanya file jenis gambar yang diperbolehkan!",

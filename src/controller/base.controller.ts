@@ -4,12 +4,14 @@ import { BadRequestException } from '@root/app/exception/httpException'
 import { IRequestValidationSchema } from '@root/interfaces'
 
 import { BookSchema } from '@root/schema/requestvalidators/book.schema'
+import { BlogSchema } from '@root/schema/requestvalidators/blog.schema'
 import { UserSchema } from '@root/schema/requestvalidators/user.schema'
 import { CategorySchema } from '@root/schema/requestvalidators/category.schema'
 
 export abstract class BaseController {
   static schemas = {
     bookSchema: new BookSchema(),
+    blogSchema: new BlogSchema(),
     userSchema: new UserSchema(),
     categorySchema: new CategorySchema()
   }

@@ -6,6 +6,8 @@ import { UserController } from '@root/controller/api/user.controller'
 import { BookController } from '@root/controller/api/book.controller'
 import { CategoryController } from '@root/controller/api/category.controller'
 
+import { BlogController } from '@root/controller/api/blog.controller'
+
 import { ConversationController } from '@root/controller/api/conversation.controller'
 import { MessageController } from '@root/controller/api/message.controller'
 
@@ -13,6 +15,7 @@ import { AuthController } from '@root/authentication/controller/auth.controller'
 export const controllers = [
   HealthCheckController,
   AdminController,
+  BlogController,
   BookController,
   UserController,
   AuthController,

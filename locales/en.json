@@ -5,6 +5,7 @@
   "CATEGORY_NOT_FOUND": "Category with id: {{ categoryId }} not found",
   "BOOK_SAME_STATUS": "To change the status of a book, the current state of the book must be different from the requested state, current state: {{ bookStatus }}",
   "BOOK_NOT_FOUND": "Book with id: {{ bookId }} not found",
+  "BLOG_NOT_FOUND": "Blog with id: {{ blogId }} not found",
   "PDF_ONLY": "Only pdf file is allowed!",
   "IMAGE_ONLY": "Only image type files are allowed!",
   "INACTIVE_CATEGORY": "This category is inactive",
