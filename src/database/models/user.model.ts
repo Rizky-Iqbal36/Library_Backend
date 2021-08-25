@@ -19,8 +19,10 @@ export interface IUser {
   isAdmin?: boolean
   status?: UserStatusEnum
   bookmarkedBook?: string[]
-  uploadedBook?: string[]
   totalBookmarked?: number
+  uploadedBook?: string[]
+  postedBlogs?: string[]
+  bookmarkedBlog?: string[]
   avatar?: string
   connections?: string[]
   verified?: boolean
@@ -44,6 +46,8 @@ const UserSchema = new Schema(
     uploadedBook: [{ type: Schema.Types.ObjectId, ref: 'Book', default: null }],
     bookmarkedBook: [{ type: Schema.Types.ObjectId, ref: 'Book', default: null }],
     totalBookmarked: { type: Number, default: 0 },
+    postedBlogs: [{ type: Schema.Types.ObjectId, ref: 'Blog', default: null }],
+    bookmarkedBlog: [{ type: Schema.Types.ObjectId, ref: 'Blog', default: null }],
     avatar: { type: String, default: null },
     connections: [{ type: Schema.Types.ObjectId, default: null }],
     verified: { type: Boolean, default: false }

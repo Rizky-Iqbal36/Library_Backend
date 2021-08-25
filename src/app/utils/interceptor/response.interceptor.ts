@@ -10,10 +10,14 @@ export interface Response<T> {
 @Injectable()
 export default class TransformInterceptor<T> implements NestInterceptor<T, Response<T>> {
   intercept(context: ExecutionContext, next: CallHandler): Observable<Response<T>> {
-    return next.handle().pipe(
-      map(data => {
-        throw new SuccessResponse(data)
-      })
-    )
+    const path = context.switchToHttp().getRequest().route?.path || context.switchToHttp().getRequest().originalUrl
+    const method = context.switchToHttp().getRequest().method
+    if (path.includes('blog') && method === 'GET') return next.handle()
+    else
+      return next.handle().pipe(
+        map(data => {
+          throw new SuccessResponse(data)
+        })
+      )
   }
 }

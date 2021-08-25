@@ -1,0 +1,27 @@
+name: Test
+
+on:
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+      CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+      CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+      CLOUDINARY_ASSETS: ${{ secrets.CLOUDINARY_ASSETS }}
+      JWT_SECRET: ${{secrets.JWT_SECRET}}
+      ENCRYPT_JWT_SECRET: ${{secrets.ENCRYPT_JWT_SECRET}}
+      JWT_EXPIRATION: ${{secrets.JWT_EXPIRATION}}
+    steps:
+      - uses: actions/checkout@v1
+      - name: Run Tests
+        run: |
+          cp .env.example .env
+          npm install
+          npm run dependency:local
+          sleep 5
+          npm run test

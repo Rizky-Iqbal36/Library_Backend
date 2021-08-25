@@ -194,12 +194,11 @@ describe(`Admin API`, () => {
       .put(`${url}/approve-book/${book._id}`)
       .set(header)
       .send({ status: BookStatusEnum.ACTIVE })
-    const categoryAfterApprovalSetActive: any = await categoryRepository.getAllCategory()
-
     expect(adminApprovalSetActive.status).toBe(200)
     expect(adminApprovalSetActive.body.result.status).toBe(BookStatusEnum.ACTIVE)
     expect(adminApprovalSetActive.body.result.isActive).toBe(true)
 
+    const categoryAfterApprovalSetActive: any = await categoryRepository.getAllCategory()
     expect(categoryAfterApprovalSetActive[0].numberOfBook).toBe(1)
     expect(categoryAfterApprovalSetActive[0].books[0]._id.toString()).toBe(book._id.toString())
     expect(categoryAfterApprovalSetActive[1].numberOfBook).toBe(1)
@@ -209,12 +208,11 @@ describe(`Admin API`, () => {
       .put(`${url}/approve-book/${book._id}`)
       .set(header)
       .send({ status: BookStatusEnum.CANCEL })
-    const categoryAfterApprovalSetCancel = await categoryRepository.getAllCategory()
-
     expect(adminApprovalSetCancel.status).toBe(200)
     expect(adminApprovalSetCancel.body.result.status).toBe(BookStatusEnum.CANCEL)
     expect(adminApprovalSetCancel.body.result.isActive).toBe(false)
 
+    const categoryAfterApprovalSetCancel = await categoryRepository.getAllCategory()
     expect(categoryAfterApprovalSetCancel[0].numberOfBook).toBe(0)
     expect(categoryAfterApprovalSetCancel[0].books.length).toBe(0)
     expect(categoryAfterApprovalSetCancel[1].numberOfBook).toBe(0)

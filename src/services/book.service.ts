@@ -78,7 +78,8 @@ export class BookService {
     body.thumbnail = 'thumbnail-' + userId + `-${count}.jpg`
 
     const createdBook = await this.bookRepository.createBook(body)
-
+    user.uploadedBook.push(createdBook._id)
+    await user.save()
     createdBook.file = `${config.cloudinary.assets.replace(/rizkyiqbal/, 'rizkyiqbal/raw/upload')}/files/${userId}/${
       createdBook.file
     }`
@@ -134,16 +135,12 @@ export class BookService {
         book.isActive = true
         book.status = BookStatusEnum.ACTIVE
         await this.updateBookOnCategory(book.categoryIds, book._id, UpdateBookEnum.ADD)
-        await book.save()
       } else {
         book.isActive = false
-        book.status === BookStatusEnum.ACTIVE
-          ? await this.updateBookOnCategory(book.categoryIds, book._id, UpdateBookEnum.DELETE)
-          : []
+        await this.updateBookOnCategory(book.categoryIds, book._id, UpdateBookEnum.DELETE)
         book.status = status
-        await book.save()
       }
-
+      await book.save()
       return book
     } else {
       throw new NotFoundException(httpFlags.BOOK_NOT_FOUND, {
