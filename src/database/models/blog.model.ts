@@ -10,6 +10,7 @@ export interface IBlog {
   blogThumbnail: string
   bookMarked?: number
   bookMarkedBy?: string[]
+  isActive?: boolean
 }
 
 export type IBlogDoc = IBlog & Document
@@ -22,6 +23,7 @@ const BlogSchema = new Schema(
     publication: { type: Date, required: true },
     views: { type: Number, required: true, default: 0 },
     content: { type: String, required: true },
+    isActive: { type: Boolean, required: true, default: false },
     blogThumbnail: { type: String, required: true },
     bookMarked: { type: Number, required: false, default: 0 },
     bookMarkedBy: [{ type: Schema.Types.ObjectId, ref: 'User', required: false, default: null }]

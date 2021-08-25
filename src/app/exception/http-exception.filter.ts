@@ -8,6 +8,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp()
     const response = ctx.getResponse()
     const request = ctx.getRequest()
+    const method = request.method
     let status = HttpStatus.INTERNAL_SERVER_ERROR
     let message = 'INTERNAL_SERVER_ERROR'
 
@@ -37,6 +38,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     response.status(status).json({
       statusCode: status,
       path,
+      method,
       result,
       errors,
       accessTime: new Date().toISOString()

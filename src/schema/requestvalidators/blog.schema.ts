@@ -6,6 +6,7 @@ export class BlogSchema {
       'x-user-id': Joi.string().required()
     }).required()
   }
+
   createBlog = {
     header: Joi.object({
       'x-user-id': Joi.string().required()

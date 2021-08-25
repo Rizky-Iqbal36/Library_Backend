@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, Req, UseInterceptors, Res, Render } from '@nestjs/common'
+import { Controller, Get, Post, Param, Req, UseInterceptors, Render } from '@nestjs/common'
 import { FileFieldsInterceptor } from '@nestjs/platform-express'
 
 import { CloudStorage } from '@app/utils/cloudinary/cloudinary.provider'
@@ -8,7 +8,7 @@ import { BadRequestException } from '@root/app/exception/httpException'
 import { httpFlags } from '@root/constant/flags'
 import { BaseController } from '@root/controller/base.controller'
 
-import { Request, Response } from 'express'
+import { Request } from 'express'
 import mongoose from 'mongoose'
 
 @Controller('blog')
@@ -30,7 +30,7 @@ export class BlogController extends BaseController {
         cb(null, true)
       },
       limits: {
-        fileSize: 15 * 1000 * 1000
+        fileSize: 2 * 1000 * 1000
       }
     })
   )
@@ -38,9 +38,10 @@ export class BlogController extends BaseController {
   async create(@Req() req: Request) {
     await this.validateRequest(req, BaseController.schemas.blogSchema.createBlog)
     const userId = req.header('x-user-id')
+    const lang = req.header('Accept-Language')
     try {
-      if (!req.files['blogThumbnail']) throw new Error('Blog validation failed: blogThumbnail required')
-      return this.blogService.createBlog(req.body, userId)
+      if (!(req.files as any)?.blogThumbnail) throw new Error('Blog validation failed: blog thumbnail required')
+      return this.blogService.createBlog(req.body, userId, lang)
     } catch (err) {
       throw new BadRequestException(httpFlags.INVALID_BODY, { plainMessage: err.message })
     }
@@ -55,7 +56,7 @@ export class BlogController extends BaseController {
 
   @Get('/:id')
   @Render('web/content')
-  async getOne(@Res() res: Response, @Param('id') id: string) {
+  async getOne(@Param('id') id: string) {
     const isValidID = mongoose.Types.ObjectId.isValid(id)
     if (isValidID) {
       return this.blogService.findOneBlog(id)

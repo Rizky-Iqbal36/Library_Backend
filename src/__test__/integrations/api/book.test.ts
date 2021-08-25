@@ -11,6 +11,7 @@ import { SeedUserData } from '@database/seeds/user.seed'
 import { SeedCategoryData } from '@database/seeds/category.seed'
 
 import { CategoryRepository } from '@root/repositories/category.repository'
+import { UserRepository } from '@root/repositories/user.repository'
 
 const url = '/book'
 const header: any = validHeaders
@@ -25,6 +26,7 @@ describe(`Book API`, () => {
   let seedCategoryData: SeedCategoryData
 
   let categoryRepository: CategoryRepository
+  let userRepository: UserRepository
 
   beforeAll(async () => {
     app = await initServerApp()
@@ -35,6 +37,7 @@ describe(`Book API`, () => {
     seedCategoryData = await app.get(SeedCategoryData)
 
     categoryRepository = await app.get(CategoryRepository)
+    userRepository = await app.get(UserRepository)
 
     await app.init()
   })
@@ -78,9 +81,8 @@ describe(`Book API`, () => {
         'aboutBook',
         "Harry Potter and the Goblet of Fire is the fourth book in J. K. Rowling's Harry Potter novel series"
       )
-
-    const categoryAfterUpload = await categoryRepository.getCategoryById(category._id)
     expect(res.status).toBe(200)
+    expect(res.body.result).toHaveProperty('_id')
     expect(res.body.result).toMatchObject({
       uploadBy: user.userId.toString(),
       status: BookStatusEnum.WAIT,
@@ -90,8 +92,14 @@ describe(`Book API`, () => {
       }-0.pdf`,
       thumbnail: `${config.cloudinary.assets}/thumbnails/${user.userId}/thumbnail-${user.userId}-0.jpg`
     })
+
+    const categoryAfterUpload = await categoryRepository.getCategoryById(category._id)
     expect(categoryAfterUpload.books.length).toBe(0)
     expect(categoryAfterUpload.numberOfBook).toBe(0)
+
+    const userAfterUpload = await userRepository.getOneUser(user.userId.toString())
+    expect(userAfterUpload.uploadedBook.length).toBe(1)
+    expect(userAfterUpload.uploadedBook[0].toString()).toBe(res.body.result._id.toString())
   })
 
   it(`Success => User should get a book`, async () => {
@@ -407,7 +415,7 @@ describe(`Book API`, () => {
     expect(res.body.errors.message).toBe('INVALID_PARAM')
   })
 
-  it(`Error => Get Book Should got error: No such a book`, async () => {
+  it(`Error => Get book Should got error: No such a book`, async () => {
     const user = await seedUserData.createOne({ admin: false })
     header['x-user-id'] = user.userId
     header['Authorization'] = `Bearer ${user.token}`

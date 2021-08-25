@@ -18,16 +18,15 @@ export class BlogRepository {
     return this.blogModel.countDocuments()
   }
 
-  public async getOneBlog(id: string, populate?: boolean) {
-    if (populate) return this.blogModel.findById(id).populate('author')
-    else return this.blogModel.findById(id)
+  public async getOneBlog(id: string) {
+    return this.blogModel.findById(id)
   }
 
   public async createBlog(data: IBlog) {
     return this.blogModel.create(data)
   }
 
-  public async deleteOneBlog(id: string) {
-    return this.blogModel.findByIdAndRemove(id)
-  }
+  // public async deleteOneBlog(id: string) {
+  //   return this.blogModel.findByIdAndRemove(id)
+  // }
 }

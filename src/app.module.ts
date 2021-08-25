@@ -19,6 +19,7 @@ import { UserAuthMiddleware } from '@root/authentication/middleware/auth.middlew
 import { BookController } from '@root/controller/api/book.controller'
 import { UserController } from '@root/controller/api/user.controller'
 import { CategoryController } from '@root/controller/api/category.controller'
+import { BlogController } from '@root/controller/api/blog.controller'
 @Module({
   imports: [
     ThrottlerModule.forRoot({
@@ -39,7 +40,9 @@ import { CategoryController } from '@root/controller/api/category.controller'
 })
 export class AppModule {
   async configure(consumer: MiddlewareConsumer) {
-    consumer.apply(UserAuthMiddleware, UserMiddleware).forRoutes(CategoryController, BookController, UserController)
+    consumer
+      .apply(UserAuthMiddleware, UserMiddleware)
+      .forRoutes(CategoryController, BookController, UserController, BlogController)
     consumer
       .apply(HeaderMiddleware)
       .exclude({ path: '/api/v2/health', method: RequestMethod.ALL }, { path: 'health', method: RequestMethod.ALL })

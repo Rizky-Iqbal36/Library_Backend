@@ -1,13 +1,18 @@
 import { Injectable } from '@nestjs/common'
-import { BlogRepository } from '@root/repositories/blog.respository'
-import { IBlog } from '@root/database/models/blog.model'
-import { NotFoundException } from '@root/app/exception/httpException'
+
+import { NotFoundException } from '@app/exception/httpException'
+import { getLocalizedMsg } from '@app/i18n/translation'
+
+import { IBlog } from '@database/models/blog.model'
+
 import { httpFlags } from '@root/constant/flags'
-import { v4 as uuidv4 } from 'uuid'
+import { BlogRepository } from '@root/repositories/blog.respository'
+
+import { UserService } from '@root/services/user.service'
 
 @Injectable()
 export class BlogService {
-  constructor(private readonly blogRepository: BlogRepository) {}
+  constructor(private readonly blogRepository: BlogRepository, private readonly userService: UserService) {}
 
   public async findAllBlogs(page: number) {
     const take = 10
@@ -30,17 +35,25 @@ export class BlogService {
         localeMessage: { key: 'BLOG_NOT_FOUND', vars: { blogId: id } }
       })
 
-    return { id, content: blog.content }
+    return { id, title: blog.title, content: blog.content }
   }
 
-  public async createBlog(data: IBlog, userId: string) {
+  public async createBlog(data: IBlog, userId: string, lang?: string) {
+    const user = await this.userService.findOneUser(userId)
+
     data.author = userId
     data.publication = new Date()
-    data.blogThumbnail = 'blogThumbnail-' + userId + `-${uuidv4()}.jpg`
+
+    const count = user.postedBlogs.length
+
+    data.blogThumbnail = 'blogThumbnail-' + userId + `-${count}.jpg`
     const blog = await this.blogRepository.createBlog(data)
+    user.postedBlogs.push(blog._id)
+    await user.save()
+
     return {
       id: blog._id,
-      message: 'New blog succesfully created'
+      message: getLocalizedMsg({ key: 'BLOG_CREATED' }, lang || 'en')
     }
   }
 }
