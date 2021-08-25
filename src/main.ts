@@ -10,6 +10,6 @@ async function bootstrap() {
   app.enableCors()
   app.setGlobalPrefix('api/v2')
   app.useGlobalInterceptors(new ResponseInterceptor())
-  await app.listen(port, () => Logger.debug(`App is running 🚀  on port ${port}`))
+  await app.listen(port, () => Logger.debug(`Server is running 🚀  on port ${port}`))
 }
 bootstrap()

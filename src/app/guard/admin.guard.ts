@@ -16,6 +16,6 @@ export class AdminGuard implements CanActivate {
 
     if (user.isAdmin && user.isActive) return true
 
-    throw new UnauthorizedException(httpFlags.USER_UNAUTHORIZED)
+    throw new UnauthorizedException(httpFlags.USER_UNAUTHORIZED, { localeMessage: { key: 'USER_UNAUTHORIZED' } })
   }
 }

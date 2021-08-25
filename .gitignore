@@ -4,6 +4,7 @@
 .scannerwork
 junit.xml
 /builds
+/client
 
 # Logs
 logs

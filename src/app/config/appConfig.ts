@@ -6,7 +6,8 @@ const appConfig = {
   app: {
     name: pjson.name,
     version: pjson.version,
-    port: parseInt(process.env.PORT) || 3001
+    port: parseInt(process.env.PORT) || 3001,
+    websocketPort: parseInt(process.env.WEBSOCKET_PORT) || 8080
   },
   mongodb: {
     host: process.env.MONGO_DB_HOST,
@@ -30,6 +31,11 @@ const appConfig = {
     jwtSecret: process.env.JWT_SECRET,
     jwtExpiration: process.env.JWT_EXPIRATION,
     ecryptJwtSecret: process.env.ENCRYPT_JWT_SECRET
+  },
+  redis: {
+    host: process.env.REDIS_HOST,
+    port: parseInt(process.env.REDIS_PORT) || 6379,
+    auth_pass: process.env.REDIS_PASS
   }
 }
 

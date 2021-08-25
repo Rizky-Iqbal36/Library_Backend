@@ -1,12 +1,18 @@
-import { Module, MiddlewareConsumer } from '@nestjs/common'
+import { Module, MiddlewareConsumer, RequestMethod } from '@nestjs/common'
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core'
+import { ThrottlerModule } from '@nestjs/throttler'
+
 import { controllers } from '@root/controller'
 import { databaseProviders } from '@database/index'
 import { repositories } from '@root/repositories'
 import { services } from '@root/services/index'
-import { HttpExceptionFilter } from '@root/app/exception/http-exception.filter'
-import ResponseInterceptor from '@root/app/utils/interceptor/response.interceptor'
+import { ChattingGateway } from '@root/events/chatting.event'
 
+import { ClientConnections } from '@app/providers/clientConnection'
+import { HttpExceptionFilter } from '@app/exception/http-exception.filter'
+import ResponseInterceptor from '@app/utils/interceptor/response.interceptor'
+
+import { HeaderMiddleware } from '@app/middlewares/header.middleware'
 import { UserMiddleware } from '@app/middlewares/user.middleware'
 import { UserAuthMiddleware } from '@root/authentication/middleware/auth.middleware'
 
@@ -14,8 +20,16 @@ import { BookController } from '@root/controller/api/book.controller'
 import { UserController } from '@root/controller/api/user.controller'
 import { CategoryController } from '@root/controller/api/category.controller'
 @Module({
+  imports: [
+    ThrottlerModule.forRoot({
+      ttl: 60,
+      limit: 30
+    })
+  ],
   controllers,
   providers: [
+    ClientConnections,
+    ChattingGateway,
     ...databaseProviders,
     ...repositories,
     ...services,
@@ -26,5 +40,9 @@ import { CategoryController } from '@root/controller/api/category.controller'
 export class AppModule {
   async configure(consumer: MiddlewareConsumer) {
     consumer.apply(UserAuthMiddleware, UserMiddleware).forRoutes(CategoryController, BookController, UserController)
+    consumer
+      .apply(HeaderMiddleware)
+      .exclude({ path: '/api/v2/health', method: RequestMethod.ALL }, { path: 'health', method: RequestMethod.ALL })
+      .forRoutes({ path: '*', method: RequestMethod.ALL })
   }
 }

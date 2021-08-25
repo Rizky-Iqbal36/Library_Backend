@@ -1,5 +1,6 @@
 import { INestApplication } from '@nestjs/common'
 import { initServerApp, stopServerApp } from '@root/__test__/util/createApp'
+import appConfig from '@root/app/config/appConfig'
 import request from 'supertest'
 
 describe('Health check API', () => {
@@ -16,6 +17,13 @@ describe('Health check API', () => {
 
   it('Success => Should hit health check endpoint', async () => {
     const res = await request(server).get('/health')
+
     expect(res.status).toBe(200)
+    expect(res.body.result).toMatchObject({
+      name: appConfig.app.name,
+      version: appConfig.app.version,
+      websokcetPort: appConfig.app.websocketPort,
+      redis: 'UP'
+    })
   })
 })

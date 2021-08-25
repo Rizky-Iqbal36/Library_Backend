@@ -22,6 +22,8 @@ export interface IUser {
   uploadedBook?: string[]
   totalBookmarked?: number
   avatar?: string
+  connections?: string[]
+  verified?: boolean
 }
 
 export type IUserDoc = IUser & Document
@@ -42,7 +44,9 @@ const UserSchema = new Schema(
     uploadedBook: [{ type: Schema.Types.ObjectId, ref: 'Book', default: null }],
     bookmarkedBook: [{ type: Schema.Types.ObjectId, ref: 'Book', default: null }],
     totalBookmarked: { type: Number, default: 0 },
-    avatar: { type: String, default: null }
+    avatar: { type: String, default: null },
+    connections: [{ type: Schema.Types.ObjectId, default: null }],
+    verified: { type: Boolean, default: false }
   },
   { timestamps: true }
 )
